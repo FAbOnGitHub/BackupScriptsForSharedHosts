@@ -156,7 +156,14 @@ function _notify_email()
     else
         SUBJECT="[$PRJ]$1 (by $ME)"
     fi
-     mail -s "$SUBJECT" $NOTIFY_TO
+
+    if [ $(which mail 2>/dev/null) -eq 0]; then
+        mail -s "$SUBJECT" $NOTIFY_TO
+    else
+        echo "$KO *** mail not found : $NOTIFY_TO" >> $LOG_FILE
+        cat - >> $LOG_FILE
+    fi
+
 }
 ##
 # Envoi un message mais en laissant la lecture de stdin à faire.
