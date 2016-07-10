@@ -1,0 +1,544 @@
+2015-04-14 19:30  fab
+
+	* ., backup_mysql_full.sh, general.sh: Amélioration calcul total DB
+
+2015-04-14 19:29  fab
+
+	* import_backup2.sh: Améliorations rapport + correction bug calcul
+	  total
+
+2015-03-24 09:16  fab
+
+	* backup_mysql_full.sh, backup_svn_full.sh, general.sh,
+	  import_backup2.sh: Mineur: autour du rapport par mail
+
+2015-03-24 09:06  fab
+
+	* import_backup2.sh: Mineur : identation, libellés erreur
+
+2015-03-17 19:01  fab
+
+	* backup_mysql_full.sh, backup_sql.sh, import_backup2.sh:
+	  Manipulation des mail report
+
+2014-11-21 01:23  fab
+
+	* CHANGE_LOG, VERSION: minrut
+
+2014-11-03 19:54  fab
+
+	* backup_sql.sh, import_backup2.sh: Amélioration des logs
+
+2014-10-27 20:23  fab
+
+	* exec2.php: Mineur
+
+2014-04-14 21:18  fab
+
+	* CHANGE_LOG, VERSION: Commentaire CHANGE_LOG
+
+2014-04-13 20:19  fab
+
+	* backup_mysql_full.sh, config_ovh.sh, general.sh: Ajout de
+	  l'option d'exclusion des BDD par backup_mysql_full.sh
+
+2014-03-29 10:10  fab
+
+	* VERSION: Après correctoin doc et 1 bug
+
+2014-03-29 10:08  fab
+
+	* boot.sh: Mineur: correction du bug sur calcul du chemin pour
+	  config_priv.sh
+
+2014-03-29 10:07  fab
+
+	* CHANGE_LOG: Mineur: mise à jour de la doc
+
+2014-03-29 10:07  fab
+
+	* backup_wiki.sh, config_ovh.sh: Mineur: mise à jour de la doc, de
+	  quelques commentaires et variables.
+
+2013-06-04 21:10  fab
+
+	* boot.sh, import_backup2.sh: dbg mesg
+
+2013-05-27 10:21  fab
+
+	* VERSION, backup_sql.sh, config_ovh.sh, general.sh,
+	  import_backup2.sh, makeRelease: Ajout variable TASK_NAME et
+	  améliorations (à reprendre) pour récupérer les fichiers de logs
+	  distants
+
+2013-05-26 21:36  fab
+
+	* import_backup2.sh: Mineur : meilleurs messages d'erreurs,
+	  raw_file bug--
+
+2013-05-14 18:08  fab
+
+	* import_backup2.sh: Commentaire
+
+2013-05-08 07:30  fab
+
+	* import_backup2.sh: Mineur: supression affichage file=
+
+2013-05-08 06:22  fab
+
+	* boot.sh, import_backup2.sh: Mineur: bug-- sur VERBOSE
+
+2013-05-07 16:12  fab
+
+	* backup_sql.sh, general.sh, import_backup2.sh: Ajout de la
+	  fonctionnalité qui permet d'ajout des fichiers à télécharger
+
+2013-05-07 14:48  fab
+
+	* boot.sh, general.sh, import_backup2.sh: Ajout de la possibilité
+	  d'envoi d'email+log
+
+2012-09-05 14:06  fab
+
+	* backup_mysql_full.sh: Mineur: -verbose
+
+2012-09-05 14:03  fab
+
+	* backup_mysql_full.sh: Mineur: - performance_schema
+
+2012-09-05 13:53  fab
+
+	* backup_mysql_full.sh: Mineur: bug-- sur options
+
+2012-09-05 13:50  fab
+
+	* backup_mysql_full.sh: Mineur: +commentaires et charset. Attention
+	  il faut aussi le privilège PROCESS
+
+2012-09-05 13:27  fab
+
+	* backup_mysql_full.sh: Mineur: sauvegardes triggers +
+	  information_schema et performance_schema
+
+2012-06-12 08:24  fab
+
+	* boot.sh: Commentaires sur variables
+
+2012-04-18 21:04  fab
+
+	* backup_crontab.sh, import_backup2.sh: Petit ménage + ajout de
+	  l'ébauche de crontab
+
+2012-04-15 21:40  fab
+
+	* boot.sh, fix_fs.sh: Modif fix_fs.sh pour intégrer que ks36211 a
+	  plusieurs rôles MAIS c'est à reprendre
+
+2012-04-15 13:04  fab
+
+	* CHANGE_LOG: Description CHANGE_LOG
+
+2012-04-15 12:57  fab
+
+	* import_backup2.sh: Ajout de --auth-no-challenge qui évite la
+	  connexion de rejeu en réponse au challenge basic-auth... évite
+	  une ligne de log dans le serveur apache avec le code 401 et dans
+	  logwatch :-)
+
+2012-03-26 20:51  fab
+
+	* fix_fs.sh: correction exemple dans rushes
+
+2012-03-26 14:09  fab
+
+	* config_ovh.sh, general.sh, import_backup.sh, import_backup2.sh:
+	  Correcions autours des fichiers de logs, cksum et config d'import
+
+2012-03-25 22:07  fab
+
+	* general.sh: Bug-- : le zip semble agglutinant
+
+2012-03-20 17:05  fab
+
+	* CHANGE_LOG, general.sh: Documentation++
+
+2012-03-20 16:17  fab
+
+	* backup_mysql_full.sh, backup_svn_full.sh: Mineur correction
+	  XferZone pr svn
+
+2012-03-20 16:03  fab
+
+	* general.sh: Mineur gestion XferZone
+
+2012-03-20 15:57  fab
+
+	* general.sh: Mineur gestion XferZone
+
+2012-03-20 15:53  fab
+
+	* general.sh: Mineur, écrasement autorisé par gpg
+
+2012-03-20 15:48  fab
+
+	* backup_mysql_full.sh: Bug-- do compress simplifié
+
+2012-03-20 15:46  fab
+
+	* backup_mysql_full.sh, general.sh: Bug-- do compress simplifié
+
+2012-03-20 15:39  fab
+
+	* general.sh: Bug --cksum en moins sur do_compress et refonte de
+	  SVN et MySQL par grande simplification
+
+2012-03-20 15:36  fab
+
+	* backup_mysql_full.sh, backup_svn_full.sh, general.sh: cksum en
+	  moins sur do_compress
+
+2012-03-20 15:27  fab
+
+	* backup_mysql_full.sh: bug-- : tar en moins sur mysql
+
+2012-03-20 15:26  fab
+
+	* general.sh: Chiffrement amélioré + tar en moins sur mysql
+
+2012-03-20 15:20  fab
+
+	* backup_mysql_full.sh, general.sh: Chiffrement amélioré + tar en
+	  moins sur mysql
+
+2012-03-20 15:12  fab
+
+	* general.sh: Autour du chiffrement (pkoi pas passphrase ?
+
+2012-03-20 15:01  fab
+
+	* config_ovh.sh, fix_fs.sh, general.sh: Autour du chiffrement (chgt
+	  PGP-> GPG !!!)
+
+2012-03-20 14:58  fab
+
+	* fix_fs.sh: Autour du chiffrement
+
+2012-03-20 14:56  fab
+
+	* config_ovh.sh: Ajout de fonction de chiffrement
+
+2012-03-20 14:43  fab
+
+	* CHANGE_LOG, boot.sh, fix_fs.sh, general.sh: Ajour de fonction de
+	  chiffrement
+
+2012-03-20 13:30  fab
+
+	* general.sh: Mineur: do_moveXferZone silence
+
+2012-03-20 13:23  fab
+
+	* boot.sh, general.sh: Mineur: vérif ZIP_PASSWD
+
+2012-03-20 12:48  fab
+
+	* CHANGE_LOG, TODO, VERSION, boot.sh, config.txt, general.sh,
+	  makeRelease: Corrections mineures + doc, voir CHANGE_LOG
+
+2012-03-19 22:47  fab
+
+	* import_backup2.sh: Mineur: modif autours de import_backup2.sh
+	  csum et test
+
+2012-03-19 20:09  fab
+
+	* general.sh: zip dev null
+
+2012-03-19 20:04  fab
+
+	* backup_mysql_full.sh, fix_fs.sh, general.sh: ajout des checksum
+	  sinon import_backup2 rale
+
+2012-03-19 18:47  fab
+
+	* boot.sh: Mineur
+
+2012-03-19 14:21  fab
+
+	* backup_mysql_full.sh, boot.sh, config_ovh.sh, fix_fs.sh,
+	  general.sh: Ajout des contrôles de variables
+
+2012-03-19 09:39  fab
+
+	* fix_fs.sh, general.sh: Mineur
+
+2012-03-18 19:22  fab
+
+	* backup_svn_full.sh: MySQL et SVN full ont l'air Ok
+
+2012-03-18 18:14  fab
+
+	* backup_mysql_full.sh, fix_fs.sh, general.sh: Grrr pas commité de
+	  puis longtemps
+
+2012-03-18 17:14  fab
+
+	* backup_mysql_full.sh, backup_sql.sh, boot.sh, config_ovh.sh,
+	  fix_fs.sh, general.sh, import_backup2.sh: Majeur : ajout d'un
+	  script pour toutes les bases + correcions diverses
+
+2011-09-26 14:03  fab
+
+	* denied.php, exec2.php, index.php, vide.php: Mineur
+
+2011-09-07 12:14  fab
+
+	* config_ovh.sh, fix_fs.sh: misc
+
+2010-09-22 07:54  fab
+
+	* TODO, fix_fs.sh: modif mineure d'affichage surtout dans fix_fs.sh
+
+2010-09-22 07:36  fab
+
+	* TODO: Ajout TODO car je vais pas pouvoir y retoucher de 15 jours
+
+2010-09-21 07:53  fab
+
+	* config.txt: doc
+
+2010-09-20 22:23  fab
+
+	* CHANGE_LOG, backup_web.sh, config_ovh.sh, fix_fs.sh: +backup_web
+	  sans updload; +check_passfile
+
+2010-09-20 22:13  fab
+
+	* fix_fs.sh: misc
+
+2010-09-20 21:54  fab
+
+	* fix_fs.sh: Ajout couleur
+
+2010-09-17 22:25  fab
+
+	* makeRelease: CoMi makeRelease
+
+2010-09-17 22:20  fab
+
+	* makeRelease: + makeRelease
+
+2010-09-17 21:47  fab
+
+	* CHANGE_LOG, Suivi: - Suivi
+
+2010-09-17 21:37  fab
+
+	* CHANGE_LOG, backup_sql.sh, backup_web.sh, backup_wiki.sh,
+	  boot.sh, config_ovh.sh, import_backup2.sh: divers
+
+2010-05-04 22:08  fab
+
+	* backup_sql.sh, backup_web.sh, backup_wiki.sh: Exclusion et dump
+	  séparé d'une table, +modif messages d'erreur
+
+2010-01-18 20:47  fab
+
+	* CHANGE_LOG, config_ovh.sh: modif param user1
+
+2010-01-18 19:25  fab
+
+	* backup_sql.sh, backup_web.sh, backup_wiki.sh, boot.sh,
+	  config_ovh.sh, fix_fs.sh, import_backup2.sh: Modif sur ERR_FILE
+
+2010-01-15 15:39  fab
+
+	* config.txt: ajout config.txt
+
+2010-01-15 15:36  fab
+
+	* backup_sql.sh: modif backup_sql pour sauvegarde BASE2 même avec
+	  erreur sur BASE1
+
+2010-01-14 10:55  fab
+
+	* fix_fs.sh: Yeah ! fin si confirmé
+
+2010-01-14 10:37  fab
+
+	* fix_fs.sh: Je crois que là on est bon ++
+
+2010-01-14 10:35  fab
+
+	* fix_fs.sh: Je crois que là on est bon +
+
+2010-01-14 10:32  fab
+
+	* exec2.php: Je crois que là on est bon
+
+2010-01-14 10:28  fab
+
+	* config_ovh.sh, fix_fs.sh: Sans doute proche de la finale
+
+2010-01-14 10:20  fab
+
+	* CHANGE_LOG, fix_fs.sh: Sans doute proche de la finale
+
+2010-01-14 10:19  fab
+
+	* config_ovh.sh, import_backup2.sh: Sans doute proche de la finale
+
+2010-01-14 10:11  fab
+
+	* config_ovh.sh, import_backup2.sh: fab
+
+2010-01-14 00:38  fab
+
+	* backup_wiki.sh, config_ovh.sh, fix_fs.sh: fin ?
+
+2010-01-14 00:10  fab
+
+	* CHANGE_LOG, exec2.php: v0.53
+
+2010-01-13 23:47  fab
+
+	* fix_fs.sh: -web.zip +wiki.zip
+
+2010-01-13 23:43  fab
+
+	* backup_wiki.sh, exec2.php, fix_fs.sh: Correction après modif arbo
+
+2010-01-13 23:18  fab
+
+	* config_ovh.sh, fix_fs.sh: fix dir
+
+2010-01-13 15:09  fab
+
+	* CHANGE_LOG: c'est de la bonne, modif CHANGELOG
+
+2010-01-13 14:49  fab
+
+	* exec2.php: c'est de la bonne, modif exec2 affichage +court
+
+2010-01-13 14:46  fab
+
+	* CHANGE_LOG: c'est de la bonne, modif CHANGELOG
+
+2010-01-13 14:43  fab
+
+	* CHANGE_LOG, Suivi, backup_sql.sh, backup_wiki.sh: c'est de la
+	  bonne
+
+2010-01-13 14:21  fab
+
+	* backup_sql.sh, backup_web.sh, backup_wiki.sh, boot.sh,
+	  config_ovh.sh, fix_fs.sh, general.sh: YEEAH
+
+2010-01-13 12:51  fab
+
+	* config_ovh.sh, fix_fs.sh: ok
+
+2010-01-13 11:15  fab
+
+	* exec2.php: bug-- exec2 /bin/bash
+
+2010-01-13 11:12  fab
+
+	* fix_fs.sh: bug-- exec2 basename
+
+2010-01-13 11:08  fab
+
+	* exec2.php: bug-- exec2 basename
+
+2010-01-13 11:03  fab
+
+	* fix_fs.sh: bug-- check_file
+
+2010-01-13 11:00  fab
+
+	* fix_fs.sh: a l'air ok. Testé kimsufi
+
+2010-01-13 10:33  fab
+
+	* CHANGE_LOG, backup_web.sh, boot.sh, exec2.php, fix_fs.sh,
+	  import_backup2.sh: légères modif + fix_fs
+
+2010-01-12 23:11  fab
+
+	* exec2.php: v0.49 ...
+
+2010-01-12 23:07  fab
+
+	* config_ovh.sh, exec2.php: v0.48 ...
+
+2010-01-12 20:42  fab
+
+	* backup_sql.sh, config_ovh.sh, exec.php, exec2.php,
+	  import_backup2.sh, tests_vide.sh: v0.43 devrait être ok
+
+2010-01-12 20:08  fab
+
+	* exec2.php: fab
+
+2010-01-12 19:53  fab
+
+	* exec.php, exec2.php, tests_vide.sh: test
+
+2010-01-10 22:41  fab
+
+	* import_backup2.sh: fab
+
+2010-01-10 22:33  fab
+
+	* boot.sh, import_backup2.sh: Ok on doit être bon là
+
+2010-01-10 21:58  fab
+
+	* boot.sh, config_ovh.sh, import_backup2.sh: Allez, on va testé
+
+2010-01-10 19:06  fab
+
+	* import_backup2.sh: échange chmod +x par toto
+
+2010-01-10 19:04  fab
+
+	* import_backup2.sh: propset 'svn:exutable' on import_backup2.sh
+
+2010-01-10 18:59  fab
+
+	* boot.sh, config_fab.sh, config_ovh.sh, config_tannhauser.sh,
+	  import_backup2.sh: fab
+
+2010-01-10 18:41  fab
+
+	* backup_sql.sh: chmod a+x import_backup2.sh
+
+2010-01-10 18:35  fab
+
+	* backup_sql.sh: test contournement chmod +x
+
+2010-01-09 23:26  fab
+
+	* import_backup2.sh: -exit
+
+2010-01-09 23:23  fab
+
+	* backup_sql.sh, backup_web.sh, backup_wiki.sh, boot.sh,
+	  config_ovh.sh, general.sh, import_backup.sh, import_backup2.sh:
+	  UTF8
+
+2010-01-09 23:10  fab
+
+	* backup_sql.sh, backup_web.sh, backup_wiki.sh, import_backup2.sh:
+	  Ça l'air mieux, je vais au dodo.
+
+2010-01-09 22:20  fab
+
+	* backup_sql.sh, backup_web.sh, backup_wiki.sh, boot.sh,
+	  config_fab.sh, config_ovh.sh, config_tannhauser.sh, general.sh,
+	  import_backup.sh, import_backup2.sh: Premier jet avec boot.sh
+
+2010-01-09 22:09  fab
+
+	* .: Project initialisation :Here we go !
+

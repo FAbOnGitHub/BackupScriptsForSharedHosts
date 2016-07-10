@@ -1,0 +1,218 @@
+CHANGE_LOG  du répertoire  cgi-bin de  RL. Ce  fichier est  accompagné par
+	Change_log qui est généré par svn2cl
+
+
+PROJET : Ce répertoire contient essentiellement les scripts de backups.
+
+Le numéro de version sont "marketing" et correspondent aux échanges entre
+FAb et  Oli_v_ier, pas aux numéros  de version de  subversion. Ces numéros
+sont fabriqués par le script makeRelease.
+
+v0.70
+  20150430 FAb
+     * Amélioration des messages de logs et des mails. Cela tourne depuis
+       quelques temps sur mon serveur. Configuration pour activation par défaut
+
+v0.68
+  20141103 FAb
+     * Raffinage des logs d'erreurs mysqldump et wget
+
+v0.66
+  20140414 FAb
+      * general.sh, boot.sh, backup_mysql_full.sh 
+       - Ajout de l'option d'exclusion des BDD par backup_mysql_full.sh
+         MYSQL_DB_EXCLUDE_PREFIX=
+
+v0.65
+  20130327 FAb
+       * import_backup2.sh : 
+        - Nouvelle option qui permet au serveur à sauvegarder de demander 
+          d'inclure des fichiers supplémentaires.
+          Si la variable booléenne est renseignée alors la liste de fichier
+          contenue dans le fichier 'Please_backup.lst est ajoutée à BAK_FILES
+          sDistantBakFilename="Please_backup.lst"
+          Plus d'information dans general.sh
+        - Amérlioration des messages d'erreur wget (et plus simple code)
+       * general.sh, boot.sh
+        - Meilleure documentation des fonctions
+        - Envoi de mail si la variable NOTIFY_TO est renseignée        
+        - Les fichiers proposés au DL sont tous chiffrés
+        - Le chiffrement est assuré par GnuPG à la place de zip si les
+          variables sont renseignées, de préférence par clé publique, sinon par
+          mot de passe. Au pire du pire c'est encore  zip qui chiffre.
+          GPG_KEYFILE=                    # Fichier clé publique
+          GPG_PASSWD=                     # sinon un mdp pr chiffrement symétrique
+          Pour cela un répertoire temporaire est utilisé.
+
+
+v0.64
+    20120415 FAb 
+        * import_backup2.sh : modif pour éviter le code 401 dans les logs
+        d'Apache suite au challenge auth. (ENFIN !!!)
+        Pas de message d'erreur ou débug qui trainent détectés mais à relire.
+
+    20120319 FAb SpringRelease
+	* Modifications importantes peut-être majeures au sens
+	logiciel. Les programmes existants restent compatibles. 
+	Contexte : il y a longtemps  que le serveur de secours ne récupère
+	plus les archives. Problème de configuration distante sans doute.
+
+        Nouvelles notions (et rappels)
+        * BAK_DIR : espace où sont fabriquées les sauvegardes
+        * BAK_DIR_CLI : espace où les archives sont téléchargées par
+        import_backup2.sh 
+        * BAK_DIR_PUB : espace consultable à distance pour import_backup2.sh
+        (vaut BAK_DIR sinon défini)(Sans importance pour RL)
+
+        * config_ovh.sh : prises en compte des nouvelles variables
+
+	* fix_fs.sh : affiche  les variables,  messages  d'aide ont  été
+	repris. Désormais il est lui aussi lié à boot.sh et general.sh
+        Normalement il n'affiche pas d'informations trop sensibles.
+        Il y a quelques contrôles en plus et des status d'erreur :
+        - [**KO**] : il y a un problème grave, il faut *réagir*.
+        - [=WARN=] : il y a un problème léger.
+        - [ info ] : simple information
+
+         todo : ajouter option pour contrôler versions des scripts
+
+        * general.sh : toutes les fonctions communes aux scripts ont été
+        déplacées ici.
+         todo : incorporer gpg (do_moveXferZone)
+         todo : reprendre zip et mdp 
+
+        * import_backup2.sh :
+        Les contrôles de checksum ne sont plus effectués sur les fichiers dont
+        le suffixe est '.txt' (les fichiers de logs).
+         todo : lui faire utiliser do_moveXferZone
+         todo : option pour télécharger la liste des fichiers à sauvegarder
+          depuis le serveur cible ?
+         todo : récupérer le résultat distant de fix_fs.sh, contrôler l'absence
+          de [**KO**] et éventuellement afficher les différences.
+
+        * makeRelease : 
+        Ajout fichier VERSION dans SVN et ajout de la création de branche
+        release (tag svn)
+
+        * exec2.php : non modifé
+         todo : reprendre et ajouter une option pour interroger un serveur
+         distant à sauvegarder
+
+        * config.txt :
+        Mise à jour de la doc.
+
+
+        Nouveaux programmes :
+        * backup_mysql_full.sh : sauvegarde automatiquement et individuellement
+        chaque base du serveur MySQL et les aggrège dans un zip qui est placé
+        dans la zone de transfert.
+         todo : découper en un prog qui ne gère que la DB et un autre qui le
+         chapeaute à la sauce RL.
+
+        * backup_svn_full.sh : comme backup_mysql_full.sh mais pour
+        SubVersion. Ne sert pas pour RL. 
+         todo : il est fonctionnel mais il faudra reprendre les améliorations de
+         backup_mysql_full.sh  lors qu'elles auront abouti.
+
+
+v0.63 20100920 FAb
+        *  Modif dans  fix_fs.sh pour  vérifier la  présence  des fichiers
+	.htaccess dans  les différents répertoires à  protéger. Un exemple
+	de fichier .htaccess est dans à  la fin du fichier fix_fs.sh Si on
+	met  le bon  chemin  pour le  fichier  de mot  de passe  (attribue
+	AuthUserFile) il suffit de  copier le .htaccess dans le repertoire
+	à protéger. Il  faut que Apache (le service web)  puisse le lire !
+	Normalement fix_fs.sh doit l'indiquer mais je n'ai pas le temps de
+	tester ce soir.
+	*  Enlevé les droits  de lecture  sur CHANGE_LOG
+	pour Apache. À  vérifier son on perd ce  changement dans l'échange
+	d'archive Zip
+
+
+v0.62
+        20100917 FAb
+        * Ajout variable UPLOAD_DIR dans config_ovh.sh pour exclure le nouveau
+        répertoire ~www/forum/upload. Cela peut-être changé bien entendu dans ce
+        fichier ou dans le fichier "privé'.
+        Pfff si j'avais réfléchi ou dormi  avant de faire la 0.61 (modifs encore
+        présentes)
+
+v0.61
+        20100917 FAb : Mise à jour mineure :
+        * Ajout de l'exclusion du ou des dossiers upload\* dans l'espace WWW
+        * Correction de quelques oublis sur le status [_ok_] ou [*KO*] dans les
+        logs (je trouve ça plus facile à lire)
+        * Je ne me souviens pas trop ce que j'ai fichu :
+         - j'ai oublié un commit dans subversion => beurk les dernières modifs
+         - la plateforme de dev exécute aussi les backup-locaux comme le serveur
+        de RL. Du coup si on a un pb on peut le voir ici aussi.
+        * Ajout makeRelease
+
+v0.60
+        Grosse mise-à-jour
+        - Séparation des répertoires de backup, un pour le local et l'autre pour
+        le distant (nouveaux dossier et fichier de config)
+        - Exclusion d'une table SQL (paramètre) pour le backup de la base et
+        sauvegarde à part de cette table.
+        - Changement de tags plus visible dans les logs pour repérer les erreurs
+
+v0.57
+        Les messages d'erreur système vont désormais dans le fichier $ERR_FILE
+        et non plus dans LOG_FILE
+ import_backup2.sh :
+        Corrections de la liste des fichier à importer
+        Meilleurs message des erreurs + import de log.txt ovh
+v0.56
+v0.55
+v0.54
+
+v0.53
+        modif exec2.php
+        à l'air ok.
+
+v0.52
+        modif arbo + variables
+
+v0.51
+Tous les bash scripts:
+          Relecture de tous les scripts de backup et modification pour ne plus
+          jamais perdre aucun message d'erreur
+          Modification système de log/debug par la variable $DEBUG
+          Configuration d'une plateforme des tests.
+          IMPORTANT :
+          Désormais, la configuration privée du serveur est dans
+          ~/www/cgi-etc/config_priv.cfg
+          Les autres fichiers peuvent encore être utilisés.
+backup_sql :
+           Corrections pour prendre en compte les serveurs (modif $1 etc)
+           Vérification des paramètres absents
+           Test en dev ok
+backup_wiki:
+          Test en dev ok
+backup_web:
+          Test en dev ok
+boot.sh:
+          Modif pour tracer le chargement le chargement des configs (attention
+          le traitement est asynchrone)
+general.sh:
+          Modif mineures (fonction debug)
+fix_fs.sh:
+          Modifs mineures
+exec2.php:
+          Inclusion de fix_fs.sh par 'url?action=check'
+TODO:
+          Faire valider par Oli_v_ier
+          J'ai un léger doute sur l'organisation des répertoires.
+
+
+v0.50
+exec2.php:
+           Modif du exec shell pour récup aussi le retcode
+boot.sh:
+           Modif pour tenir compte du fait que le hostname varie chez OVH et
+           donc recherche d'un fichier privé de config
+
+
+
+v0.49
+        Trop de petites modifs.

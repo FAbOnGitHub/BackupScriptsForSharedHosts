@@ -1,0 +1,120 @@
+#!/bin/bash
+##############################################################################
+# $Id: makeRelease 113 2013-05-27 10:21:36Z fab $
+# makeRelease crée avec cs par fab le 'Fri Sep 17 23:48:35 CEST 2010'
+VERSION=0.0.1
+# Objectif : générer le zip qui va bien avec le numéro de version que connaît
+# Oli_v_ier.
+# Numéro de version auto-incrémenté dans le fichier VERSION en valeur entière
+# fois 100 (ex 60 pour v060 et 113 pour 1.13)
+#
+# Génère une branche SVN (entrainement)
+# Fais le ménage pour virer .svn
+#
+# Author: Fabrice Mendes
+# Last Revision :
+# - $Revision: 113 $
+# - $Author: fab $
+# - $Date: 2013-05-27 12:21:36 +0200 (Mon, 27 May 2013) $
+#
+######################################################(FAb)###################
+
+
+Self=$0
+ME=$(basename $Self)
+. functions.sh
+
+
+function help()
+{
+	echo "No help ;-)
+$ME [--help|--version]"
+}
+function print_version()
+{
+    echo "$ME $VERSION"
+    exit $EXIT_SUCCESS
+}
+
+function  parse_args() {
+	#[ "$1" = "" ] && echo "NoArg"
+	while [ "$1" ]
+	do
+	case "$1" in
+	 --help) help; exit $EXIT_SUCCESS;
+	  ;;
+	  --version) echo $VERSION; exit $EXIT_SUCCESS;
+	  ;;
+	 *) #break
+	    #shift
+	  ;;
+	 esac
+	done
+}
+
+function do_clean()
+{
+    cd $OLDPWD
+    rm -rf "$tmp"
+}
+
+### Main
+#parse_args "$@"
+
+V=VERSION
+[ ! -f $ME ] && die "Sorry, $ME must be called from his directory '.'"
+[ ! -f $V ] && die "Missing version file '$V'"
+
+v=$(cat $V)
+let v++
+let c=$v/100
+[ $c -gt 0 ] && let r=$v-$c*100 || r=$v
+#echo $c.$r
+ver=$c.$r
+
+which svn2cl 2>/dev/null 1>&2
+rc=$?
+if [ $rc -eq 0 ]; then
+    echo "Génération de ChangeLog"
+    svn2cl
+else
+    echo "Missing svn2cl : ChangeLog skipped"
+fi
+
+wd="$(pwd|sed -e "s%.*/%%")"
+OLD_PWD=$PWD
+
+tmp=$(mktemp -d /tmp/$ME.XXXXX)
+chmod 700 "$tmp"
+arch="${wd}_${ver}".zip
+
+# Récup information sur SVN pour fabriquer une branche de release
+export $(svn info . | sed -ne "s@^URL: @TRUNK_URL=@ p" \
+    -e "s@^Repository Root: @ROOT_URL=@ p")
+rc=$?
+if [ $rc -ne 0 ]; then
+    echo "Error with SVN info"
+    exit $rc
+fi
+
+svn cp "$TRUNK_URL" "$ROOT_URL/tags/$ver"
+rc=$?
+if [ $rc -ne 0 ]; then
+    echo "Error with SVN cp "
+    exit $rc
+fi
+cd ..
+cp -a "$wd" "$tmp"/
+cd "$tmp"
+find . -type d -name '.svn' -exec rm -rf -- '{}' \;  # -delete
+zip -r "$arch" ${wd}
+res=$?
+echo "res=$res v:$v"
+if [ $res -eq 0 ]; then
+    echo "$v" > $OLD_PWD/$V
+    mv $arch $OLD_PWD/..
+fi
+do_clean
+
+exit $EXIT_SUCCESS
+
