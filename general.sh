@@ -157,7 +157,7 @@ function _notify_email()
         SUBJECT="[$PRJ]$1 (by $ME)"
     fi
 
-    if [ $(which mail 2>/dev/null) -eq 0]; then
+    if [ $(which mail 2>/dev/null) -eq 0 ]; then
         mail -s "$SUBJECT" $NOTIFY_TO
     else
         echo "$KO *** mail not found : $NOTIFY_TO" >> $LOG_FILE
