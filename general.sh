@@ -40,6 +40,14 @@ NOTIFY_SUBJECT="Errors occured, please inspect log='%LOG_FILE'"
 bUseDistantBakFile=1
 sDistantBakFilename="Please_backup.lst"
 
+# Is mail command avaible ?
+bMailCommandAvaible=0
+which mail 2>/dev/null
+rc=$?
+if [ $rc -eq 0 ]; then
+    bMailCommandAvaible=1
+fi
+
 ###
 # Functions
 
@@ -82,7 +90,7 @@ checkSumFile()
 # log $file $msg
 #
 # Ecrit un message dans un journal FIFO d'au plus LOG_MAX_SIZE entrées.
-function log ()
+function log()
 {
   echo `date +%a\ %d/%m/%g\ %X` `basename $0` ":" $2 > $TMP_FILE
   head -n $[$LOG_MAX_SIZE - 1] $1 >> $TMP_FILE 2> /dev/null
@@ -157,7 +165,8 @@ function _notify_email()
         SUBJECT="[$PRJ]$1 (by $ME)"
     fi
 
-    if [ $(which mail 2>/dev/null) -eq 0 ]; then
+
+    if [ $bMailCommandAvaible -eq 1 ]; then
         mail -s "$SUBJECT" $NOTIFY_TO
     else
         echo "$KO *** mail not found : $NOTIFY_TO" >> $LOG_FILE
