@@ -27,6 +27,7 @@ sCypherArgs=
 ##
 # Mail variables
 bUseMailWarning=1
+bMailCommandAvaible=1
 NOTIFY_SUBJECT="Errors occured, please inspect log='%LOG_FILE'"
 # $LOG_FILE n'est pas encore définie
 ##
@@ -40,13 +41,6 @@ NOTIFY_SUBJECT="Errors occured, please inspect log='%LOG_FILE'"
 bUseDistantBakFile=1
 sDistantBakFilename="Please_backup.lst"
 
-# Is mail command avaible ?
-bMailCommandAvaible=0
-which mail 2>/dev/null
-rc=$?
-if [ $rc -eq 0 ]; then
-    bMailCommandAvaible=1
-fi
 
 ###
 # Functions
@@ -145,6 +139,21 @@ function view_today_logs()
     grep "$(date +"%F")" $LOG_FILE
 }
 
+bMailInit=0
+function init_mail()
+{
+    [ $bMailInit -eq 1 ] && return $EXIT_SUCCESS
+
+    # Is mail command avaible ?
+    bMailCommandAvaible=0
+    which mail >/dev/null 2>&1
+    rc=$?
+    if [ $rc -eq 0 ]; then
+        bMailCommandAvaible=1
+    fi
+    bMailInit=1
+}
+
 ###
 # Envoi de messages par email
 # $1 : sujet optionnel
@@ -154,6 +163,9 @@ function _notify_email()
         fileLogger "notify_email() called but \$bUseMailWarning  is not set."
         return $EXIT_FAILURE
     fi
+    
+    init_mail
+    
     if [ "x$NOTIFY_TO" = "x" ]; then
         error " NOTIFY_TO is not set"
         fileLogger "notify_email() NOTIFY_TO is empty."
