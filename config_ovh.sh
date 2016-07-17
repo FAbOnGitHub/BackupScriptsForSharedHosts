@@ -68,10 +68,14 @@ MYSQL_DB_EXCLUDE_PREFIX=	# reset
 
 
 
+##
+## Mail settings
+## 
 bUseMailWarning=0		# Désactive la notificatin par email
 bUseMailWarning=1		# Active la notificatin par email
 NOTIFY_SUBJECT="Errors occured, please inspect log='%LOG_FILE'"
-NOTIFY_TO="admin1@you_domain.tld admin2@you_domain.tld"
+NOTIFY_TO="admin1@your_domain.tld admin2@your_domain.tld"
+NOTIFY_FROM='you@your_domain.tld'
 
 ##
 ## Partie sur un client distant, permet de fonctionner même
