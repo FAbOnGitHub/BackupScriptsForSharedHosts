@@ -318,7 +318,7 @@ function init_cypher()
     # Zip in default. ZIP_PASSWD always set.
     sCypherFct="do_cypher_zip"
 
-    which gpg >/dev/null
+    which gpg  >/dev/null 2>&1
     rc=$?
     if [ $rc -eq 0 ]; then
         if [ "x$GPG_KEYFILE" != "x" ]; then
@@ -341,7 +341,7 @@ function init_cypher()
         fi
     fi
 
-    which zip >/dev/null
+    which zip  >/dev/null 2>&1
     rc=$?
     if [ $rc -ne 0 ]; then
         error "CYPHER PANIC !! CYPHER PANIC !! (no zip program)"
