@@ -88,12 +88,16 @@
 
     - Every step is logged into a log file.
 
-    - Archives  are accessible  via an  unknown  URL (pseudo  public) and  realm
-      password. But you should use SSL too if you can.
+    - Archives  are accessible  
+      - via an  hidden  URL (pseudo  public) 
+      - and  realm password
+      - with a filter on the user-agent
+
+    But you should use SSL too if you can.
 
     - All archives are cyphered but default : All dumps are written to a private
       directory. Then  there are compressed  with zip  and a password  (which is
-      weack) or if it's possible via gnupg (much stronger)
+      weak) or if it's possible via gnupg (much stronger)
 
 
     Indeed, it comes with no garanties :-)
