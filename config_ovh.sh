@@ -35,10 +35,10 @@
 # variable ci-dessous.
 #
 
-
-####################
+###############################################
 ## General options
-####################
+###############################################
+
 #
 # DEBUG:  0=nothing, 1=log file, 2=log file and stdout
 DEBUG=${DEBUG:-0}
@@ -78,9 +78,15 @@ LOG_FILE=$BAK_DIR/log.txt       # Journal
 ERR_FILE=$BAK_DIR/err.txt       # Journal des erreurs système
 #FR: Les logs devraient être de la forme $BAK_DIR/$(hostname -s).log.txt
 
-###
-# Archives
-#
+
+###############################################
+## Server option
+###############################################
+
+## #######################################
+##  Archives  (compression and cypher)
+## #######################################
+
 # Use compression
 bDoCompress=${bDoCompress:-1}
 bDoCompressAll=${bDoCompressAll:-1}
@@ -93,12 +99,14 @@ ZIP_PASSWD=
 # Utilise le chiffrement
 bDoCypher=${bDoCypher:-0}
 bDoXfer=${bDoXfer:-0}
-
+# Compression program
 sCompressProg=gzip
+# Arguments for compression program
 sCompressArgs='-9'
+# Program used to cypher data
 sCypherProg=gpg
+# arguments
 sCypherArgs=
-
 
 ##
 # GnuPG credentials
@@ -171,9 +179,9 @@ MYSQL_DB_EXCLUDE_PREFIX=	# reset
 
 
 
-#########################
-## import_backup2.sh
-#########################
+###############################################
+## import_backup2.sh              (aka client)
+###############################################
 
 ## EN:
 ## On a second host, this program is called to fetch the archives and store
