@@ -4,7 +4,23 @@
 #
 #  Licence  GPL v3
 #
-# Configuration serveur OVH
+
+
+# EN:
+#
+# Configuration server
+#
+# - config_ovh.sh :
+#         all configuration variables
+# - ../cgi-etc/config_priv.sh :
+#         specific to an host
+# - ../cgi-etc/config_<hostname>.sh
+#         Idem
+#         hostname = $(hostname -s)
+#      
+
+
+# FR:
 #
 # Ce fichier constitue la configuration général des scripts de backup de RL. Ce
 # fichier doit leur permettre de fonctionner à l'exception des informations
@@ -19,65 +35,151 @@
 # variable ci-dessous.
 #
 
-#
-# DEBUG:  0=rien, 1=log fichier, 2=log fichier + écran
-# Penser à le redéfinir dans le fichier privé
-DEBUG=${DEBUG:-0} # 0 par défaut mais peut être changé dans la ligne de commande
-                  # pour tester
 
+####################
+## General options
+####################
 #
+# DEBUG:  0=nothing, 1=log file, 2=log file and stdout
+DEBUG=${DEBUG:-0}
+#FR:  Penser à le redéfinir dans le fichier privé
+#FR:  0 par défaut mais peut être changé dans la ligne de commande pour tester
+#FR:  0=rien, 1=log fichier, 2=log fichier + écran
+
+# EN : Task Id
+# FR:
 # TASK_NAME : identifiant d'une opération, par exemple le nom du serveur qui est
 # 	en cours de copie. Utilisé pour calculé le nom des logs du serveur vers
 #	le local. À écraser dans config_xxxx_dist.sh
 TASK_NAME="serveur"
+PRJ="B4SH"
 
 ##
-## Partie serveur, pour les scripts de sauvegarde locale
+# root of the web server
+WWW_DIR=~/www
+#FR: Racine web
+
 ##
-SQL_SERVER1=mysql5-2.bdb	# Serveur SQL
-SQL_BASE1=randonnerforum1	# Base SQL 1
-SQL_USER1=randonnerforum1	# Login SQL 1
-SQL_TABLES1=pun_search_matches	# ou des tables à traiter à part
-SQL_SERVER2=mysql5-5          	# Serveur SQL
-SQL_BASE2=randonner_poids     	# Base SQL 2
-SQL_USER2=randonner_poids     	# Login SQL 2
-WWW_DIR=~/www                 	# Racine web
-BAK_DIR=$WWW_DIR/backup_LH5Y59v	# Dossier de backup
-WIKI_DIR=$WWW_DIR/wiki/data/	# Racine wiki
-UPLOAD_DIR=$WWW_DIR/forum/uploads # les uploads bannis
-LOCK_FILE=$BAK_DIR/rl.lock	# Lock, ne pas déclarer cette variable est dangereux.
+# Where archives are store on the server
+# See BAK_DIR_CLI 
+BAK_DIR=$WWW_DIR/backup_LH5Y59v
+#FR: Dossier de backup
+
+
+##
+#  Lock file to prevent multi-backup
+LOCK_FILE=$BAK_DIR/rl.lock
+#FR : fichier verrour pour éviter les sauvegardes concurrentielles
+# Lock, ne pas déclarer cette variable est dangereux.
+
+##
+# Differents logs file
 LOG_FILE=$BAK_DIR/log.txt       # Journal
 ERR_FILE=$BAK_DIR/err.txt       # Journal des erreurs système
-# Les logs devraient être de la forme $BAK_DIR/$(hostname -s).log.txt
+#FR: Les logs devraient être de la forme $BAK_DIR/$(hostname -s).log.txt
 
-# Ces variables sont définies (écrasées) dans un fichier
-# dont le nom dépend de l'hôte dans le répertoire ../cgi-etc/
-SQL_PASSWD1=			# Mot de passe SQL 1
-SQL_PASSWD2=                  	# Mot de passe SQL 2
-ZIP_PASSWD=                   	# Mot de passe zip
+###
+# Archives
+#
+# Use compression
+bDoCompress=${bDoCompress:-1}
+bDoCompressAll=${bDoCompressAll:-1}
+#FR: utilise la compression de fichier
 
-MYSQL_USER=		      	# Utilisateur pour le dump complet
-MYSQL_PASS=
+# Zip Archives password
+ZIP_PASSWD=
+#FR: Mot de passe zip
 
+# Utilise le chiffrement
+bDoCypher=${bDoCypher:-0}
+bDoXfer=${bDoXfer:-0}
+
+sCompressProg=gzip
+sCompressArgs='-9'
+sCypherProg=gpg
+sCypherArgs=
+
+
+##
+# GnuPG credentials
 GPG_KEYFILE=			# Fichier clé publique
 GPG_PASSWD=			# sinon un mdp pr chiffrement symétrique
 
-# Exclure les tables commençant par ce préfixe dans backup_mysql_full.sh
+
+
+## #######################################
+## Mail settings
+## #######################################
+
+# 1: use mail notification, 0 else
+bUseMailWarning=0
+#FR:  Désactive la notificatin par email
+bUseMailWarning=1
+#FR:  Active la notificatin par email
+
+# 'mail' command is avaible (else the program must handle it)
+bMailCommandAvaible=1
+#FR: Peut indiquer que la commande mail n'est pas disponible
+
+# Subject field in mails
+NOTIFY_SUBJECT="Errors occured, please inspect log='%LOG_FILE'"
+#FR: le sujet des messages
+
+# Who will be notified by mail 
+NOTIFY_TO="admin1@your_domain.tld admin2@your_domain.tld"
+#FR:  Destinataires des messages
+
+# From field
+NOTIFY_FROM='you@your_domain.tld'
+#FR: expéditeur des messages
+
+
+
+####################
+## backup_wiki.sh
+####################
+
+##
+# Data of the dokuwiki : 
+WIKI_DIR=$WWW_DIR/wiki/data/
+#FR: Racine wiki
+
+####################
+## backup_web.sh
+####################
+
+##
+# Excluded part of the forum
+UPLOAD_DIR=$WWW_DIR/forum/uploads
+#FR: sous dossier uploads banni
+
+
+
+#######################
+## backup_mysql_full.sh
+#######################
+
+##
+#  Global MySQL credentials
+MYSQL_USER=		      	# Utilisateur pour le dump complet
+MYSQL_PASS=
+## 
+# Prefix to exclude some table in a sql dump
+#FR: Exclure les tables commençant par ce préfixe dans backup_mysql_full.sh
 MYSQL_DB_EXCLUDE_PREFIX=test_	# Eclure les BDD de test
 MYSQL_DB_EXCLUDE_PREFIX=	# reset
 
 
 
-##
-## Mail settings
-## 
-bUseMailWarning=0		# Désactive la notificatin par email
-bUseMailWarning=1		# Active la notificatin par email
-NOTIFY_SUBJECT="Errors occured, please inspect log='%LOG_FILE'"
-NOTIFY_TO="admin1@your_domain.tld admin2@your_domain.tld"
-NOTIFY_FROM='you@your_domain.tld'
+#########################
+## import_backup2.sh
+#########################
 
-##
+## EN:
+## On a second host, this program is called to fetch the archives and store
+## them locally day by day except on LTS_PATTERN
+
+## FR:
 ## Partie sur un client distant, permet de fonctionner même
 ## si on oublie le fichier hôte
 #
@@ -108,7 +210,28 @@ BAK_LEVEL=10
 # Niveaux d'archivage
 HTTP_AGENT=nobody
 
-# Authorise le téléchargement de fichiers supplémentaires à la demande du
-# serveur. Voir fichier general.sh
+##
+# Shall we let distant server to add some files to download ?
 bUseDistantBakFile=1
+#FR: Authorise le téléchargement de fichiers supplémentaires à la demande du
+#FR:  serveur. Voir fichier general.sh
+
+# Which is the file which contains the list of the archives to retrieve ?
 sDistantBakFilename="Please_backup.lst"
+#FR: Fichier contenant la liste des archives supplémentaires à récupérer
+
+#########################
+## backup_sql.sh
+#########################
+## Really specific : backup some tables from some databases
+# FR: sauvegarde certaines tables et bases (à une époque une table trop
+#     volumineuse posait des problèmes de sauvegarde)
+SQL_SERVER1=server1f.fqdn	# Serveur SQL
+SQL_BASE1=base1			# Base SQL 1
+SQL_USER1=user1			# Login SQL 1
+SQL_TABLES1=excluded_tables	# ou des tables à traiter à part
+SQL_SERVER2=sql.server2.fqdn 	# Serveur SQL
+SQL_BASE2=base2		     	# Base SQL 2
+SQL_USER2=user2		     	# Login SQL 2
+SQL_PASSWD1=			# Mot de passe SQL 1
+SQL_PASSWD2=                  	# Mot de passe SQL 2
