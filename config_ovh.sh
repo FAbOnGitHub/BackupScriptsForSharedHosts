@@ -199,9 +199,18 @@ MYSQL_DB_EXCLUDE_PREFIX=	# reset
 
 # URL dossier backup distant
 BAK_URL=https://login:password@you_domain.tld/backup_SecretToken
+URL_USER="mylogin"
+URL_PASS="MySecretPassword"
+BAK_URL="http://${URL_USER}:${URL_PASS}@domain.tld/Token"
+# Liste archives
+TARGET_SRV=antaya
+
 #
 # Liste archives
-BAK_FILES="www.zip  wiki.zip $SQL_BASE1.sql.zip $SQL_BASE2.sql.zip"
+BAK_FILES="www.zip  wiki.zip"
+BAK_FILES="$BAK_FILES $SQL_BASE1.sql.zip"
+BAK_FILES="$BAK_FILES $SQL_BASE2.sql.zip"
+
 # BAK pour le client
 BAK_DIR_CLI=$BAK_DIR
 # LTS_DIR : Sert de répertoire de dépôt (par import_backup2.sh) de longue durée
