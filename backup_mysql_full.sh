@@ -64,6 +64,20 @@ if [ ${#aDB[*]} -eq 0 ]; then
     die " $KO no databases found."
 fi
 
+vars="$(echo "show variables;" | mysql -u $MYSQL_USER \
+                          | grep innodb_version| cut -c 16- \
+                          |sed -e "s@\([0-9]\).\([0-9]\)\(.*\)@maj=\1 min=\2@")"
+
+export "$vars"
+COMPAT56=true
+if [ $maj -eq 5 ]; then
+    if [ $min -ge 7 ]; then
+        COMPAT56=false
+    fi
+elif [ $maj -gt 5 ]; then
+    COMPAT56=false
+fi
+
 cd $BAK_DIR
 rm -rf $dir
 mkdir -m 0700 $dir
@@ -91,7 +105,14 @@ do
         debug  "$WARN performance_schema ignored"
         continue
     fi
+    if [ "$db" = "information_schema" ]; then
+        if [ $COMPAT56 = "false" ]; then
+            debug  "$WARN information_schema ignored (no compat56)"
+            continue
+        fi
+    fi
 
+    
     fileLogger "$ME '$db' found ${date} (sLock=$sLock)"
 #    dumpfile="${db}_${date}.sql"
     dumpfile="${db}.sql"
