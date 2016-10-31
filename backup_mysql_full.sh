@@ -32,6 +32,7 @@ export LIB_PATH
 
 [ "x$MYSQL_USER" = "x" ] && die "$KO \$MYSQL_USER is empty"
 [ "x$MYSQL_PASS" = "x" ] && die "$KO \$MYSQL_PASS is empty"
+export MYSQL_PWD="$MYSQL_PASS"  #instead of '-p$MYSQL_PASS'
 bDoCompress=${bDoCompress:-1}
 bDoCompressAll=${bDoCompressAll:-1}
 bDoCypher=${bDoCypher:-0}
@@ -50,10 +51,10 @@ mysql_opt="--routines --triggers --events --comments --dump-date --extended-inse
 # 2 Get name of databases
 if [ "x$MYSQL_DB_EXCLUDE_PREFIX" = "x" ]; then
     declare -a aDB=( $(echo "SHOW DATABASES; " \
-        | mysql -u $MYSQL_USER -p$MYSQL_PASS -N ) )
+        | mysql -u $MYSQL_USER -N ) )
 else
     declare -a aDB=( $(echo "SHOW DATABASES; " \
-        | mysql -u $MYSQL_USER -p$MYSQL_PASS -N \
+        | mysql -u $MYSQL_USER -N \
         | grep -v -e "^$MYSQL_DB_EXCLUDE_PREFIX" ) )
 fi
 rc=$?
@@ -94,7 +95,7 @@ do
     fileLogger "$ME '$db' found ${date} (sLock=$sLock)"
 #    dumpfile="${db}_${date}.sql"
     dumpfile="${db}.sql"
-    mysqldump -u $MYSQL_USER -p$MYSQL_PASS $sLock $mysql_opt ${db} >"$dumpfile" 2>>$ERR_FILE
+    mysqldump -u $MYSQL_USER $sLock $mysql_opt ${db} >"$dumpfile" 2>>$ERR_FILE
     rc=$?
     if [ $rc -ne $EXIT_SUCCESS ]; then
         error "$KO mysqldump '$db' failed (rc=$rc)"
