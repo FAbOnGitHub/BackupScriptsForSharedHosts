@@ -69,6 +69,7 @@ vars="$(echo "show variables;" | mysql -u $MYSQL_USER \
                           |sed -e "s@\([0-9]\).\([0-9]\)\(.*\)@maj='\1' min='\2'@")"
 
 local $vars
+echo "[maj=$maj][min=$min]"
 COMPAT56=true
 if [ $maj -eq 5 ]; then
     if [ $min -ge 7 ]; then
