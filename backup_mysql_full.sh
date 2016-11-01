@@ -66,10 +66,10 @@ fi
 
 vars="$(echo "show variables;" | mysql -u $MYSQL_USER \
                           | grep innodb_version| cut -c 16- \
-                          |sed -e "s@\([0-9]\).\([0-9]\)\(.*\)@maj='\1' min='\2'@")"
+                          |sed -e "s@\([0-9]\).\([0-9]\)\(.*\)@maj=\1 min=\2@")"
 
-local $vars
-echo "[maj=$maj][min=$min]"
+export $vars
+#echo "[maj=$maj][min=$min]"
 COMPAT56=true
 if [ $maj -eq 5 ]; then
     if [ $min -ge 7 ]; then
