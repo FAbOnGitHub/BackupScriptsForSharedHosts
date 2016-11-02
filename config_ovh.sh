@@ -168,8 +168,9 @@ UPLOAD_DIR=$WWW_DIR/forum/uploads
 #######################
 
 MYSQL_HOST=localhost #Change me
-#MYSQL_OPT="--skip-events
-MYSQL_OPT="--events"
+#MYSQL_OPT="--skip-events --skip-lock-tables"
+MYSQL_OPT="--events --routines --triggers -l"
+
 ##
 #  Global MySQL credentials
 MYSQL_USER=		      	# Utilisateur pour le dump complet
