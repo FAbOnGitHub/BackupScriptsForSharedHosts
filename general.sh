@@ -318,7 +318,7 @@ function init_cypher()
     # Zip in default. ZIP_PASSWD always set.
     sCypherFct="do_cypher_zip"
 
-    which gpg >/dev/null
+    which $sCypherProg >/dev/null
     rc=$?
     if [ $rc -eq 0 ]; then
         if [ "x$GPG_KEYFILE" != "x" ]; then
@@ -334,6 +334,11 @@ function init_cypher()
         fi
         if [ "x$GPG_PASSWD" != "x" ]; then
             sCypherFct="do_cypher_gpg_s"
+	    if [ $sCypherProg = "/bin/gpg" ]; then
+		sCypherArgs=" $sCypherArgs --no-use-agent"
+            else
+                sCypherArgs=" $sCypherArgs --batch"
+	    fi
             bCypherInit=1
             return $EXIT_SUCCESS
         else
@@ -380,7 +385,7 @@ function do_cypher_zip()
 function do_cypher_gpg_a()
 {
     f="$1"
-    gpg  $GPG_KEYFILE --yes  "$f"
+    $sCypherProg  $sCypherArgs  $GPG_KEYFILE --yes  "$f"
     rc=$?
     [ $rc -eq 0 ] && echo "$f".gpg || echo ""
     return $rc
@@ -390,9 +395,11 @@ function do_cypher_gpg_a()
 function do_cypher_gpg_s()
 {
     f="$1"
-    gpg --no-use-agent -q -c --passphrase "$GPG_PASSWD" --yes "$f"
+
+    $sCypherProg $sCypherArgs -q -c --passphrase "$GPG_PASSWD" --yes "$f"
     rc=$?
     [ $rc -eq 0 ] && echo "$f".gpg || echo ""
+
     return $rc
     #mv "$f".gpg "$f".X
 }
