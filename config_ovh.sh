@@ -169,7 +169,7 @@ UPLOAD_DIR=$WWW_DIR/forum/uploads
 
 MYSQL_HOST=localhost #Change me
 #MYSQL_OPT="--skip-events
-MYSQL_OPT=
+MYSQL_OPT="--events"
 ##
 #  Global MySQL credentials
 MYSQL_USER=		      	# Utilisateur pour le dump complet
@@ -179,6 +179,8 @@ MYSQL_PASS=
 #FR: Exclure les tables commençant par ce préfixe dans backup_mysql_full.sh
 MYSQL_DB_EXCLUDE_PREFIX=test_	# Eclure les BDD de test
 MYSQL_DB_EXCLUDE_PREFIX=	# reset
+
+
 
 
 
