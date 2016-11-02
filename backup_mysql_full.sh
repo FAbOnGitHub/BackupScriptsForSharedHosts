@@ -100,7 +100,7 @@ do
             sLock="--skip-lock-tables";;
         *)
             let iCountThisOne=1
-            sLock="-l";;
+            #sLock="-l";;
     esac
 
     if [ "$db" = "performance_schema" ]; then
