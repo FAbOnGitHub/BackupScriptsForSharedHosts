@@ -97,10 +97,13 @@ do
         "information_schema"|"performance_schema")
             let iCountThisOne=0
             let iSkipThisOne++
-            sLock="--skip-lock-tables";;
+            sLock="--skip-lock-tables"
+            continue # New ; skip virtual databases
+            ;;
         *)
             let iCountThisOne=1
             #sLock="-l";;
+            ;;        
     esac
 
     if [ "$db" = "performance_schema" ]; then
