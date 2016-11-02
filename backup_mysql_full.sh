@@ -118,7 +118,7 @@ do
     fi
 
     
-    fileLogger "$ME '$db' found ${date} (sLock=$sLock)"
+    fileLogger "$ME '$db' found ${date}"
 #    dumpfile="${db}_${date}.sql"
     dumpfile="${db}.sql"
 
