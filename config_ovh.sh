@@ -167,6 +167,7 @@ UPLOAD_DIR=$WWW_DIR/forum/uploads
 ## backup_mysql_full.sh
 #######################
 
+MYSQL_HOST=localhost #Change me
 ##
 #  Global MySQL credentials
 MYSQL_USER=		      	# Utilisateur pour le dump complet

@@ -32,6 +32,7 @@ export LIB_PATH
 
 [ "x$MYSQL_USER" = "x" ] && die "$KO \$MYSQL_USER is empty"
 [ "x$MYSQL_PASS" = "x" ] && die "$KO \$MYSQL_PASS is empty"
+[ "x$MYSQL_HOST" = "x" ] && die "$KO \$MYSQL_HOST is empty"
 export MYSQL_PWD="$MYSQL_PASS"  #instead of '-p$MYSQL_PASS'
 bDoCompress=${bDoCompress:-1}
 bDoCompressAll=${bDoCompressAll:-1}
@@ -117,7 +118,8 @@ do
     fileLogger "$ME '$db' found ${date} (sLock=$sLock)"
 #    dumpfile="${db}_${date}.sql"
     dumpfile="${db}.sql"
-    mysqldump -u $MYSQL_USER $sLock $mysql_opt ${db} >"$dumpfile" 2>>$ERR_FILE
+
+    mysqldump -h $MYSQL_HOST -u $MYSQL_USER $sLock $mysql_opt ${db} >"$dumpfile" 2>>$ERR_FILE
     rc=$?
     if [ $rc -ne $EXIT_SUCCESS ]; then
         error "$KO mysqldump '$db' failed (rc=$rc)"
