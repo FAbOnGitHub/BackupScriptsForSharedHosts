@@ -51,6 +51,9 @@ msg=$msg"\nloading $LIB_PATH/config_ovh.sh"
 #  hostname varie... Donc je fixe un nom à config_priv comme
 #  privée
 export D_ETC="$(echo $LIB_PATH | sed -e "s@\/cgi-bin\$@\/cgi-etc@" )"
+if [ ! -d "$D_ETC" ]; then
+    die "Cannot find \$D_ETC from \$LIB_PATH=$LIB_PATH"
+fi
 f=$D_ETC/config_priv.sh
 if [ -f "$f" ]; then
     msg=$msg"\nloading config_priv.sh"

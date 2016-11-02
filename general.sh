@@ -29,6 +29,8 @@ sCypherArgs=
 bUseMailWarning=1
 bMailCommandAvaible=1
 NOTIFY_SUBJECT="Errors occured, please inspect log='%LOG_FILE'"
+## Attention %LOG_FILE = template
+
 # $LOG_FILE n'est pas encore définie
 ##
 # Système qui permet au serveur source (à sauvegarder) de définir des fichiers
