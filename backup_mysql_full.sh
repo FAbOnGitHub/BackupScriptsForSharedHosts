@@ -47,7 +47,7 @@ dir="$DIR.$date"
 MYSQL_DB_EXCLUDE_PREFIX=${MYSQL_DB_EXCLUDE_PREFIX:-""}
 
 # Oups ! Désormais on sauvegarde tout, comme des pros !
-mysql_opt="--routines --triggers --events --comments --dump-date --extended-insert --set-charset"
+mysql_opt="--routines --triggers --comments --dump-date --extended-insert --set-charset"
 
 # 2 Get name of databases
 if [ "x$MYSQL_DB_EXCLUDE_PREFIX" = "x" ]; then
