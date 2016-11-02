@@ -119,7 +119,7 @@ do
 #    dumpfile="${db}_${date}.sql"
     dumpfile="${db}.sql"
 
-    mysqldump -h $MYSQL_HOST -u $MYSQL_USER $sLock $mysql_opt ${db} >"$dumpfile" 2>>$ERR_FILE
+    mysqldump -h $MYSQL_HOST -u $MYSQL_USER $MYSQL_OPT $sLock $mysql_opt ${db} >"$dumpfile" 2>>$ERR_FILE
     rc=$?
     if [ $rc -ne $EXIT_SUCCESS ]; then
         error "$KO mysqldump '$db' failed (rc=$rc)"
