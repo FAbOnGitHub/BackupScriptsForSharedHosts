@@ -13,7 +13,7 @@ VERSION=0.0.1
 ######################################################(FAb)###################
 ME=$0
 DEBUG=1
-echo "1 [DEBUG=$DEBUG]"
+#echo "1 [DEBUG=$DEBUG]"
 
 
 #  (À INCLURE) Chemin fichiers inclus, auto-ajustement
@@ -80,7 +80,7 @@ function prepareDiff()
 ### Main
 #parse_args "$@"
 
-echo "2 [DEBUG=$DEBUG]"
+#echo "2 [DEBUG=$DEBUG]"
 
 file1="$1"
 file2="$2"
