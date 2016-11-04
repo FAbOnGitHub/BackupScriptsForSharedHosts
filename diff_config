@@ -101,12 +101,13 @@ D_TMP=/tmp/$ME
 mkdir -p "$D_TMP"
 chmod 700 "$D_TMP"
 
-F1="$(basename $file1)"
-F2="$(basename $file2)"
+F1="$(basename "$file1")"
+F2="$(basename "$file2")"
+
 prepareDiff "$file1"
 prepareDiff "$file2"
 
-diff "$D_TMP/$F" "$D_TMP/$F2"
+diff "$D_TMP/$F1" "$D_TMP/$F2"
 
 echo "rm -rf $D_TMP"
 # see to use rc=$? and then exit $rc
