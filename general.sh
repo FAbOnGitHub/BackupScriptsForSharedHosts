@@ -121,12 +121,43 @@ function fileRotate ()
 # Affiche un message de débogage
 function debug()
 {
-    echo "[DEBUG=$DEBUG]"
-    if [ $DEBUG -gt 0 ]; then
-        [ $DEBUG -gt 1 ] && echo -e "DBG : $@"
-        echo -e "`date +"%F %T"` DBG : $@" >>$LOG_FILE
-    fi
+    case "x$DEBUG" in
+        "x1"|"x2")
+            if [ $DEBUG -gt 0 ]; then
+                [ $DEBUG -gt 1 ] && echo -e "DBG : $@"
+                echo -e "`date +"%F %T"` DBG : $@" >>$LOG_FILE
+            fi
+            ;;
+        *)
+            echo "[DEBUG=$DEBUG]"
+            __fm_error
+            exit 123
+            ;;
+    esac
 }
+
+function __fm_trace()
+{
+    iNbLines=$(awk 'BEGIN{ i=0}
+        { i++}
+        END{ printf("%d\n", log(i) / log(10) +1)}' "${BASH_SOURCE[0]}")
+    [ "x$1" = "x" ] && iSkip=0 || iSkip=$1
+    error "Call stack:"
+    for((i=$iSkip; i<${#BASH_LINENO[*]}; i++))
+    do
+        printf "%s: line %0"$iNbLines"d: call %s\n" "${BASH_SOURCE[$i]}" \
+            "${BASH_LINENO[$i]}"  ${FUNCNAME[$i]} 1>&2
+
+    done
+    return 0
+}
+function __fm_error()
+{
+    __fm_trace 2
+    return 1
+}
+
+
 
 # Formate le message de debut et le pousse dans le fichier
 function fileLogger()
