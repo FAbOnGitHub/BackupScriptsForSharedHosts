@@ -71,7 +71,8 @@ function  parse_args()
 function prepareDiff()
 {
     local f="$1"
-    sed -e "s@\(#.*$\)@@" -e "/^$/ d " "$1" |sort > "$D_TMP/$f"
+    F="$(basename $f1)"
+    sed -e "s@\(#.*$\)@@" -e "/^$/ d " "$1" |sort > "$D_TMP/$F"
 }
 
 ### Main
@@ -100,10 +101,12 @@ D_TMP=/tmp/$ME
 mkdir -p "$D_TMP"
 chmod 700 "$D_TMP"
 
+F1="$(basename $file1)"
+F2="$(basename $file2)"
 prepareDiff "$file1"
 prepareDiff "$file2"
 
-diff "$D_TMP/$file1" "$D_TMP/$file2"
+diff "$D_TMP/$F" "$D_TMP/$F2"
 
 echo "rm -rf $D_TMP"
 # see to use rc=$? and then exit $rc
