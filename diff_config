@@ -73,7 +73,7 @@ function  parse_args()
 function prepareDiff()
 {
     local f="$1"
-    F="$(basename $f1)"
+    F="$(basename $f)"
     sed -e "s@\(#.*$\)@@" -e "/^$/ d " "$1" |sort > "$D_TMP/$F"
 }
 
