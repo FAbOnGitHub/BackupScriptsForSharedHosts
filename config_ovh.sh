@@ -52,7 +52,9 @@ DEBUG=$DEBUG
 # 	en cours de copie. Utilisé pour calculé le nom des logs du serveur vers
 #	le local. À écraser dans config_xxxx_dist.sh
 TASK_NAME="serveur"
+# This one is used by mail notification
 PRJ="B4SH"
+
 
 ##
 # root of the web server
