@@ -12,12 +12,14 @@ VERSION=0.0.1
 #
 ######################################################(FAb)###################
 ME=$0
+DEBUG=1
+echo "1 [DEBUG=$DEBUG]"
+
+
 #  (À INCLURE) Chemin fichiers inclus, auto-ajustement
 LIB_PATH=$(dirname $0)
 export LIB_PATH
 . $LIB_PATH/boot.sh
-
-DEBUG=1
 
 function help()
 {
@@ -77,6 +79,8 @@ function prepareDiff()
 
 ### Main
 #parse_args "$@"
+
+echo "2 [DEBUG=$DEBUG]"
 
 file1="$1"
 file2="$2"
