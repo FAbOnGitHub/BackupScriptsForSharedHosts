@@ -17,7 +17,7 @@ LIB_PATH=$(dirname $0)
 export LIB_PATH
 . $LIB_PATH/boot.sh
 
-
+DEBUG=1
 
 function help()
 {
