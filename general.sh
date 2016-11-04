@@ -43,6 +43,7 @@ NOTIFY_SUBJECT="Errors occured, please inspect log='%LOG_FILE'"
 bUseDistantBakFile=1
 sDistantBakFilename="Please_backup.lst"
 
+DEBUG=${DEBUG:-0}
 
 ###
 # Functions
