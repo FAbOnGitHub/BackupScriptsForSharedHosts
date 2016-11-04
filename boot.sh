@@ -96,6 +96,7 @@ case $ME in
         ;;
 esac
 debug "$msg"
+export DEBUG
 
 if [ "x$BAK_DIR_PUB" = "x" ]; then
     fileLogger "BAK_DIR_PUB not defined: set to BAK_DIR=$BAK_DIR"
