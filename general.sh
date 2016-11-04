@@ -122,14 +122,14 @@ function fileRotate ()
 function debug()
 {
     case "x$DEBUG" in
-        "x1"|"x2")
+        "x1"|"x0")
             if [ $DEBUG -gt 0 ]; then
                 [ $DEBUG -gt 1 ] && echo -e "DBG : $@"
                 echo -e "`date +"%F %T"` DBG : $@" >>$LOG_FILE
             fi
             ;;
         *)
-            echo "[DEBUG=$DEBUG]"
+            echo "debug() error : [DEBUG=$DEBUG]"
             __fm_error
             exit 123
             ;;
