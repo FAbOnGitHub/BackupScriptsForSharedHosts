@@ -121,7 +121,7 @@ function fileRotate ()
 # Affiche un message de débogage
 function debug()
 {
-    echo "[DEBUG=$DEBUG]"
+    #echo "[DEBUG=$DEBUG]"
     if [ $DEBUG -gt 0 ]; then
         [ $DEBUG -gt 1 ] && echo -e "DBG : $@"
         echo -e "`date +"%F %T"` DBG : $@" >>$LOG_FILE
