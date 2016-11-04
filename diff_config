@@ -91,10 +91,10 @@ if [ "x$file2" = "x" ]; then
 fi
 
 if [ ! -f "$file1" ]; then
-   error "'$file1' not found"
+    die "'$file1' not found"
 fi
 if [ ! -f "$file2" ]; then
-   error "'$file2' not found"
+    die "'$file2' not found"
 fi
 
 D_TMP=/tmp/$ME  
