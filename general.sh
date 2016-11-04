@@ -130,6 +130,9 @@ function debug()
 function fileLogger()
 {
     LOG_FILE=${LOG_FILE:-'/tmp/backup_scripts.log'}
+    if [ ! -f $LOG_FILE ]; then
+        backtrace
+    fi
     echo "$(date +"%F %T") $(basename $0) : $@" >> $LOG_FILE
 }
 
