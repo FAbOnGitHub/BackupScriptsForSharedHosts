@@ -25,9 +25,9 @@ WARN='[=WARN=]'
 t2='=='
 t3='==='
 t4='==='
-export ok KO NTFOUND INFO WARN t2 t3 t4
 DEBUG=${DEBUG:-0}
 VERBOSE=${VERBOSE:-0}
+export ok KO NTFOUND INFO WARN t2 t3 t4
 export DEBUG VERBOSE
 
 ### Variables:
