@@ -12,7 +12,7 @@ VERSION=0.0.1
 #
 ######################################################(FAb)###################
 ME=$0
-DEBUG=1
+#DEBUG=1
 #echo "1 [DEBUG=$DEBUG]"
 
 
@@ -26,7 +26,8 @@ function help()
 	[ "x$1" != "x" ] && status=$1 || status=$EXIT_FAILURE
 	echo "
 $ME [--help|--version]
-$ME conffile1 [conffile2]
+$ME [-V] conffile1 [conffile2]
+  -V : diff only variables, without their values
   'ovh_config.sh' is the default for conffile2
  "
 	exit  $status
@@ -74,13 +75,25 @@ function prepareDiff()
 {
     local f="$1"
     F="$(basename $f)"
-    sed -e "s@\(#.*$\)@@" -e "/^$/ d " "$1" |sort > "$D_TMP/$F"
+    if [ $bWithoutValues -eq 0 ]; then
+        sed -e "s@\(#.*$\)@@" -e "/^$/ d " "$1" |sort > "$D_TMP/$F"
+    else
+        sed -e "s@\(#.*$\)@@" -e "s@\(.*=\)\(.*\)@\1@" -e "/^$/ d " "$1" \
+            |sort > "$D_TMP/$F"
+    fi
 }
 
 ### Main
 #parse_args "$@"
 
 #echo "2 [DEBUG=$DEBUG]"
+
+bWithoutValues=0
+if [ "x$1" = "x-V" ]; then
+    echo "Diff without values"
+    bWithoutValues=1
+    shift
+fi
 
 file1="$1"
 file2="$2"
