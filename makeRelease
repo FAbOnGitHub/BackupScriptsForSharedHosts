@@ -72,13 +72,13 @@ let c=$v/100
 #echo $c.$r
 ver=$c.$r
 
-which svn2cl 2>/dev/null 1>&2
+which git2cl 2>/dev/null 1>&2
 rc=$?
 if [ $rc -eq 0 ]; then
     echo "Génération de ChangeLog"
-    svn2cl
+    git2cl
 else
-    echo "Missing svn2cl : ChangeLog skipped"
+    echo "Missing git2cl : ChangeLog skipped"
 fi
 
 wd="$(pwd|sed -e "s%.*/%%")"
@@ -88,25 +88,12 @@ tmp=$(mktemp -d /tmp/$ME.XXXXX)
 chmod 700 "$tmp"
 arch="${wd}_${ver}".zip
 
-# Récup information sur SVN pour fabriquer une branche de release
-export $(svn info . | sed -ne "s@^URL: @TRUNK_URL=@ p" \
-    -e "s@^Repository Root: @ROOT_URL=@ p")
-rc=$?
-if [ $rc -ne 0 ]; then
-    echo "Error with SVN info"
-    exit $rc
-fi
+git tag release_$ver
 
-svn cp "$TRUNK_URL" "$ROOT_URL/tags/$ver"
-rc=$?
-if [ $rc -ne 0 ]; then
-    echo "Error with SVN cp "
-    exit $rc
-fi
 cd ..
 cp -a "$wd" "$tmp"/
 cd "$tmp"
-find . -type d -name '.svn' -exec rm -rf -- '{}' \;  # -delete
+find . -type d \( -name '.svn' -o -name '.git' \) -exec rm -rf -- '{}' \; # -delete
 zip -r "$arch" ${wd}
 res=$?
 echo "res=$res v:$v"
