@@ -384,7 +384,7 @@ function init_cypher()
         fi
     fi
 
-    which zip >/dev/null
+    which zip  >/dev/null 2>&1
     rc=$?
     if [ $rc -ne 0 ]; then
         error "CYPHER PANIC !! CYPHER PANIC !! (no zip program)"
