@@ -43,8 +43,8 @@ case $(hostname -s) in
         ;;
 esac
 #echo "ROOT=$ROOT"
-D_CGIBIN=$ROOT/cgi-bin
-D_CGIETC=$ROOT/cgi-etc
+#D_CGIBIN=$ROOT/cgi-bin
+#D_CGIETC=$ROOT/cgi-etc
 D_SECRET=$ROOT/secret
 F_SECRET=$D_SECRET/rl.pw
 D_WIKI=$D_WWW/wiki
@@ -134,6 +134,8 @@ check_cmd /usr/bin/cksum
 check_cmd /usr/bin/gpg "option"
 check_cmd /usr/bin/gpg2 "option"
 check_cmd /usr/bin/svnadmin "option"
+
+say "== Vérification des commandes utilisateurs =="
 if [ "x$sCompressProg" != "x" ]; then
     check_cmd $sCompressProg
 fi
