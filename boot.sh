@@ -42,8 +42,8 @@ msg="Loading $LIB_PATH/general.sh"
 . $LIB_PATH/general.sh
 
 # Chargement de la config par défaut (OVH), serveur de prod
-msg=$msg"\nloading $LIB_PATH/config_ovh.sh"
-. $LIB_PATH/config_ovh.sh
+msg=$msg"\nloading $LIB_PATH/config_default.sh"
+. $LIB_PATH/config_default.sh
 
 
 ## Chargement éventuel d'une config alternative par machine
@@ -138,6 +138,7 @@ function viewConfig()
 {
     say " viewConfig"
     check_dir $BAK_DIR "BAK_DIR"
+    check_dir $BAK_DIR_PUB "BAK_DIR_PUB"
     check_file $LOCK_FILE  "[LOCK_FILE=$LOCK_FILE]"
     check_dir $LTS_DIR "LTS_DIR"
     check_file $LOG_FILE "LOG_FILE"
