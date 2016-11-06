@@ -162,7 +162,7 @@ else
 fi
 
 sReport="$sLabel[$iNbTargetOk+$iSkipThisOne/$c] DB saved "
-reportByMail "$sReport"
+reportByMail "$sReport" "$ME"
 
 # see to use rc=$? and then exit $rc
 exit $EXIT_SUCCESS

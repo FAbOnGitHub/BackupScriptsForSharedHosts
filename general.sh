@@ -245,7 +245,11 @@ function reportByMail ()
         else
             sReport="$1"
         fi
-        view_today_logs| notify_email_stdin "$sReport"
+        if [ "x$2" != "x" ]; then
+            view_today_logs | grep "$2" | notify_email_stdin "$sReport"
+        else
+            view_today_logs| notify_email_stdin "$sReport"
+        fi
     fi
 }
 
