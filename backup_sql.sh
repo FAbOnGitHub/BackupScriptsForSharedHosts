@@ -19,10 +19,11 @@
 #
 # Licence : GPL v3
 
-
 #  (À INCLURE) Chemin fichiers inclus, auto-ajustement
-LIB_PATH=$(dirname $0)
+DIR=$(dirname $0) #Resolving path
+cd $DIR 2>/dev/null; export LIB_PATH=$PWD; cd - >/dev/null
 . $LIB_PATH/boot.sh
+
 
 ME=$0
 

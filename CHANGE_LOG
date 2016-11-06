@@ -1,5 +1,7 @@
 CHANGE_LOG  du répertoire  cgi-bin de  RL. Ce  fichier est  accompagné par
-	Change_log qui est généré par svn2cl
+	Change_log qui est généré par +svn2cl+ git2cl
+
+        Ce fichier est désormais obsolète. Il est conservé pour l'historique.
 
 
 PROJET : Ce répertoire contient essentiellement les scripts de backups.

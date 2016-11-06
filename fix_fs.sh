@@ -15,37 +15,38 @@
 ######################################################(FAb)###################
 Self=$0
 ME=$(basename $Self)
-#. functions.sh
-
-LIB_PATH=$(dirname $0)
+DIR=$(dirname $0) #Resolving path
+OLDPWD=$PWD
+cd $DIR 2>/dev/null; export LIB_PATH=$PWD; cd ..; ROOT=$PWD; cd $OLDPWD >/dev/null
 . $LIB_PATH/boot.sh
 
-###
-### 20120415 : oups ! Mais que c'est laid ! Et en plus cela est trop bavard
-### sur les autres serveurs. À reprendre. Fixme
 D_BACKUP=
+#
+# This script cannot rely on boot.sh and other configuration file, that's
+# there such an ignomious hack :  ~Not, I'm confused now~
 case $(hostname -s) in
-antaya)
-        ROOT=/home/fab/www/Backup
+    antaya)
         D_WWW=$ROOT/htdocs
-        D_BACKUP=$D_WWW/Backup_DFREvSD
         ;;
-herbert)
-        ROOT=/home/mendes/www/BackupWeb_80
+    orion)
+        #no more exception
         D_WWW=$ROOT/www
         ;;
 
-*)
-        # OVH
-        ROOT=~
+    *)
+        # Other provider
+        ROOT=$HOME
         D_WWW=$ROOT/www
         ;;
 esac
+#echo "ROOT=$ROOT"
 D_CGIBIN=$ROOT/cgi-bin
 D_CGIETC=$ROOT/cgi-etc
 D_SECRET=$ROOT/secret
 F_SECRET=$D_SECRET/rl.pw
 D_WIKI=$D_WWW/wiki
+WIKI_DIR=$D_WWW/wiki
+
 
 # Config système
 #F_LOG=$D_BACKUP/log.txt
@@ -91,16 +92,18 @@ function  parse_args() {
 
 say "= Analyse de la configuration et du système de fichier ="
 say "*** $ME : starting $(date) ***"
-say "Le champ status peut prendre plusieurs valeur. Si c'est en MAJUSCULES c'est"
-say "qu'il n'est pas content et qu'il faut regarder."
+say " Le champ status peut prendre plusieurs valeur. Si c'est en MAJUSCULES c'est"
+say " qu'il n'est pas content et qu'il faut regarder."
 say "== Vérification de la configuration =="
 check_var ROOT WWW_DIR WIKI_DIR
 check_var BAK_DIR BAK_DIR_PUB BAK_LEVEL
 check_var SQL_SERVER1 SQL_BASE1 SQL_USER1
 check_var_secret SQL_PASSWD1
 check_var SQL_SERVER2 SQL_BASE2 SQL_USER2
+check_var sCompressProg sCompressArgs bDoCompress
 check_var_secret SQL_PASSWD2
 check_var_secret ZIP_PASSWD
+check_var sCypherProg sCypherArgs bDoCypher
 check_var GPG_KEYFILE
 check_var_secret GPG_PASSWD
 check_var LOG_FILE ERR_FILE
@@ -126,7 +129,16 @@ check_cmd /usr/bin/mysqldump
 check_cmd /usr/bin/zip
 check_cmd /usr/bin/cksum
 check_cmd /usr/bin/gpg "option"
+check_cmd /usr/bin/gpg2 "option"
 check_cmd /usr/bin/svnadmin "option"
+
+say "== Vérification des commandes utilisateurs =="
+if [ "x$sCompressProg" != "x" ]; then
+    check_cmd $sCompressProg
+fi
+if [ "x$sCypherProg" != "x" ]; then
+    check_cmd $sCypherProg
+fi
 
 say "== Variables =="
 id="$(id)"
@@ -148,9 +160,10 @@ check_dir  "$D_WWW"
 check_dir  "$D_WIKI"
 
 say "== Recherche des fichiers de configuration =="
+check_file "$D_CGIBIN/config_default.sh"
 check_file "$D_CGIETC/config_priv.sh" "Optionnel mais vraiment conseillé." "option"
 check_file "$D_CGIETC/config_$(/bin/hostname -s).sh" "$strCfgHostname"
-check_file "$D_CGIBIN/config_ovh.sh"
+
 
 say "== Recherche des scripts inclus =="
 check_file "$D_CGIBIN/general.sh"

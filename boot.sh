@@ -18,16 +18,17 @@ export EXIT_SUCCESS=0
 export EXIT_FAILURE=1
 ok='[__ok__]'
 KO='[**KO**]'
-NTFOUND='[NTFOUND]'
+NOTFOUND='[NOTFND]'
+NOTEXEC='[NOTEXE]'
 INFO='[__..__]'
-INFO='  info  '
+INFO='[ info ]'
 WARN='[=WARN=]'
 t2='=='
 t3='==='
 t4='==='
-export ok KO NTFOUND INFO WARN t2 t3 t4
 DEBUG=${DEBUG:-0}
 VERBOSE=${VERBOSE:-0}
+export ok KO NTFOUND INFO WARN t2 t3 t4
 export DEBUG VERBOSE
 
 ### Variables:
@@ -41,8 +42,8 @@ msg="Loading $LIB_PATH/general.sh"
 . $LIB_PATH/general.sh
 
 # Chargement de la config par défaut (OVH), serveur de prod
-msg=$msg"\nloading $LIB_PATH/config_ovh.sh"
-. $LIB_PATH/config_ovh.sh
+msg=$msg"\nloading $LIB_PATH/config_default.sh"
+. $LIB_PATH/config_default.sh
 
 
 ## Chargement éventuel d'une config alternative par machine
@@ -51,6 +52,9 @@ msg=$msg"\nloading $LIB_PATH/config_ovh.sh"
 #  hostname varie... Donc je fixe un nom à config_priv comme
 #  privée
 export D_ETC="$(echo $LIB_PATH | sed -e "s@\/cgi-bin\$@\/cgi-etc@" )"
+if [ ! -d "$D_ETC" ]; then
+    die "Cannot find \$D_ETC from \$LIB_PATH=$LIB_PATH"
+fi
 f=$D_ETC/config_priv.sh
 if [ -f "$f" ]; then
     msg=$msg"\nloading config_priv.sh"
@@ -84,6 +88,7 @@ case $ME in
     *)
         msg=$msg"\nDist script... bonus !"
         cfg_dist="$D_ETC/config_${hostname}_dist.sh"
+        #echo "cfg_dist=$cfg_dist"
         if [ -f "$cfg_dist" ]; then
             msg=$msg"\nloading $cfg_dist"
             . "$cfg_dist"
@@ -133,6 +138,7 @@ function viewConfig()
 {
     say " viewConfig"
     check_dir $BAK_DIR "BAK_DIR"
+    check_dir $BAK_DIR_PUB "BAK_DIR_PUB"
     check_file $LOCK_FILE  "[LOCK_FILE=$LOCK_FILE]"
     check_dir $LTS_DIR "LTS_DIR"
     check_file $LOG_FILE "LOG_FILE"

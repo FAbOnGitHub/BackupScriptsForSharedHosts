@@ -26,12 +26,15 @@
 ######################################################(FAb)###################
 ME=$0
 #  (À INCLURE) Chemin fichiers inclus, auto-ajustement
-LIB_PATH=$(dirname $0)
-export LIB_PATH
+DIR=$(dirname $0) #Resolving path
+cd $DIR 2>/dev/null; export LIB_PATH=$PWD; cd - >/dev/null
+
 . $LIB_PATH/boot.sh
 
 [ "x$MYSQL_USER" = "x" ] && die "$KO \$MYSQL_USER is empty"
 [ "x$MYSQL_PASS" = "x" ] && die "$KO \$MYSQL_PASS is empty"
+[ "x$MYSQL_HOST" = "x" ] && die "$KO \$MYSQL_HOST is empty"
+export MYSQL_PWD="$MYSQL_PASS"  #instead of '-p$MYSQL_PASS'
 bDoCompress=${bDoCompress:-1}
 bDoCompressAll=${bDoCompressAll:-1}
 bDoCypher=${bDoCypher:-0}
@@ -45,15 +48,15 @@ dir="$DIR.$date"
 MYSQL_DB_EXCLUDE_PREFIX=${MYSQL_DB_EXCLUDE_PREFIX:-""}
 
 # Oups ! Désormais on sauvegarde tout, comme des pros !
-mysql_opt="--routines --triggers --events --comments --dump-date --extended-insert --set-charset"
+mysql_opt="--routines --triggers --comments --dump-date --extended-insert --set-charset"
 
 # 2 Get name of databases
 if [ "x$MYSQL_DB_EXCLUDE_PREFIX" = "x" ]; then
     declare -a aDB=( $(echo "SHOW DATABASES; " \
-        | mysql -u $MYSQL_USER -p$MYSQL_PASS -N ) )
+        | mysql -u $MYSQL_USER -N ) )
 else
     declare -a aDB=( $(echo "SHOW DATABASES; " \
-        | mysql -u $MYSQL_USER -p$MYSQL_PASS -N \
+        | mysql -u $MYSQL_USER -N \
         | grep -v -e "^$MYSQL_DB_EXCLUDE_PREFIX" ) )
 fi
 rc=$?
@@ -61,6 +64,21 @@ rc=$?
 
 if [ ${#aDB[*]} -eq 0 ]; then
     die " $KO no databases found."
+fi
+
+vars="$(echo "show variables;" | mysql -u $MYSQL_USER \
+                          | grep innodb_version| cut -c 16- \
+                          |sed -e "s@\([0-9]\).\([0-9]\)\(.*\)@maj=\1 min=\2@")"
+
+export $vars
+#echo "[maj=$maj][min=$min]"
+COMPAT56=true
+if [ $maj -eq 5 ]; then
+    if [ $min -ge 7 ]; then
+        COMPAT56=false
+    fi
+elif [ $maj -gt 5 ]; then
+    COMPAT56=false
 fi
 
 cd $BAK_DIR
@@ -80,21 +98,32 @@ do
         "information_schema"|"performance_schema")
             let iCountThisOne=0
             let iSkipThisOne++
-            sLock="--skip-lock-tables";;
+            sLock="--skip-lock-tables"
+            continue # New ; skip virtual databases
+            ;;
         *)
             let iCountThisOne=1
-            sLock="-l";;
+            #sLock="-l";;
+            ;;        
     esac
 
     if [ "$db" = "performance_schema" ]; then
         debug  "$WARN performance_schema ignored"
         continue
     fi
+    if [ "$db" = "information_schema" ]; then
+        if [ $COMPAT56 = "false" ]; then
+            debug  "$WARN information_schema ignored (no compat56)"
+            continue
+        fi
+    fi
 
-    fileLogger "$ME '$db' found ${date} (sLock=$sLock)"
+    
+    fileLogger "$ME '$db' found ${date}"
 #    dumpfile="${db}_${date}.sql"
     dumpfile="${db}.sql"
-    mysqldump -u $MYSQL_USER -p$MYSQL_PASS $sLock $mysql_opt ${db} >"$dumpfile" 2>>$ERR_FILE
+
+    mysqldump -h $MYSQL_HOST -u $MYSQL_USER $MYSQL_OPT $sLock $mysql_opt ${db} >"$dumpfile" 2>>$ERR_FILE
     rc=$?
     if [ $rc -ne $EXIT_SUCCESS ]; then
         error "$KO mysqldump '$db' failed (rc=$rc)"
@@ -133,7 +162,7 @@ else
 fi
 
 sReport="$sLabel[$iNbTargetOk+$iSkipThisOne/$c] DB saved "
-reportByMail "$sReport"
+reportByMail "$sReport" "$ME"
 
 # see to use rc=$? and then exit $rc
 exit $EXIT_SUCCESS

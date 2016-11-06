@@ -23,8 +23,8 @@ VERSION=0.0.1
 ######################################################(FAb)###################
 ME=$0
 #  (À INCLURE) Chemin fichiers inclus, auto-ajustement
-LIB_PATH=$(dirname $0)
-export LIB_PATH
+DIR=$(dirname $0) #Resolving path
+cd $DIR 2>/dev/null; export LIB_PATH=$PWD; cd - >/dev/null
 . $LIB_PATH/boot.sh
 
 bDoCompress=${bDoCompress:-1}

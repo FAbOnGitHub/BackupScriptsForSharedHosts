@@ -1,0 +1,240 @@
+2016-11-06  FAb Mendes <fab@antaya.fr>
+
+	* README.md, README.org, backup_crontab.sh, backup_sql.sh,
+	backup_svn_full.sh, backup_web.sh, backup_wiki.sh, boot.sh,
+	config_default.sh, config_ovh.sh, diff_config, diff_config.sh,
+	fix_fs.sh, general.sh: Big: change default config_file for a better
+	name, change diff_config to diff_config.sh for a better cohesion
+	change resolution for LIB_PATH update documentation README
+
+2016-11-06  FAb Mendes <fab@antaya.fr>
+
+	* backup_mysql_full.sh, general.sh: minor fixes, test commit
+
+2016-11-06  FAb Mendes <fab@antaya.fr>
+
+	* backup_mysql_full.sh, boot.sh, fix_fs.sh: minor fixes, test commit
+
+2016-11-06  FAb Mendes <fab@antaya.fr>
+
+	* backup_mysql_full.sh, fix_fs.sh: Some workaround for $ROOT and
+	debug improvement. Commit to deploy on test server.
+
+2016-11-06  FAb Mendes <fab@antaya.fr>
+
+	* boot.sh, config_ovh.sh, fix_fs.sh, general.sh: Great! I found how
+	to simulate 'realpath' with dirs
+
+2016-11-06  FAb Mendes <fab@antaya.fr>
+
+	* general.sh: add missing 'function'
+
+2016-11-06  FAb Mendes <fab@antaya.fr>
+
+	* diff_config: Adding option to compare local config with default
+	file, just variables without their values
+
+2016-11-05  FAb Mendes <fab@antaya.fr>
+
+	* : Setting Master and devel to the same level... Big merge soon
+
+2016-11-04  FAb Mendes <f.mendes@epoc.u-bordeaux1.fr>
+
+	* diff_config: Minor: bugfixes - ok... I seem to be very tired
+
+2016-11-04  FAb Mendes <f.mendes@epoc.u-bordeaux1.fr>
+
+	* diff_config: Minor: bugfixes - ok... I seem to be tired
+
+2016-11-04  FAb Mendes <f.mendes@epoc.u-bordeaux1.fr>
+
+	* diff_config: Minor: bugfixes - ok ??
+
+2016-11-04  FAb Mendes <f.mendes@epoc.u-bordeaux1.fr>
+
+	* general.sh: Minor: bugfixes - ok ??
+
+2016-11-04  FAb Mendes <f.mendes@epoc.u-bordeaux1.fr>
+
+	* diff_config: Minor: bugfixes - ok ??
+
+2016-11-04  FAb Mendes <f.mendes@epoc.u-bordeaux1.fr>
+
+	* boot.sh, config_ovh.sh: Minor: bugfixes - one bug found in dist
+	config file. Am I stupid ?
+
+2016-11-04  FAb Mendes <f.mendes@epoc.u-bordeaux1.fr>
+
+	* general.sh: Minor: bugfixes - adding my debug functions
+
+2016-11-04  FAb Mendes <f.mendes@epoc.u-bordeaux1.fr>
+
+	* boot.sh, general.sh: Minor: bugfixes - one bug found in dist
+	config file
+
+2016-11-04  FAb Mendes <f.mendes@epoc.u-bordeaux1.fr>
+
+	* diff_config, general.sh: Minor: bugfixes - one bug found in dist
+	config file
+
+2016-11-04  FAb Mendes <f.mendes@epoc.u-bordeaux1.fr>
+
+	* general.sh: Minor: bugfixes
+
+2016-11-04  FAb Mendes <f.mendes@epoc.u-bordeaux1.fr>
+
+	* diff_config: Minor: bugfixes
+
+2016-11-04  FAb Mendes <f.mendes@epoc.u-bordeaux1.fr>
+
+	* diff_config: Minor: bugfixes
+
+2016-11-04  FAb Mendes <f.mendes@epoc.u-bordeaux1.fr>
+
+	* diff_config: Minor: bugfixes
+
+2016-11-04  FAb Mendes <f.mendes@epoc.u-bordeaux1.fr>
+
+	* config_ovh.sh: Minor: bugfixes
+
+2016-11-04  FAb Mendes <f.mendes@epoc.u-bordeaux1.fr>
+
+	* diff_config: Minor: bugfixes
+
+2016-11-04  FAb Mendes <f.mendes@epoc.u-bordeaux1.fr>
+
+	* diff_config, general.sh: Add script to help config-file evolution
+
+2016-11-04  FAb Mendes <f.mendes@epoc.u-bordeaux1.fr>
+
+	* diff_config, general.sh: Add script to help config-file evolution
+
+2016-11-02  FAb Mendes <f.mendes@epoc.u-bordeaux1.fr>
+
+	* general.sh: Important : clean zip tmp file
+
+2016-11-02  FAb Mendes <f.mendes@epoc.u-bordeaux1.fr>
+
+	* backup_mysql_full.sh: Minor: better log -lock removed
+
+2016-11-02  FAb Mendes <f.mendes@epoc.u-bordeaux1.fr>
+
+	* backup_mysql_full.sh: Minor : skip virtual databases
+
+2016-11-02  FAb Mendes <f.mendes@epoc.u-bordeaux1.fr>
+
+	* backup_mysql_full.sh, config_ovh.sh: Minor : alter
+	--events/--skip-events and -l/--skip-lock-tables
+
+2016-11-02  FAb Mendes <f.mendes@epoc.u-bordeaux1.fr>
+
+	* backup_mysql_full.sh, config_ovh.sh: Minor : alter
+	--events/--skip-events
+
+2016-11-02  FAb Mendes <f.mendes@epoc.u-bordeaux1.fr>
+
+	* boot.sh, general.sh: Minor : protection D_ETC
+
+2016-11-02  FAb Mendes <f.mendes@epoc.u-bordeaux1.fr>
+
+	* backup_mysql_full.sh, config_ovh.sh: Minor: add options for
+	mysqldump
+
+2016-11-02  FAb Mendes <f.mendes@epoc.u-bordeaux1.fr>
+
+	* backup_mysql_full.sh, config_ovh.sh, general.sh: Minor: add HOST
+	for mysql and options for gpg2
+
+2016-11-01  FAb Mendes <fab@antaya.fr>
+
+	* backup_mysql_full.sh: bugfix compat56 solved... (Now I have a
+	machine-test again)
+
+2016-11-01  FAb Mendes <fab@antaya.fr>
+
+	* backup_mysql_full.sh: bugfix with version compat56
+
+2016-11-01  FAb Mendes <fab@antaya.fr>
+
+	* backup_mysql_full.sh: bugfix with version compat56
+
+2016-11-01  FAb Mendes <fab@antaya.fr>
+
+	* backup_mysql_full.sh: Trying to identify mysql version to prevent
+	dumping information_schema above mysql 5.7
+
+2016-10-31  FAb Mendes <fab@antaya.fr>
+
+	* backup_mysql_full.sh: Change for MYSQL_PWD... but for how long
+	have I been taken away from this project ???
+
+2016-07-18  FAb Mendes <fab@antaya.fr>
+
+	* config_ovh.sh: Others variables
+
+2016-07-18  FAb Mendes <fab@antaya.fr>
+
+	* config_ovh.sh: Reorganization and documenation of default config
+	file
+
+2016-07-18  FAb Mendes <fab@antaya.fr>
+
+	* config_ovh.sh: Reorganization and documenation of default config
+	file
+
+2016-07-18  FAb Mendes <fab@antaya.fr>
+
+	* config_ovh.sh: To a better self documentation
+
+2016-07-17  FAb Mendes <fab@antaya.fr>
+
+	* general.sh: Minor : error message improvements with the 'which'
+	command
+
+2016-07-14  FAb Mendes <fab@antaya.fr>
+
+	* : mail stuff commit c99d4794320f22aabe9db3c49be6e45f98f0ddc3 Author: FAb Mendes
+	<fab@antaya.fr> Date:   Thu Jul 14 16:42:45 2016 +0200
+
+2016-07-12  FAb Mendes <fab@antaya.fr>
+
+	* .gitignore, ChangeLog, makeRelease: makeRelease reset to GIT
+
+2016-07-12  FAb Mendes <f.mendes@epoc.u-bordeaux1.fr>
+
+	* .gitignore: gitignore ++
+
+2016-07-12  FAb Mendes <f.mendes@epoc.u-bordeaux1.fr>
+
+	* general.sh: Correction et optimisation détection commande mail
+
+2016-07-11  FAb Mendes <f.mendes@epoc.u-bordeaux1.fr>
+
+	* general.sh: bugfix crochet mal placé et bug signalé par email
+
+2016-07-10  FAb Mendes <f.mendes@epoc.u-bordeaux1.fr>
+
+	* general.sh: bug: command 'mail' disappeared... trying a workaround
+
+2016-07-10  FAb Mendes <f.mendes@epoc.u-bordeaux1.fr>
+
+	* README.md: Oups, forgot to generate README.md. I should use a
+	branch
+
+2016-07-10  FAb Mendes <f.mendes@epoc.u-bordeaux1.fr>
+
+	* .gitignore, CHANGE_LOG, ChangeLog, README.md, README.org,
+	backup_crontab.sh, backup_mysql_full.sh, backup_sql.sh,
+	backup_svn_full.sh, backup_web.sh, backup_wiki.sh, boot.sh,
+	config_ovh.sh, denied.php, exec2.php, fix_fs.sh, general.sh,
+	import_backup2.sh, index.php, makeRelease, tests_vide.sh, vide.php: 
+	Explanation, licence, and privacy
+
+2016-07-10  FAb Mendes <f.mendes@epoc.u-bordeaux1.fr>
+
+	* README.md: First commit to test connectiviy
+
+2016-07-10  FAbOnGitHub <fab@antaya.fr>
+
+	* Initial commit
+
