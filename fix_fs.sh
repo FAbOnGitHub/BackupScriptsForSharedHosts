@@ -163,7 +163,7 @@ check_dir  "$D_WWW"
 check_dir  "$D_WIKI"
 
 say "== Recherche des fichiers de configuration =="
-check_file "$D_CGIBIN/config_ovh.sh"
+check_file "$D_CGIBIN/config_default.sh"
 check_file "$D_CGIETC/config_priv.sh" "Optionnel mais vraiment conseillé." "option"
 check_file "$D_CGIETC/config_$(/bin/hostname -s).sh" "$strCfgHostname"
 

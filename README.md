@@ -1,6 +1,9 @@
+
+
 # BackupScriptsForSharedHosts  # ;-\*- mode: org -\*-
 
 *(French version below)*
+
 
 ## Genesis and aim of the project
 
@@ -13,6 +16,7 @@ it.
 
 On july, 2016 the project migrated to GitHub (losing subversion history).
 
+
 ### General : how it works :
 
 When you need to  backup a server `HOST A` (where you're  not root), you cas
@@ -21,6 +25,7 @@ archives and put them in a pseudo public area.
 
 In a second time, another machine `HOST B` can connect to this pseudo public
 aera in HTTPS and retrieve archives : see `import_backup2.sh` 
+
 
 ### What can be saved ?
 
@@ -43,23 +48,25 @@ aera in HTTPS and retrieve archives : see `import_backup2.sh`
     (`backup_wiki.sh` and `backup_web.sh`) but it's quite easy to adapt to your
     needs.
 
+
 ### Configuration
 
 Currently  a  lot  of  things  are  explained  (*in  french*)  in  the  file
 `config.txt`).
 
-But, fortunetly, config file `config_ovh.sh` is widely commented.
+But, fortunetly, config file `config_default.sh` is widely commented.
 
-Scripts (HOST A= can use three level of configuration file :
+Scripts (`HOST A` can use three level of configuration file :
 
-1.  First `config_ovh.sh` in `cgi-bin` (default param)
+1.  First `config_default.sh` in `cgi-bin` (default param)
 2.  `config_priv.sh` in `cgi=etc`  (your param)
-3.  `config_<hostname>.sh in =cgi=etc`  (option)
+3.  `config_<hostname>.sh` in `cgi=etc`  (option)
 
-Host B which hosts `import_backup2.sh` use this file in addition :
-`config_<hostname>_dist.sh in =cgi=etc`
+`HOST B` which hosts `import_backup2.sh` use this file **in addition** :
+`config_<hostname>_dist.sh` in `cgi=etc`
 
 nota : <hostname> is the result of bash command "hostname -s"
+
 
 ### Extra features :
 
@@ -70,6 +77,7 @@ nota : <hostname> is the result of bash command "hostname -s"
 -   Long Term Support directory for imported archives : archives are retrieved
     and stored  by day except  that you can  specify a day  to push them  in a
     non-overwritten directory.
+
 
 ### What about security ?
 
@@ -84,6 +92,7 @@ nota : <hostname> is the result of bash command "hostname -s"
 
 Indeed, it comes with no garanties :-)
 
+
 ## French version : en Français
 
 Ce projet regroupe un ensemble  d'outils pour permettre faire des sauvegardes
@@ -95,3 +104,4 @@ d'une association hébergés sur une machine mutualisée chez l'hébergeur OVH.
 
 Des fonctionnalités ont  été ajoutées pour permettre  de sauvegarder d'autres
 objets pour d'autres cas.
+

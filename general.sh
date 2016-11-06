@@ -20,9 +20,9 @@ MYSQL_DB_EXCLUDE_PREFIX=
 
 ##
 # Compress et crypto variables
-sCompressProg=gzip
+sCompressProg=/bin/gzip
 sCompressArgs='-9'
-sCypherProg=gpg
+sCypherProg=/usr/bin/gpg2
 sCypherArgs=
 ##
 # Mail variables
@@ -425,6 +425,7 @@ function do_cypher_zip()
 }
 function do_cypher_gpg_a()
 {
+    echo "$ME: WARNING ! No tested!"
     f="$1"
     $sCypherProg  $sCypherArgs  $GPG_KEYFILE --yes  "$f"
     rc=$?

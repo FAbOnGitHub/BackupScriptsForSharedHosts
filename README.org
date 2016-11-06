@@ -61,15 +61,15 @@
     Currently  a  lot  of  things  are  explained  (/in  french/)  in  the  file
     =config.txt=).
 
-    But, fortunetly, config file =config_ovh.sh= is widely commented.
+    But, fortunetly, config file =config_default.sh= is widely commented.
     
-    Scripts (HOST A= can use three level of configuration file :
-    1. First =config_ovh.sh= in =cgi-bin= (default param)
+    Scripts (=HOST A= can use three level of configuration file :
+    1. First =config_default.sh= in =cgi-bin= (default param)
     2. =config_priv.sh= in =cgi=etc=  (your param)
-    3. =config_<hostname>.sh in =cgi=etc=  (option)
+    3. =config_<hostname>.sh= in =cgi=etc=  (option)
 
-    Host B which hosts =import_backup2.sh= use this file in addition :
-    =config_<hostname>_dist.sh in =cgi=etc=
+    =HOST B= which hosts =import_backup2.sh= use this file *in addition* :
+    =config_<hostname>_dist.sh= in =cgi=etc=
 
     nota : <hostname> is the result of bash command "hostname -s"
 

@@ -104,7 +104,7 @@ if [ "x$file1" = "x" ]; then
     exit 2
 fi
 if [ "x$file2" = "x" ]; then
-    file2="$LIB_PATH/config_ovh.sh"
+    file2="$LIB_PATH/config_default.sh"
 fi
 
 if [ ! -f "$file1" ]; then

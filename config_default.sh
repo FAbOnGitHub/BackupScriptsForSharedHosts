@@ -1,4 +1,4 @@
-# config_ovh.sh
+# config_default.sh
 #  Initial author : Meo pour RL
 #  Main dev : FAb
 #
@@ -10,7 +10,7 @@
 #
 # Configuration server
 #
-# - config_ovh.sh :
+# - config_default.sh :
 #         all configuration variables
 # - ../cgi-etc/config_priv.sh :
 #         specific to an host
@@ -103,13 +103,13 @@ ZIP_PASSWD=
 bDoCypher=${bDoCypher:-0}
 bDoXfer=${bDoXfer:-0}
 # Compression program
-sCompressProg=gzip
+sCompressProg=/bin/gzip
 # Arguments for compression program
 sCompressArgs='-9'
 # Program used to cypher data
-sCypherProg=gpg
+sCypherProg=/usr/bin/gpg2
 # arguments
-sCypherArgs=
+sCypherArgs="--batch "
 
 ##
 # GnuPG credentials
