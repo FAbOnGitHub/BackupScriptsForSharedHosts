@@ -88,7 +88,7 @@ case $ME in
     *)
         msg=$msg"\nDist script... bonus !"
         cfg_dist="$D_ETC/config_${hostname}_dist.sh"
-        echo "cfg_dist=$cfg_dist"
+        #echo "cfg_dist=$cfg_dist"
         if [ -f "$cfg_dist" ]; then
             msg=$msg"\nloading $cfg_dist"
             . "$cfg_dist"
@@ -97,7 +97,6 @@ case $ME in
         fi
         ;;
 esac
-debug "Booting logs :"
 debug "$msg"
 
 if [ "x$BAK_DIR_PUB" = "x" ]; then
