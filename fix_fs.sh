@@ -15,37 +15,42 @@
 ######################################################(FAb)###################
 Self=$0
 ME=$(basename $Self)
-#. functions.sh
 
 LIB_PATH=$(dirname $0)
+LIB_PATH="$(dirname "$(dirs)/cgi-bin" |sed -e "s@^~/@$HOME/@" )"
 . $LIB_PATH/boot.sh
 
-###
-### 20120415 : oups ! Mais que c'est laid ! Et en plus cela est trop bavard
-### sur les autres serveurs. À reprendre. Fixme
 D_BACKUP=
+#
+# This script cannot rely on boot.sh and other configuration file, that's
+# there such an ignomious hack :
+dirs -c
 case $(hostname -s) in
-antaya)
-        ROOT=/home/fab/www/Backup
+    antaya)
+        ROOT="$(dirname "$(dirs)" )"
         D_WWW=$ROOT/htdocs
         D_BACKUP=$D_WWW/Backup_DFREvSD
         ;;
-herbert)
-        ROOT=/home/mendes/www/BackupWeb_80
+    orion)
+        #no more exception
+        ROOT="$(dirname "$(dirs)" )"
         D_WWW=$ROOT/www
         ;;
 
-*)
+    *)
         # OVH
         ROOT=~
         D_WWW=$ROOT/www
         ;;
 esac
+
 D_CGIBIN=$ROOT/cgi-bin
 D_CGIETC=$ROOT/cgi-etc
 D_SECRET=$ROOT/secret
 F_SECRET=$D_SECRET/rl.pw
 D_WIKI=$D_WWW/wiki
+WIKI_DIR=$D_WIKI
+
 
 # Config système
 #F_LOG=$D_BACKUP/log.txt
@@ -99,8 +104,10 @@ check_var BAK_DIR BAK_DIR_PUB BAK_LEVEL
 check_var SQL_SERVER1 SQL_BASE1 SQL_USER1
 check_var_secret SQL_PASSWD1
 check_var SQL_SERVER2 SQL_BASE2 SQL_USER2
+check_var sCompressProg sCompressArgs bDoCompress
 check_var_secret SQL_PASSWD2
 check_var_secret ZIP_PASSWD
+check_var sCypherProg sCypherArgs bDoCypher
 check_var GPG_KEYFILE
 check_var_secret GPG_PASSWD
 check_var LOG_FILE ERR_FILE
@@ -126,6 +133,7 @@ check_cmd /usr/bin/mysqldump
 check_cmd /usr/bin/zip
 check_cmd /usr/bin/cksum
 check_cmd /usr/bin/gpg "option"
+check_cmd /usr/bin/gpg2 "option"
 check_cmd /usr/bin/svnadmin "option"
 
 say "== Variables =="
