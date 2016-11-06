@@ -17,3 +17,4 @@
    - Enhance security and security configuration control
    - Enhance feeback after a =backup_import2.sh= operation towards the source server
    - Do something better with log files.
+   - Add an option to permit the check-certificat with is bypassed...

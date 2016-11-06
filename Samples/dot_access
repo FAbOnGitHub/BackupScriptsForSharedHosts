@@ -3,13 +3,13 @@ AuthGroupFile	/dev/null
 AuthName	"Say hello to Backup System"
 AuthType	Basic
 
-
-<limit GET POST>
   <ifModule mod_authz_core.c>
      # Apache 2.4
-     Require valid-user
-     Require ip IP1 IP2
-     Require expr %{HTTP_USER_AGENT} != 'MySecretUserAgent'
+     <RequireAll>
+       Require valid-user
+       Require ip IP1 IP2
+       Require expr %{HTTP_USER_AGENT} == 'MySecretUserAgent'
+     </RequireAll>
   </ifModule>
   <ifModule !mod_authz_core.c>
     # Not tested because I haven't apache 2.2 anymorex
@@ -24,4 +24,4 @@ AuthType	Basic
           #Allow from all
           #Deny from env=GoAway 
   </ifModule>
-</Limit>
+
