@@ -1,0 +1,18 @@
+AuthUserFile	/path/to/secret/file/rl.pw
+AuthGroupFile	/dev/null
+AuthName	"Sayt hello to Backup System"
+AuthType	Basic
+
+
+<limit GET POST>
+  <ifModule mod_authz_core.c>
+     # Apache 2.4
+     Require valid-user
+     Require ip IP1 IP2
+  </ifModule>
+  <ifModule !mod_authz_core.c>
+    order allow,deny
+    allow from IP1 IP2
+    require valid-user
+    </ifModule>
+</Limit>
