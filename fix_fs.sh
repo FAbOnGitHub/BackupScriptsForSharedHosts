@@ -15,9 +15,10 @@
 ######################################################(FAb)###################
 Self=$0
 ME=$(basename $Self)
+DIR=$(dirname $0) #Resolving path
+OLDPWD=$PWD
+cd $DIR 2>/dev/null; export LIB_PATH=$PWD; cd ..; ROOT=$PWD; cd $OLDPWD >/dev/null
 
-LIB_PATH=$(dirname $0)
-LIB_PATH="$(dirname "$(dirs)/cgi-bin" |sed -e "s@^~/@$HOME/@" )"
 . $LIB_PATH/boot.sh
 
 D_BACKUP=
@@ -27,29 +28,27 @@ D_BACKUP=
 dirs -c
 case $(hostname -s) in
     antaya)
-        ROOT="$(dirname "$(dirs)" )"
         D_WWW=$ROOT/htdocs
         D_BACKUP=$D_WWW/Backup_DFREvSD
         ;;
     orion)
         #no more exception
-        ROOT="$(dirname "$(dirs)" )"
         D_WWW=$ROOT/www
         ;;
 
     *)
-        # OVH
-        ROOT=~
+        # Other provider
+        ROOT=$HOME
         D_WWW=$ROOT/www
         ;;
 esac
-
+#echo "ROOT=$ROOT"
 D_CGIBIN=$ROOT/cgi-bin
 D_CGIETC=$ROOT/cgi-etc
 D_SECRET=$ROOT/secret
 F_SECRET=$D_SECRET/rl.pw
 D_WIKI=$D_WWW/wiki
-WIKI_DIR=$D_WIKI
+WIKI_DIR=$D_WWW/wiki
 
 
 # Config système
@@ -96,8 +95,8 @@ function  parse_args() {
 
 say "= Analyse de la configuration et du système de fichier ="
 say "*** $ME : starting $(date) ***"
-say "Le champ status peut prendre plusieurs valeur. Si c'est en MAJUSCULES c'est"
-say "qu'il n'est pas content et qu'il faut regarder."
+say " Le champ status peut prendre plusieurs valeur. Si c'est en MAJUSCULES c'est"
+say " qu'il n'est pas content et qu'il faut regarder."
 say "== Vérification de la configuration =="
 check_var ROOT WWW_DIR WIKI_DIR
 check_var BAK_DIR BAK_DIR_PUB BAK_LEVEL
@@ -135,6 +134,12 @@ check_cmd /usr/bin/cksum
 check_cmd /usr/bin/gpg "option"
 check_cmd /usr/bin/gpg2 "option"
 check_cmd /usr/bin/svnadmin "option"
+if [ "x$sCompressProg" != "x" ]; then
+    check_cmd $sCompressProg
+fi
+if [ "x$sCypherProg" != "x" ]; then
+    check_cmd $sCypherProg
+fi
 
 say "== Variables =="
 id="$(id)"
@@ -156,9 +161,10 @@ check_dir  "$D_WWW"
 check_dir  "$D_WIKI"
 
 say "== Recherche des fichiers de configuration =="
+check_file "$D_CGIBIN/config_ovh.sh"
 check_file "$D_CGIETC/config_priv.sh" "Optionnel mais vraiment conseillé." "option"
 check_file "$D_CGIETC/config_$(/bin/hostname -s).sh" "$strCfgHostname"
-check_file "$D_CGIBIN/config_ovh.sh"
+
 
 say "== Recherche des scripts inclus =="
 check_file "$D_CGIBIN/general.sh"
