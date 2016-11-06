@@ -15,7 +15,7 @@ PRJ="RLBackup"
 
 ##
 # Variable pour les backups MySQL, les tables dont le nom commencent
-# par cette chaîne sont exclue de backup_mysql_full.sh
+# par cette chaîne sont exclues de backup_mysql_full.sh
 MYSQL_DB_EXCLUDE_PREFIX=
 
 ##
@@ -52,7 +52,7 @@ DEBUG=${DEBUG:-0}
 #
 # Taille d'un fichier en octets
 
-sizeOf ()
+function sizeOf()
 {
  wc -c $1 | awk '{print $1}'
 }
@@ -74,12 +74,12 @@ linesOf ()
 #
 # Retourne la somme de contrôle de $file
 
-checkSum ()
+function checkSum()
 {
   cksum $1 | awk '{print $1}'
 }
 
-checkSumFile()
+function checkSumFile()
 {
     checkSum "$1" > "$1".csum
 }
