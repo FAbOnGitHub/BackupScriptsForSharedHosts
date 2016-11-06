@@ -18,18 +18,15 @@ ME=$(basename $Self)
 DIR=$(dirname $0) #Resolving path
 OLDPWD=$PWD
 cd $DIR 2>/dev/null; export LIB_PATH=$PWD; cd ..; ROOT=$PWD; cd $OLDPWD >/dev/null
-
 . $LIB_PATH/boot.sh
 
 D_BACKUP=
 #
 # This script cannot rely on boot.sh and other configuration file, that's
-# there such an ignomious hack :
-dirs -c
+# there such an ignomious hack :  ~Not, I'm confused now~
 case $(hostname -s) in
     antaya)
         D_WWW=$ROOT/htdocs
-        D_BACKUP=$D_WWW/Backup_DFREvSD
         ;;
     orion)
         #no more exception
@@ -43,8 +40,8 @@ case $(hostname -s) in
         ;;
 esac
 #echo "ROOT=$ROOT"
-#D_CGIBIN=$ROOT/cgi-bin
-#D_CGIETC=$ROOT/cgi-etc
+D_CGIBIN=$ROOT/cgi-bin
+D_CGIETC=$ROOT/cgi-etc
 D_SECRET=$ROOT/secret
 F_SECRET=$D_SECRET/rl.pw
 D_WIKI=$D_WWW/wiki
