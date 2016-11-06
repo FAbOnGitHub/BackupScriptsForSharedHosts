@@ -15,20 +15,22 @@ PRJ="RLBackup"
 
 ##
 # Variable pour les backups MySQL, les tables dont le nom commencent
-# par cette chaîne sont exclue de backup_mysql_full.sh
+# par cette chaîne sont exclues de backup_mysql_full.sh
 MYSQL_DB_EXCLUDE_PREFIX=
 
 ##
 # Compress et crypto variables
-sCompressProg=gzip
+sCompressProg=/bin/gzip
 sCompressArgs='-9'
-sCypherProg=gpg
+sCypherProg=/usr/bin/gpg2
 sCypherArgs=
 ##
 # Mail variables
 bUseMailWarning=1
 bMailCommandAvaible=1
 NOTIFY_SUBJECT="Errors occured, please inspect log='%LOG_FILE'"
+## Attention %LOG_FILE = template
+
 # $LOG_FILE n'est pas encore définie
 ##
 # Système qui permet au serveur source (à sauvegarder) de définir des fichiers
@@ -41,6 +43,7 @@ NOTIFY_SUBJECT="Errors occured, please inspect log='%LOG_FILE'"
 bUseDistantBakFile=1
 sDistantBakFilename="Please_backup.lst"
 
+DEBUG=${DEBUG:-0}
 
 ###
 # Functions
@@ -48,10 +51,9 @@ sDistantBakFilename="Please_backup.lst"
 # sizeOf $file
 #
 # Taille d'un fichier en octets
-
-sizeOf ()
+function sizeOf()
 {
- wc -c $1 | awk '{print $1}'
+    wc -c $1 | awk '{print $1}'
 }
 
 # lineOf $file
@@ -71,12 +73,12 @@ linesOf ()
 #
 # Retourne la somme de contrôle de $file
 
-checkSum ()
+function checkSum()
 {
   cksum $1 | awk '{print $1}'
 }
 
-checkSumFile()
+function checkSumFile()
 {
     checkSum "$1" > "$1".csum
 }
@@ -118,16 +120,51 @@ function fileRotate ()
 # Affiche un message de débogage
 function debug()
 {
-    if [ $DEBUG -gt 0 ]; then
-        [ $DEBUG -gt 1 ] && echo -e "DBG : $@"
-        echo -e "`date +"%F %T"` DBG : $@" >>$LOG_FILE
-    fi
+    case "x$DEBUG" in
+        "x0"|"x1"|"x2")
+            if [ $DEBUG -gt 0 ]; then
+                [ $DEBUG -gt 1 ] && echo -e "DBG : $@"
+                echo -e "`date +"%F %T"` DBG : $@" >>$LOG_FILE
+            fi
+            ;;
+        *)
+            echo "debug() error : [DEBUG=$DEBUG]"
+            __fm_error
+            exit 123
+            ;;
+    esac
 }
+
+function __fm_trace()
+{
+    iNbLines=$(awk 'BEGIN{ i=0}
+        { i++}
+        END{ printf("%d\n", log(i) / log(10) +1)}' "${BASH_SOURCE[0]}")
+    [ "x$1" = "x" ] && iSkip=0 || iSkip=$1
+    error "Call stack:"
+    for((i=$iSkip; i<${#BASH_LINENO[*]}; i++))
+    do
+        printf "%s: line %0"$iNbLines"d: call %s\n" "${BASH_SOURCE[$i]}" \
+            "${BASH_LINENO[$i]}"  ${FUNCNAME[$i]} 1>&2
+
+    done
+    return 0
+}
+function __fm_error()
+{
+    __fm_trace 2
+    return 1
+}
+
+
 
 # Formate le message de debut et le pousse dans le fichier
 function fileLogger()
 {
     LOG_FILE=${LOG_FILE:-'/tmp/backup_scripts.log'}
+    if [ ! -f $LOG_FILE ]; then
+        backtrace
+    fi
     echo "$(date +"%F %T") $(basename $0) : $@" >> $LOG_FILE
 }
 
@@ -208,7 +245,11 @@ function reportByMail ()
         else
             sReport="$1"
         fi
-        view_today_logs| notify_email_stdin "$sReport"
+        if [ "x$2" != "x" ]; then
+            view_today_logs | grep "$2" | notify_email_stdin "$sReport"
+        else
+            view_today_logs| notify_email_stdin "$sReport"
+        fi
     fi
 }
 
@@ -318,7 +359,7 @@ function init_cypher()
     # Zip in default. ZIP_PASSWD always set.
     sCypherFct="do_cypher_zip"
 
-    which gpg  >/dev/null 2>&1
+    which $sCypherProg >/dev/null
     rc=$?
     if [ $rc -eq 0 ]; then
         if [ "x$GPG_KEYFILE" != "x" ]; then
@@ -334,6 +375,11 @@ function init_cypher()
         fi
         if [ "x$GPG_PASSWD" != "x" ]; then
             sCypherFct="do_cypher_gpg_s"
+	    if [ $sCypherProg = "/bin/gpg" ]; then
+		sCypherArgs=" $sCypherArgs --no-use-agent"
+            else
+                sCypherArgs=" $sCypherArgs --batch"
+	    fi
             bCypherInit=1
             return $EXIT_SUCCESS
         else
@@ -379,8 +425,9 @@ function do_cypher_zip()
 }
 function do_cypher_gpg_a()
 {
+    echo "$ME: WARNING ! No tested!"
     f="$1"
-    gpg  $GPG_KEYFILE --yes  "$f"
+    $sCypherProg  $sCypherArgs  $GPG_KEYFILE --yes  "$f"
     rc=$?
     [ $rc -eq 0 ] && echo "$f".gpg || echo ""
     return $rc
@@ -390,9 +437,11 @@ function do_cypher_gpg_a()
 function do_cypher_gpg_s()
 {
     f="$1"
-    gpg --no-use-agent -q -c --passphrase "$GPG_PASSWD" --yes "$f"
+
+    $sCypherProg $sCypherArgs -q -c --passphrase "$GPG_PASSWD" --yes "$f"
     rc=$?
     [ $rc -eq 0 ] && echo "$f".gpg || echo ""
+
     return $rc
     #mv "$f".gpg "$f".X
 }
@@ -419,6 +468,7 @@ function do_moveXferZone()
     X="$(do_cypher "$f")"
     rc=$?
     [ $rc -ne 0 ] && die "ERROR cypher f='f' (rc=$rc)"
+    rm "$f"
     F="$(basename "$X")"
     debug "[f=$f][X=$X][F=$F] $do_cypher_fct"
     debug "[BAK_DIR=$BAK_DIR][BAK_DIR_PUB=$BAK_DIR_PUB]"
@@ -442,15 +492,15 @@ function check_cmd()
 {
     if [ ! -f "$1" ]; then
         if [ "x$2" = "xoption" ]; then
-            say " [NOTFND] optional command $1 not found."
+            say " $NOTFOUND optional command $1 not found."
             return $EXIT_SUCCESS
         else
-            say " [NOTFND] command $1 not found."
+            say " $NOTFOUND command    $1 not found."
             return $EXIT_FAILURE
         fi
     fi
     if [ ! -x "$1" ]; then
-        say " [NOEXEC] command $1 not executable."
+        say " $NOTEXEC command $1 not executable."
         return $EXIT_FAILURE
     fi
     say " $ok command   '$1'."
@@ -575,7 +625,7 @@ function fix_execbit()
     shift
     rc=$EXIT_SUCCESS
     if [ ! -f "$f" ]; then
-        say " $NTFOUND execbit     '$f'"
+        say " $NOTFOUND execbit   '$f'"
         return $EXIT_FAILURE
     fi
     if [ ! -x "$f" ]; then
