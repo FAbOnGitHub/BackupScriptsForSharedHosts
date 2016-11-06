@@ -18,9 +18,10 @@ export EXIT_SUCCESS=0
 export EXIT_FAILURE=1
 ok='[__ok__]'
 KO='[**KO**]'
-NTFOUND='[NTFOUND]'
+NOTFOUND='[NOTFND]'
+NOTEXEC='[NOTEXE]'
 INFO='[__..__]'
-INFO='  info  '
+INFO='[ info ]'
 WARN='[=WARN=]'
 t2='=='
 t3='==='
@@ -87,6 +88,7 @@ case $ME in
     *)
         msg=$msg"\nDist script... bonus !"
         cfg_dist="$D_ETC/config_${hostname}_dist.sh"
+        echo "cfg_dist=$cfg_dist"
         if [ -f "$cfg_dist" ]; then
             msg=$msg"\nloading $cfg_dist"
             . "$cfg_dist"
@@ -95,8 +97,8 @@ case $ME in
         fi
         ;;
 esac
+debug "Booting logs :"
 debug "$msg"
-export DEBUG
 
 if [ "x$BAK_DIR_PUB" = "x" ]; then
     fileLogger "BAK_DIR_PUB not defined: set to BAK_DIR=$BAK_DIR"

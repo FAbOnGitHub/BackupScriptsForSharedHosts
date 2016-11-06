@@ -51,10 +51,9 @@ DEBUG=${DEBUG:-0}
 # sizeOf $file
 #
 # Taille d'un fichier en octets
-
 function sizeOf()
 {
- wc -c $1 | awk '{print $1}'
+    wc -c $1 | awk '{print $1}'
 }
 
 # lineOf $file
@@ -122,7 +121,7 @@ function fileRotate ()
 function debug()
 {
     case "x$DEBUG" in
-        "x1"|"x0")
+        "x0"|"x1"|"x2")
             if [ $DEBUG -gt 0 ]; then
                 [ $DEBUG -gt 1 ] && echo -e "DBG : $@"
                 echo -e "`date +"%F %T"` DBG : $@" >>$LOG_FILE
@@ -488,15 +487,15 @@ function check_cmd()
 {
     if [ ! -f "$1" ]; then
         if [ "x$2" = "xoption" ]; then
-            say " [NOTFND] optional command $1 not found."
+            say " $NOTFOUND optional command $1 not found."
             return $EXIT_SUCCESS
         else
-            say " [NOTFND] command $1 not found."
+            say " $NOTFOUND command    $1 not found."
             return $EXIT_FAILURE
         fi
     fi
     if [ ! -x "$1" ]; then
-        say " [NOEXEC] command $1 not executable."
+        say " $NOTEXEC command $1 not executable."
         return $EXIT_FAILURE
     fi
     say " $ok command   '$1'."
@@ -621,7 +620,7 @@ function fix_execbit()
     shift
     rc=$EXIT_SUCCESS
     if [ ! -f "$f" ]; then
-        say " $NTFOUND execbit     '$f'"
+        say " $NOTFOUND execbit   '$f'"
         return $EXIT_FAILURE
     fi
     if [ ! -x "$f" ]; then

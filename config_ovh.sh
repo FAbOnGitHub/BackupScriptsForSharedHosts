@@ -41,7 +41,8 @@
 
 #
 # DEBUG:  0=nothing, 1=log file, 2=log file and stdout
-DEBUG=$DEBUG
+#   can be overwritten from CLI during test/debug sessions
+DEBUG=${DEBUG:-0}
 #FR:  Penser à le redéfinir dans le fichier privé
 #FR:  0 par défaut mais peut être changé dans la ligne de commande pour tester
 #FR:  0=rien, 1=log fichier, 2=log fichier + écran
