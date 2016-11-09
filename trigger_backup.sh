@@ -83,12 +83,14 @@ fi
 LOG_URL="$(echo "$BAK_URL"|cut -d'@' -f2-)"
 
 
+rc_global=0
 for arg in $@
 do
     case $arg in
         'mysql'|'web'|'wiki'|'sql'|'check')
             trigger_action $arg
             rc=$?
+            let rc_global+=$rc
         ;;
         *)
             error "unknown commmand"
@@ -96,4 +98,4 @@ do
     esac
 done
 fileLogger "$ok $ME stopping <<<<<< "
-exit 0
+exit $rc_global
