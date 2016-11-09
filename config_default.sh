@@ -118,6 +118,15 @@ GPG_PASSWD=			# sinon un mdp pr chiffrement symétrique
 
 
 
+
+
+## #######################################
+## Logging facility
+## #######################################
+# Use logger system ?
+bUseLogger=1
+#FR: Active l'utilise des log dans logger (/var/log/syslog)
+
 ## #######################################
 ## Mail settings
 ## #######################################

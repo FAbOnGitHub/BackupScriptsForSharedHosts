@@ -89,6 +89,7 @@ function  parse_args() {
 
 ### Main
 #parse_args "$@"
+fileLogger "$ME started"
 
 say "= Analyse de la configuration et du système de fichier ="
 say "*** $ME : starting $(date) ***"
