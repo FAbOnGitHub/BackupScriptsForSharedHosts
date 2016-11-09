@@ -40,6 +40,7 @@ function trigger_action()
         sWgetMsg=":"$(wget_translate_error $rc )
     fi
     fileLogger "$status wget $target (rc=${rc}${sWgetMsg})"
+    reportByMail "$status wget $target (rc=${rc}${sWgetMsg})"
     return $rc
 }
 
