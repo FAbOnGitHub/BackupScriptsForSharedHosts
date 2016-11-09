@@ -161,11 +161,15 @@ function __fm_error()
 # Formate le message de debut et le pousse dans le fichier
 function fileLogger()
 {
+    if [ $bUseLogger -eq 1 ]; then
+        logger "b4sh $(basename $0) : $@"
+    fi
+    
     LOG_FILE=${LOG_FILE:-'/tmp/backup_scripts.log'}
     if [ ! -f $LOG_FILE ]; then
         backtrace
     fi
-    echo "$(date +"%F %T") $(basename $0) : $@" >> $LOG_FILE
+    echo "$(date +"%F %T") b4sh $(basename $0) : $@" >> $LOG_FILE
 }
 
 ###

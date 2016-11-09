@@ -99,6 +99,15 @@ case $ME in
 esac
 debug "$msg"
 
+if [ $bUseLogger -eq 1 ]; then
+    which logger >/dev/null 2>&1
+    rc=$?
+    if [ $rc -ne 0 ]; then
+        fileLogger "sorry, can't use logger"
+        bUseLogger=0
+    fi
+fi    
+
 if [ "x$BAK_DIR_PUB" = "x" ]; then
     fileLogger "BAK_DIR_PUB not defined: set to BAK_DIR=$BAK_DIR"
     #echo "BAK_DIR_PUB not defined: set to BAK_DIR=$BAK_DIR"
@@ -107,8 +116,10 @@ fi
 mkdir -p $BAK_DIR $LTS_DIR $BAK_DIR_PUB
 
 if [ "x$LOG_FILE" = "x" ]; then
-    export LOG_FILE=/tmp/scripts_RL.txt
-    echo "LOG_FILE not set, using default $LOG_FILE"
+    export LOG_FILE=/tmp/scripts_b4sh_${USER}.txt
+    touch $LOG_FILE
+    chmod o-rwx $LOG_FILE
+    echo "ALERT: LOG_FILE not set, using default $LOG_FILE"
 fi
 if [ "x$ERR_FILE" = "x" ]; then
     export ERR_FILE=$LOG_FILE
