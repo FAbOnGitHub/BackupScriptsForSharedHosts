@@ -31,7 +31,7 @@ function trigger_action()
     sWgetMsg=""
     wget $wget_quiet -t 3 --no-check-certificate --auth-no-challenge \
          -U $HTTP_AGENT \
-         -P $BAK_DIR "$BAK_URL/?action=$target" -O - 2>> $ERR_FILE
+         -P $BAK_DIR "${CMD_URL}?action=$target" -O - 2>> $ERR_FILE
     rc=$?
     if [ $rc -eq 0 ]; then
         status="$ok"        
@@ -39,8 +39,8 @@ function trigger_action()
         status="$KO"
         sWgetMsg=":"$(wget_translate_error $rc )
     fi
-    fileLogger "$status wget $target (rc=${rc}${sWgetMsg})"
-    reportByMail "$status wget $target (rc=${rc}${sWgetMsg})"
+    fileLogger "$status wget ${CMD_URL}?action=$target (rc=${rc}${sWgetMsg})"
+    reportByMail "$status wget ${CMD_URL}?action=$target (rc=${rc}${sWgetMsg})"
     return $rc
 }
 
