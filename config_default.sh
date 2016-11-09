@@ -220,6 +220,10 @@ BAK_URL=https://login:password@you_domain.tld/backup_SecretToken
 URL_USER="mylogin"
 URL_PASS="MySecretPassword"
 BAK_URL="http://${URL_USER}:${URL_PASS}@domain.tld/Token"
+
+# URL to trigger commands
+CMD_URL=https://login:password@you_domain.tld/other/token
+
 # Liste archives
 TARGET_SRV=antaya
 
