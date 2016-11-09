@@ -31,7 +31,7 @@ function trigger_action()
     sWgetMsg=""
     wget $wget_quiet -t 3 --no-check-certificate --auth-no-challenge \
          -U $HTTP_AGENT \
-         -P $BAK_DIR "$BAK_URL/?action=$target" 2>> $ERR_FILE
+         -P $BAK_DIR "$BAK_URL/?action=$target" -O - 2>> $ERR_FILE
     rc=$?
     if [ $rc -eq 0 ]; then
         status="$ok"        
