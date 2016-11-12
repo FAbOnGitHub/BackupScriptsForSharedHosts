@@ -28,7 +28,7 @@ cd $DIR 2>/dev/null; export LIB_PATH=$PWD; cd - >/dev/null
 ME=$0
 
 #
-#
+# à reprendre pour y mettre les fonctions de general.sh (soon)
 #
 function do_zip()
 {
@@ -165,14 +165,16 @@ if [ "x$ZIP_PASSWD" = "x" ]; then
 fi
 
 let iNbTargetOk=0
+let iNbTarget=0
 cd $BAK_DIR
 debug "dumpBase $SQL_SERVER1,$SQL_BASE1,$SQL_USER1,$SQL_PASSWD1"
 dumpBase $SQL_SERVER1 $SQL_BASE1 $SQL_USER1 $SQL_PASSWD1 $SQL_TABLES1
+let iNbTarget++
 
 # 2016-05-29 Sur la demande d'olivier
 #debug "dumpBase $SQL_SERVER2,$SQL_BASE2,$SQL_USER2,$SQL_PASSWD2"
 #dumpBase $SQL_SERVER2 $SQL_BASE2 $SQL_USER2 $SQL_PASSWD2
-
+#let iNbTarget++
 
 # if [ $GENERAL_SUCCESS -eq $EXIT_FAILURE ]; then
 #     if [ $bUseMailWarning -eq 1 ]; then
@@ -182,14 +184,14 @@ dumpBase $SQL_SERVER1 $SQL_BASE1 $SQL_USER1 $SQL_PASSWD1 $SQL_TABLES1
 
 if [ $GENERAL_SUCCESS -eq $EXIT_SUCCESS ]; then
     sLabel="[KO]"
-elif [ $iNbTargetOk -ne 2 ]; then
+elif [ $iNbTargetOk -ne $iNbTarget ]; then
     sLabel="[KO]"
 else
     sLabel="[ok]"
 fi
 
 if [ $bUseMailWarning -eq 1 ]; then
-    sReport="$sLabel[$iNbTargetOk/2] DB saved"
+    sReport="$sLabel[$iNbTargetOk/$iNbTarget] DB saved"
     view_today_logs| notify_email_stdin "$sReport"
 fi
 
