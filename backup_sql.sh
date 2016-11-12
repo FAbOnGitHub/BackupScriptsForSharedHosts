@@ -154,16 +154,16 @@ function dumpBase()
 # Main
 ########
 if [ ! \( -d $BAK_DIR -a -w $BAK_DIR \) ]; then
-  fileLogger "$KO ERR dossier `basename $BAK_DIR` inaccessible"
+  fileLogger "$KO ERR directory `basename $BAK_DIR` not found or not writeable"
   exit 1
 fi
 if [ ! \( -d $BAK_DIR_PUB -a -w $BAK_DIR_PUB \) ]; then
-  fileLogger "$KO ERR dossier `basename $BAK_DIR_PUB` inaccessible"
+  fileLogger "$KO ERR firectory `basename $BAK_DIR_PUB` not found or not writeable ?"
   exit 1
 fi
 
 if [ ! -f $BAK_DIR_PUB/.htaccess ]; then
-  fileLogger "$KO ERR fichier .htaccess inaccessible dans  `basename $BAK_DIR_PUB`"
+  fileLogger "$KO ERR file .htaccess not found in `basename $BAK_DIR_PUB`"
   rm -f $BAK_DIR_PUB/$SQL_BASE1.sql.zip $BAK_DIR_PUB/$SQL_BASE2.sql.zip
   exit 1
 fi
