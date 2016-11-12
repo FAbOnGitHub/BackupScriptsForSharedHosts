@@ -120,14 +120,14 @@ function dumpBase()
             exclude="$exclude --ignore-table=${base}.${table}"
             name=${base}.${table}
             ## Attention au -n pour pas créer de DB
-            mysqldump -h $srv -u $user -p -l -n $base $table \
+            mysqldump -h $srv -u $user -l -n $base $table \
                 1>$BAK_DIR/${name}.sql 2>>$ERR_FILE
             res=$?
             if [ $res -eq 0 ]; then
                 #doZip ${name}
                 do_moveXferZone $BAK_DIR/${name}.sql
             else
-                fileLogger "mysqldump -h $srv -u $user -pPASSWORD -l -n $base $table"
+                fileLogger "mysqldump -h $srv -u $user  -l -n $base $table"
                 fileLogger "mysqldump has failed (rc=$res)"
                 hasFailed
             fi
@@ -142,7 +142,7 @@ function dumpBase()
 
     if [ $res -eq 0 ]; then
         #doZip $base
-        do_moveXferZone "$base"
+        do_moveXferZone "$BAK_DIR/$base.sql"
         let iNbTargetOk++
     else
         hasFailed
@@ -162,7 +162,7 @@ if [ ! \( -d $BAK_DIR_PUB -a -w $BAK_DIR_PUB \) ]; then
   exit 1
 fi
 
-if [ ! -f $BAK_DIR_PUB/.htaccess ]; then
+if [ ! -f ${BAK_DIR_PUB}/.htaccess ]; then
   fileLogger "$KO ERR file .htaccess not found in `basename $BAK_DIR_PUB`"
   rm -f $BAK_DIR_PUB/$SQL_BASE1.sql.zip $BAK_DIR_PUB/$SQL_BASE2.sql.zip
   exit 1
