@@ -26,6 +26,7 @@ cd $DIR 2>/dev/null; export LIB_PATH=$PWD; cd - >/dev/null
 
 
 ME=$0
+bDoCypher=${bDoCypher:-0}
 
 #
 # à reprendre pour y mettre les fonctions de general.sh (soon)
@@ -89,7 +90,7 @@ function dumpBase()
     pass=$4
     exclude=''
 
-    rm -f BAK_DIR/$base.sql.zip
+    rm -f $BAK_DIR/$base.sql.zip
     if [ "x$srv" = "x" ]; then
         fileLogger "$KO $0 : pas de serveur indiqué... abandon"
         hasFailed
@@ -110,7 +111,8 @@ function dumpBase()
         hasFailed
         return 1
     fi
-
+    export MYSQL_PWD="$pass"
+    
     if [ "x$5" != "x" ]; then
         shift; shift; shift; shift; #drop $1 $2 $3 $4 for $@
         for table in $@
@@ -118,11 +120,12 @@ function dumpBase()
             exclude="$exclude --ignore-table=${base}.${table}"
             name=${base}.${table}
             ## Attention au -n pour pas créer de DB
-            mysqldump -h $srv -u $user -p$pass -l -n $base $table \
+            mysqldump -h $srv -u $user -p -l -n $base $table \
                 1>$BAK_DIR/${name}.sql 2>>$ERR_FILE
             res=$?
             if [ $res -eq 0 ]; then
-                doZip ${name}
+                #doZip ${name}
+                do_moveXferZone $BAK_DIR/${name}.sql
             else
                 fileLogger "mysqldump -h $srv -u $user -pPASSWORD -l -n $base $table"
                 fileLogger "mysqldump has failed (rc=$res)"
@@ -133,12 +136,13 @@ function dumpBase()
     fi
 
     # bug ! Fallait pas le -B
-    mysqldump -h $srv -u $user -p$pass $exclude -l $base \
+    mysqldump -h $srv -u $user $exclude -l $base \
         1>$BAK_DIR/$base.sql 2>>$ERR_FILE
     res=$?
 
     if [ $res -eq 0 ]; then
-        doZip $base
+        #doZip $base
+        do_moveXferZone "$base"
         let iNbTargetOk++
     else
         hasFailed
@@ -152,9 +156,9 @@ if [ ! \( -d $BAK_DIR -a -w $BAK_DIR \) ]; then
   fileLogger "$KO ERR dossier `basename $BAK_DIR` inaccessible"
   exit 1
 fi
-if [ ! -f $BAK_DIR/.htaccess ]; then
+if [ ! -f $BAK_DIR_PUB/.htaccess ]; then
   fileLogger "$KO ERR fichier .htaccess inaccessible"
-  rm -f $BAK_DIR/$SQL_BASE1.sql.zip $BAK_DIR/$SQL_BASE2.sql.zip
+  rm -f $BAK_DIR_PUB/$SQL_BASE1.sql.zip $BAK_DIR_PUB/$SQL_BASE2.sql.zip
   exit 1
 fi
 if [ "x$ZIP_PASSWD" = "x" ]; then
