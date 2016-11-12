@@ -40,12 +40,16 @@ rm -f $ZIP_FILE
 zip -qr9 -P $ZIP_PASSWD $ZIP_FILE $WIKI_DIR \
     2>>$ERR_FILE
 res=$?
+# if [ $res -eq 0 ]; then
+#     csum=`checkSum $ZIP_FILE 2>>$ERR_FILE`
+#     size=`sizeOf $ZIP_FILE 2>>$ERR_FILE`
+#     echo $csum > $ZIP_FILE.csum
+#     fileLogger "$ok zip / OK ($size octets)"
+# else
+#     rm -f $ZIP_FILE
+#     fileLogger "$KO zip / ERR (code $res)"
+# fi
+
 if [ $res -eq 0 ]; then
-    csum=`checkSum $ZIP_FILE 2>>$ERR_FILE`
-    size=`sizeOf $ZIP_FILE 2>>$ERR_FILE`
-    echo $csum > $ZIP_FILE.csum
-    fileLogger "$ok zip / OK ($size octets)"
-else
-    rm -f $ZIP_FILE
-    fileLogger "$KO zip / ERR (code $res)"
+    do_moveXferZone $ZIP_FILE
 fi
