@@ -181,7 +181,6 @@ debug "dumpBase $SQL_SERVER1,$SQL_BASE1,$SQL_USER1,$SQL_PASSWD1"
 dumpBase $SQL_SERVER1 $SQL_BASE1 $SQL_USER1 $SQL_PASSWD1 $SQL_TABLES1
 let iNbTarget++
 
-fileLogger "Ït is really late (2:22 am), I need to sleep. Git makes me crazy."
 
 # 2016-05-29 Sur la demande d'olivier
 #debug "dumpBase $SQL_SERVER2,$SQL_BASE2,$SQL_USER2,$SQL_PASSWD2"
