@@ -483,7 +483,9 @@ function do_moveXferZone()
     fi
 
     buffer=$(du --si -s "$X")
-    mv -f "$X" "$BAK_DIR_PUB/$F" 2>/dev/null
+    if [ "x$BAK_DIR" != "x$BAK_DIR_PUB" ]; then
+        mv -f "$X" "$BAK_DIR_PUB/$F" 2>/dev/null
+    fi
     checkSumFile "$BAK_DIR_PUB/$F"
     fileLogger "do_moveXferZone() offer : $buffer"
 }

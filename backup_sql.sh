@@ -28,49 +28,49 @@ cd $DIR 2>/dev/null; export LIB_PATH=$PWD; cd - >/dev/null
 ME=$0
 bDoCypher=${bDoCypher:-0}
 
-#
-# à reprendre pour y mettre les fonctions de general.sh (soon)
-#
-function do_zip()
-{
-    base=$1
+# #
+# # à reprendre pour y mettre les fonctions de general.sh (soon)
+# #
+# function do_zip()
+# {
+#     base=$1
 
-    zip -qr9 -P $ZIP_PASSWD $BAK_DIR/$base.sql.zip $BAK_DIR/$base.sql 2>>$ERR_FILE
-    res=$?
-    if [ $res -eq 0 ]; then
-        csum=`checkSum $BAK_DIR/$base.sql.zip 2>>$ERR_FILE`
-        size=`sizeOf $BAK_DIR/$base.sql.zip 2>>$ERR_FILE`
-        echo $csum > $BAK_DIR/$base.sql.zip.csum
-        fileLogger "[ ok ] backup $base.sql OK ($size octets)"
-    else
-        rm -f $BAK_DIR/$base.sql.zip
-        fileLogger  "[ KO ] zip $base.sql ERR (code $res)"
-        hasFailed
-    fi
+#     zip -qr9 -P $ZIP_PASSWD $BAK_DIR/$base.sql.zip $BAK_DIR/$base.sql 2>>$ERR_FILE
+#     res=$?
+#     if [ $res -eq 0 ]; then
+#         csum=`checkSum $BAK_DIR/$base.sql.zip 2>>$ERR_FILE`
+#         size=`sizeOf $BAK_DIR/$base.sql.zip 2>>$ERR_FILE`
+#         echo $csum > $BAK_DIR/$base.sql.zip.csum
+#         fileLogger "[ ok ] backup $base.sql OK ($size octets)"
+#     else
+#         rm -f $BAK_DIR/$base.sql.zip
+#         fileLogger  "[ KO ] zip $base.sql ERR (code $res)"
+#         hasFailed
+#     fi
 
-}
+# }
 
 
 #bERROR=0 #deprecated
 GENERAL_SUCCESS=$EXIT_SUCCESS
 
-function doZip()
-{
-    toZip=$1
-    zip -qr9 -P $ZIP_PASSWD $BAK_DIR/${toZip}.sql.zip $BAK_DIR/${toZip}.sql 2>>$ERR_FILE
-    res=$?
-    if [ $res -eq 0 ]; then
-      csum=`checkSum $BAK_DIR/${toZip}.sql.zip 2>>$ERR_FILE`
-      size=`sizeOf $BAK_DIR/${toZip}.sql.zip 2>>$ERR_FILE`
-      echo $csum > $BAK_DIR/${toZip}.sql.zip.csum
-      fileLogger "$ok backup ${toZip}.sql $size octets)"
-    else
-      rm -f $BAK_DIR/$base.sql.zip
-      fileLogger  "$KO zip ${toZip}.sql (code $res)"
-      bERROR=1
-    fi
-    rm -f $BAK_DIR/${toZip}.sql 2>>$ERR_FILE
-}
+# function doZip()
+# {
+#     toZip=$1
+#     zip -qr9 -P $ZIP_PASSWD $BAK_DIR/${toZip}.sql.zip $BAK_DIR/${toZip}.sql 2>>$ERR_FILE
+#     res=$?
+#     if [ $res -eq 0 ]; then
+#       csum=`checkSum $BAK_DIR/${toZip}.sql.zip 2>>$ERR_FILE`
+#       size=`sizeOf $BAK_DIR/${toZip}.sql.zip 2>>$ERR_FILE`
+#       echo $csum > $BAK_DIR/${toZip}.sql.zip.csum
+#       fileLogger "$ok backup ${toZip}.sql $size octets)"
+#     else
+#       rm -f $BAK_DIR/$base.sql.zip
+#       fileLogger  "$KO zip ${toZip}.sql (code $res)"
+#       bERROR=1
+#     fi
+#     rm -f $BAK_DIR/${toZip}.sql 2>>$ERR_FILE
+# }
 
 
 # dumpBase $serveur $base $user $passwd $*
