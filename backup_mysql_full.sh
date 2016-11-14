@@ -98,7 +98,8 @@ do
         "information_schema"|"performance_schema")
             let iCountThisOne=0
             let iSkipThisOne++
-            sLock="--skip-lock-tables"
+            #sLock="--skip-lock-tables"
+            fileLogger "$ME '$db' skipped ${date} "
             continue # New ; skip virtual databases
             ;;
         *)
@@ -106,29 +107,17 @@ do
             #sLock="-l";;
             ;;        
     esac
-
-    if [ "$db" = "performance_schema" ]; then
-        debug  "$WARN performance_schema ignored"
-        continue
-    fi
-    if [ "$db" = "information_schema" ]; then
-        if [ $COMPAT56 = "false" ]; then
-            debug  "$WARN information_schema ignored (no compat56)"
-            continue
-        fi
-    fi
-
     
-    fileLogger "$ME '$db' found ${date}"
 #    dumpfile="${db}_${date}.sql"
     dumpfile="${db}.sql"
 
     mysqldump -h $MYSQL_HOST -u $MYSQL_USER $MYSQL_OPT $sLock $mysql_opt ${db} >"$dumpfile" 2>>$ERR_FILE
     rc=$?
     if [ $rc -ne $EXIT_SUCCESS ]; then
-        error "$KO mysqldump '$db' failed (rc=$rc)"
+        error "$KO $ME '$db' failed (rc=$rc)"
         continue
     else
+        fileLogger "$OK $ME '$db' found ${date} dump ok"
         let iNbTargetOk+=$iCountThisOne
     fi
 
@@ -166,3 +155,16 @@ reportByMail "$sReport" "$ME"
 
 # see to use rc=$? and then exit $rc
 exit $EXIT_SUCCESS
+
+
+
+    # if [ "$db" = "performance_schema" ]; then
+    #     debug  "$WARN performance_schema ignored"
+    #     continue
+    # fi
+    # if [ "$db" = "information_schema" ]; then
+    #     if [ $COMPAT56 = "false" ]; then
+    #         debug  "$WARN information_schema ignored (no compat56)"
+    #         continue
+    #     fi
+    # fi
