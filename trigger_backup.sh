@@ -35,9 +35,9 @@ function trigger_action()
     # -O -
     rc=$?
     if [ $rc -eq 0 ]; then
-        status="$ok"        
+        status="[ok]"        
     else
-        status="$KO"
+        status="[KO]"
         sWgetMsg=":"$(wget_translate_error $rc )
     fi
     fileLogger "$status wget ${CMD_URL}?action=$target (rc=${rc}${sWgetMsg})"
