@@ -38,6 +38,9 @@
     In a second time, another machine =HOST B= can connect to this pseudo public
     aera in HTTP(s) and retrieve those archives : see =import_backup2.sh= 
 
+    file:Docs/b4sh_schema.png
+
+
 
 *** What can be saved ?
 
