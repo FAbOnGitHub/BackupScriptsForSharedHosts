@@ -66,21 +66,6 @@ if [ ${#aDB[*]} -eq 0 ]; then
     die " $KO no databases found."
 fi
 
-vars="$(echo "show variables;" | mysql -u $MYSQL_USER \
-                          | grep innodb_version| cut -c 16- \
-                          |sed -e "s@\([0-9]\).\([0-9]\)\(.*\)@maj=\1 min=\2@")"
-
-export $vars
-#echo "[maj=$maj][min=$min]"
-COMPAT56=true
-if [ $maj -eq 5 ]; then
-    if [ $min -ge 7 ]; then
-        COMPAT56=false
-    fi
-elif [ $maj -gt 5 ]; then
-    COMPAT56=false
-fi
-
 cd $BAK_DIR
 rm -rf $dir
 mkdir -m 0700 $dir
@@ -156,6 +141,23 @@ reportByMail "$sReport" "$ME"
 # see to use rc=$? and then exit $rc
 exit $EXIT_SUCCESS
 
+
+
+
+# vars="$(echo "show variables;" | mysql -u $MYSQL_USER \
+#                           | grep innodb_version| cut -c 16- \
+#                           |sed -e "s@\([0-9]\).\([0-9]\)\(.*\)@maj=\1 min=\2@")"
+
+# export $vars
+# #echo "[maj=$maj][min=$min]"
+# COMPAT56=true
+# if [ $maj -eq 5 ]; then
+#     if [ $min -ge 7 ]; then
+#         COMPAT56=false
+#     fi
+# elif [ $maj -gt 5 ]; then
+#     COMPAT56=false
+# fi
 
 
     # if [ "$db" = "performance_schema" ]; then
