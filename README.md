@@ -28,6 +28,8 @@ archives and put them in a pseudo public area.
 In a second time, another machine `HOST B` can connect to this pseudo public
 aera in HTTP(s) and retrieve those archives : see `import_backup2.sh` 
 
+![img](Docs/b4sh_schema.png)
+
 
 ### What can be saved ?
 
@@ -115,6 +117,16 @@ usage.
 -   Long Term Support directory for imported archives : archives are retrieved
     and stored  by day except  that you can  specify a day  to push them  in a
     non-overwritten directory.
+
+
+### Daily usage : how to be warned ?
+
+If you can enable the mail system, you  will receive a mail by script and by
+day. 
+
+You can apply  a mail-filter on the subject with  begins with "`script[ok]`"
+or "`script[KO]`".  You can autmaticly redirect  the ok' ones into  a folder
+and keep the KO into the inbox.
 
 
 ### What about security ?
