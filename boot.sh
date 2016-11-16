@@ -31,6 +31,13 @@ VERBOSE=${VERBOSE:-0}
 export ok KO NTFOUND INFO WARN t2 t3 t4
 export DEBUG VERBOSE
 
+# Labels :
+L_DUMP="_DUMP_____"
+L_COMPRESS="_COMPRESS_"
+L_CYPHER="_CYPHER___"
+L_OFFER="_OFFER____"
+export L_DUMP L_COMPRESS L_CYPHER L_OFFER
+
 ### Variables:
 # BAK_DIR :	répertoire où sont fabriquées les archives
 # BAK_DIR_PUB :	répertoire où le serveur dépose les archives pour le client
@@ -114,6 +121,8 @@ if [ "x$BAK_DIR_PUB" = "x" ]; then
     BAK_DIR_PUB=$BAK_DIR
 fi
 mkdir -p $BAK_DIR $LTS_DIR $BAK_DIR_PUB
+chmod 700 $BAK_DIR
+chmod a+rx $BAK_DIR_PUB
 
 if [ "x$LOG_FILE" = "x" ]; then
     export LOG_FILE=/tmp/scripts_b4sh_${USER}.txt
@@ -123,15 +132,17 @@ if [ "x$LOG_FILE" = "x" ]; then
 fi
 if [ "x$ERR_FILE" = "x" ]; then
     export ERR_FILE=$LOG_FILE
-    date > $ERR_FILE
+    echo "Set error file to log file $(date)" >> $ERR_FILE
     chmod o-rwx $ERR_FILE
 fi
+
 if [ ! -f "$LOG_FILE" ]; then
-    date > $LOG_FILE
+    echo "new log file ($date)" > $LOG_FILE
     chmod o-rwx $LOG_FILE
 fi
+
 if [ ! -f "$ERR_FILE" ]; then
-    date > $ERR_FILE
+    echo "no such ERR_FILE=$ERR_FILE $(date) " > $ERR_FILE
     chmod o-rwx $ERR_FILE
 fi
 if [ "x$ZIP_PASSWD" = "x" ]; then
@@ -142,6 +153,10 @@ fi
 if [ "x$BAK_DIR_PUB" = "x" ]; then
     fileLogger "BAK_DIR_PUB is not defined... set to \$BAK_DIR"
     BAK_DIR_PUB=$BAK_DIR
+fi
+
+if [ "x$BAK_DIR_PUB" = "x$BAK_DIR" ]; then
+    fileLogger "$WARN BAK_DIR_PUB and BAK__DIR are the same, this a bad idea"
 fi
 
 
@@ -165,3 +180,4 @@ function viewConfig()
      fi
  fi
 
+logStart

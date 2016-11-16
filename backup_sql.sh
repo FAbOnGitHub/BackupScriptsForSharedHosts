@@ -121,14 +121,13 @@ function dumpBase()
             name=${base}.${table}
             ## Attention au -n pour pas créer de DB
             mysqldump -h $srv -u $user -l -n $base $table \
-                1>$BAK_DIR/${name}.sql 2>>$ERR_FILE
+                1>"$BAK_DIR/${name}.sql" 2>>$ERR_FILE
             res=$?
             if [ $res -eq 0 ]; then
-                #doZip ${name}
-                do_moveXferZone $BAK_DIR/${name}.sql
+                fileLogger "$ok $L_DUMP $base $table"
+                do_moveXferZone "$BAK_DIR/${name}.sql"
             else
-                fileLogger "mysqldump -h $srv -u $user  -l -n $base $table"
-                fileLogger "mysqldump has failed (rc=$res)"
+                fileLogger "$KO $L_DUMP $srv/$base/$table (rc=$res)"
                 hasFailed
             fi
         done
@@ -141,12 +140,12 @@ function dumpBase()
     res=$?
 
     if [ $res -eq 0 ]; then
-        #doZip $base
+        fileLogger "$ok $L_DUMP $base $table"
         do_moveXferZone "$BAK_DIR/$base.sql"
         let iNbTargetOk++
     else
+        fileLogger "$KO $L_DUMP $srv/$base/$table (rc=$res)"
         hasFailed
-        fileLogger "$KO mysqldump $base ERR (code $res)"
     fi
 }
 
@@ -206,5 +205,5 @@ if [ $bUseMailWarning -eq 1 ]; then
     view_today_logs| notify_email_stdin "$sReport"
 fi
 
-
+logStop
 exit $GENERAL_SUCCESS

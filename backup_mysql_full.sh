@@ -74,6 +74,7 @@ cd $dir || die "Cannot access to dir '$dir'"
 date=$(date  +"%Y%m%d-%H%M%S")
 #Loop
 let iNbTargetOk=0
+let iNbTargetErr=0
 let iCountThisOne=1
 let iSkipThisOne=0
 for db in ${aDB[*]}
@@ -84,7 +85,7 @@ do
             let iCountThisOne=0
             let iSkipThisOne++
             #sLock="--skip-lock-tables"
-            fileLogger "$ME '$db' skipped ${date} "
+            fileLogger "$ok '$db' skipped ${date} "
             continue # New ; skip virtual databases
             ;;
         *)
@@ -99,10 +100,11 @@ do
     mysqldump -h $MYSQL_HOST -u $MYSQL_USER $MYSQL_OPT $sLock $mysql_opt ${db} >"$dumpfile" 2>>$ERR_FILE
     rc=$?
     if [ $rc -ne $EXIT_SUCCESS ]; then
-        error "$KO $ME '$db' failed (rc=$rc)"
+        error "$KO '$db' failed (rc=$rc)"
+        let iNbTargetErr++
         continue
     else
-        fileLogger "$OK $ME '$db' found ${date} dump ok"
+        fileLogger "$ok '$db' dumped ${date} ok"
         let iNbTargetOk+=$iCountThisOne
     fi
 
@@ -110,7 +112,7 @@ done
 
 cd ..
 buffer="$(du --si -s "$dir")"
-fileLogger "$buffer"
+fileLogger "$ok $L_DUMP $buffer"
 
 if [ $bDoCompressAll -eq 1 ]; then
     do_compress_clean  "$DIR".zip "$dir"
@@ -135,9 +137,10 @@ else
     sLabel="[KO]"
 fi
 
-sReport="$sLabel[$iNbTargetOk+$iSkipThisOne/$c] DB saved "
+sReport="$sLabel[$iNbTargetOk+$iSkipThisOne/$c($iNbTargetErr)] DB saved "
 reportByMail "$sReport" "$ME"
 
+logStop
 # see to use rc=$? and then exit $rc
 exit $EXIT_SUCCESS
 

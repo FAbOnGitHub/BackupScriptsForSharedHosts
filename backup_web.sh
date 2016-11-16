@@ -17,35 +17,28 @@ cd $DIR 2>/dev/null; export LIB_PATH=$PWD; cd - >/dev/null
 . $LIB_PATH/boot.sh
 
 
-ZIP_FILE=$BAK_DIR/www.zip
+ARCH_FILE=$BAK_DIR/www.zip
 
-if [ ! \( -d $BAK_DIR -a -w $BAK_DIR \) ]; then
-    fileLogger "$KO ERR dossier `basename $BAK_DIR` inaccessible"
-    exit 1
-fi
-if [ ! -f $BAK_DIR/.htaccess ]; then
-    fileLogger "$KO ERR fichier .htaccess inaccessible"
-    rm -f $ZIP_FILE
-    exit 1
-fi
 if [ "x$ZIP_PASSWD" = "x" ]; then
-    fileLogger "[ KO ] ZIP_PASSWD est vide... abandon"
+    fileLogger "$KO ZIP_PASSWD est vide... abandon"
     exit 1
 fi
 
 
-rm -f $ZIP_FILE
-zip -qr9 -P $ZIP_PASSWD $ZIP_FILE $WWW_DIR \
+rm -f $ARCH_FILE
+zip -qr9 -P $ZIP_PASSWD $ARCH_FILE $WWW_DIR \
     -x $BAK_DIR/\* -x $WIKI_DIR/\* -x $WWW_DIR/backup_\* \
     -x $UPLOAD_DIR -x $WWW_DIR/upload\*
     2>>$ERR_FILE
-res=$?
-if [ $res -eq 0 ]; then
-    csum=`checkSum $ZIP_FILE 2>>$ERR_FILE`
-    size=`sizeOf $ZIP_FILE 2>>$ERR_FILE`
-    echo $csum > $ZIP_FILE.csum
-    fileLogger "[ ok ] zip / OK ($size octets)"
+rc=$?
+if [ $rc -eq 0 ]; then
+    fileLogger "$ok $L_DUMP $ARCH_FILE"
+    do_moveXferZone "$ARCH_FILE"
+    rc=$?
 else
     rm -f $ZIP_FILE
-    fileLogger  "$KO zip / ERR (code $?)"
+    fileLogger  "$KO $L_DUMP ERR (code $?)"
 fi
+
+logStop
+return $rc
