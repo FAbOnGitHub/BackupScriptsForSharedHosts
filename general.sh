@@ -122,6 +122,9 @@ function fileRotate ()
 # Affiche un message de débogage
 function debug()
 {
+    if [ ! -f $LOG_FILE ]; then
+        LOG_FILE=/dev/stderr
+    fi
     case "x$DEBUG" in
         "x0"|"x1"|"x2")
             if [ $DEBUG -gt 0 ]; then
