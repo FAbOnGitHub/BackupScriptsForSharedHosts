@@ -69,14 +69,18 @@ switch($action)
   case 'sql':
     define('BAK_CMD', $path.'/backup_sql.sh'.$LOG.';');
     break;
+  case 'mysql':
+    define('BAK_CMD', $path.'/backup_mysql_full.sh'.$LOG.';');
+    break;
+
   case 'safe': //all
     define('BAK_CMD', "/bin/bash $path/backup_web.sh 2>>$LOG_FILE ;"
            ."/bin/bash  $path/backup_wiki.sh 2>>$LOG_FILE ;"
            ."/bin/bash  $path/backup_sql.sh 2>>$LOG_FILE ;");
     break;
 
-  default: //all
-    define('BAK_CMD', '~/cgi-bin/backup_web.sh; ~/cgi-bin/backup_wiki.sh; ~/cgi-bin/backup_sql.sh;'.$LOG);
+  default: //n0thing! Use sage instead     
+      #define('BAK_CMD', '~/cgi-bin/backup_web.sh; ~/cgi-bin/backup_wiki.sh; ~/cgi-bin/backup_sql.sh;'.$LOG);
     break;
   }
 

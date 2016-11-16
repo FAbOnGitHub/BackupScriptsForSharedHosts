@@ -86,6 +86,7 @@ function checkSumFile()
 # log $file $msg
 #
 # Ecrit un message dans un journal FIFO d'au plus LOG_MAX_SIZE entrées.
+#  OBSOLETE
 function log()
 {
   echo `date +%a\ %d/%m/%g\ %X` `basename $0` ":" $2 > $TMP_FILE
@@ -96,6 +97,7 @@ function log()
 # fileRotate $file $nCopy
 #
 # Rotation file.1 -> file.2 -> file.nCopy -> drop
+#   OBSOLETE
 function fileRotate ()
 {
     if [ "x$1" = "x" ]; then
@@ -120,6 +122,9 @@ function fileRotate ()
 # Affiche un message de débogage
 function debug()
 {
+    if [ ! -f $LOG_FILE ]; then
+        LOG_FILE=/dev/stderr
+    fi
     case "x$DEBUG" in
         "x0"|"x1"|"x2")
             if [ $DEBUG -gt 0 ]; then
@@ -167,10 +172,20 @@ function fileLogger()
     
     LOG_FILE=${LOG_FILE:-'/tmp/backup_scripts.log'}
     if [ ! -f $LOG_FILE ]; then
-        backtrace
+        __fm_error
     fi
     echo "$(date +"%F %T") b4sh $(basename $0) : $@" >> $LOG_FILE
 }
+
+function logStart()
+{
+    fileLogger "<<<<<<< $ME starting"    
+}
+function logStop()
+{
+    fileLogger ">>>>>>> $ME stopping"    
+}
+
 
 ###
 # Afficher les logs du jour, pour envoi par email par exemple.
@@ -273,7 +288,10 @@ function hasFailed()
 #
 function error()
 {
-    echo -e "$*" 1>&2
+    if [ "x$LOG_FILE" = "x" ]; then
+        echo -e "$*" 1>&2
+    fi
+    fileLogger "$ERRO $*"
 }
 
 #
@@ -295,6 +313,40 @@ say_mode_restore()
 {
     SAY_MODE=$SAY_MODE_OLD
 }
+
+
+#
+# Fonctions sur les dates
+#
+date2stamp () {
+    date --utc --date "$1" +%s
+}
+
+stamp2date (){
+    date --utc --date "1970-01-01 $1 sec" "+%Y-%m-%d %T"
+}
+# Use dateDelta as result
+dateDiff ()
+{
+    dateDelta=0
+    case $1 in
+        -s)   sec=1;      shift;;
+        -m)   sec=60;     shift;;
+        -h)   sec=3600;   shift;;
+        -d)   sec=86400;  shift;;
+        *)    sec=86400;;
+    esac
+    dte1=$(date2stamp $1)
+    dte2=$(date2stamp $2)
+    diffSec=$((dte2-dte1))
+    if ((diffSec < 0)); then abs=-1; else abs=1; fi
+    dateDelta=$((diffSec/sec*abs))
+    return 0
+}
+
+
+
+
 ####
 #### Fonctions agissant sur des fichiers et qui pourraient être utiles en scripts
 ####
@@ -339,9 +391,11 @@ function do_compress_clean()
     rc=$?
     if [ $rc -eq $EXIT_SUCCESS ]; then
         rm -rf "$src"
+        fileLogger "$ok $L_COMPRESS $ME"
     else
-        fileLogger " $KO compress '$src' failed, not cleaned"
+        fileLogger "$KO $L_COMPRESS $ME '$src' failed, not cleaned"
     fi
+    return $rc
 }
 
 #
@@ -370,14 +424,14 @@ function init_cypher()
             if [ -f "$GPG_KEYFILE" ]; then
                 echo "GPG with public key not ready";
                 fileLogger "gpg happy, gpg keyfile found !"
+                fileLogger "$WARN gpg never tested !"
                 sCypherFct="do_cypher_gpg_a"
                 bCypherInit=1
                 return $EXIT_SUCCESS
             else
-                fileLogger "Warning gpg cannot access to key:$GPG_KEYFILE ! Continue"
+                fileLogger "$WARN $sCypherProg cannot access to key:$GPG_KEYFILE ! Continue"
             fi
-        fi
-        if [ "x$GPG_PASSWD" != "x" ]; then
+        elif [ "x$GPG_PASSWD" != "x" ]; then
             sCypherFct="do_cypher_gpg_s"
 	    if [ $sCypherProg = "/bin/gpg" ]; then
 		sCypherArgs=" $sCypherArgs --no-use-agent"
@@ -387,20 +441,22 @@ function init_cypher()
             bCypherInit=1
             return $EXIT_SUCCESS
         else
-            fileLogger "Warning gpg no passphrase ! Continue"
+            fileLogger "$WARN $sCypherProg has neither passphrase nor keyfile ! Continue"
         fi
+    else
+        ### Zip fallback
+        which zip  >/dev/null 2>&1
+        rc=$?
+        if [ $rc -ne 0 ]; then
+            error "CYPHER PANIC !! CYPHER PANIC !! (no zip program)"
+            bCypherInit=0
+            sCypherFct=echo
+            sCypherArgs=
+            return $EXIT_FAILURE
+        fi        
     fi
 
-    which zip  >/dev/null 2>&1
-    rc=$?
-    if [ $rc -ne 0 ]; then
-        error "CYPHER PANIC !! CYPHER PANIC !! (no zip program)"
-        bCypherInit=0
-        sCypherFct=echo
-        sCypherArgs=
-        return $EXIT_FAILURE
-    fi
-    fileLogger "Warning gpg not found ! using zip to cypher : WEAK !"
+    fileLogger "$WARN $sCypherProg not found ! using zip to cypher : WEAK !"
     bCypherInit=1
     return $EXIT_SUCCESS
 }
@@ -415,6 +471,12 @@ function do_cypher()
     fi
     $sCypherFct "$f"
     rc=$?
+    if [ $rc -eq $EXIT_SUCCESS ]; then
+        # rm -f "$f"
+        fileLogger "$ok $L_CYPHER $ME"
+    else
+        fileLogger "$KO $L_CYPHER $ME '$f' failed"
+    fi
     return $rc
 }
 
@@ -469,6 +531,17 @@ function do_moveXferZone()
         fileLogger "do_moveXferZone() : no argument"
         return $EXIT_FAILURE
     fi
+    if [ ! -f "$BAK_DIR_PUB/.htaccess" ]; then
+        fileLogger "$KO $L_OFFER BAK_DIR_PUB <> .htaccess ! Abort."
+        return $EXIT_FAILURE
+    fi
+
+    do_compress "$f"
+    rc=$?
+    if [ $rc -eq $EXIT_SUCCESS ]; then
+        f="$f_current"
+    fi
+    
     X="$(do_cypher "$f")"
     rc=$?
     [ $rc -ne 0 ] && die "ERROR cypher f='f' (rc=$rc)"
@@ -477,17 +550,69 @@ function do_moveXferZone()
     debug "[f=$f][X=$X][F=$F] $do_cypher_fct"
     debug "[BAK_DIR=$BAK_DIR][BAK_DIR_PUB=$BAK_DIR_PUB]"
 
-    if [ ! -f "$BAK_DIR_PUB/.htaccess" ]; then
-        fileLogger "Oups ! BAK_DIR_PUB <> .htaccess ! Abort."
-        return $EXIT_FAILURE
-    fi
-
     buffer=$(du --si -s "$X")
-    mv -f "$X" "$BAK_DIR_PUB/$F" 2>/dev/null
+    if [ "x$BAK_DIR" != "x$BAK_DIR_PUB" ]; then
+        mv -f "$X" "$BAK_DIR_PUB/$F" 2>/dev/null
+    fi
     checkSumFile "$BAK_DIR_PUB/$F"
-    fileLogger "do_moveXferZone() offer : $buffer"
+    writeMetaData "$BAK_DIR_PUB/$F"
+    readMetaData "$BAK_DIR_PUB/$F".meta
+    fileLogger "$ok $L_OFFER do_moveXferZone() : $buffer"
+    return $EXIT_SUCCESS
 }
 
+#
+# Write the metadata of a file.
+# Used by do_moveXferZone
+# 
+function writeMetaData()
+{
+    file="$1"
+    if [ ! -f "$file" ]; then
+        error "writeMetaData() file '$file' not found"
+    fi
+    metafile="$file".meta
+
+    # simple chekcum
+    cksum "$file" | awk '{print $1}' > "$metafile"
+    # Size
+    du -b "$file" | awk '{print $1}' >> "$metafile"
+    # time of last status change, seconds since Epoch
+    stat -c "%Z" "$file" >> "$metafile"
+    # Human reable version (not used)
+    stat -c "%z" "$file" >> "$metafile"
+
+}
+
+#
+# Read the metadata file and populate variables
+# 
+function readMetaData()
+{
+    metafile="$1"
+    csumFile=
+    sizeFile=
+    epochFile=
+
+    if [ ! -f "$metafile" ]; then
+        error "readMetaData() file '$metafile' not found"
+    fi
+    mapfile -t META < "$metafile"
+    csumFile=${META[0]}
+    sizeFile=${META[1]}
+    epochFile=${META[2]}
+    unset META[0]; unset META[1]; unset META[2]        
+    dateFile="${META[*]}"
+    
+    if [ $DEBUG -eq 1 ]; then
+        echo "Metal = " ${META[*]}
+        echo "csum: " $csumFile
+        echo "size: " $sizeFile
+        echo "date: " $epochFile
+        unset META[0]; unset META[1]; unset META[2]
+        echo "DATE: " $dateFile
+    fi
+}
 
 ####
 #### Fonctions de vérifications du système de fichier

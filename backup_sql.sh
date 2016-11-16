@@ -26,50 +26,51 @@ cd $DIR 2>/dev/null; export LIB_PATH=$PWD; cd - >/dev/null
 
 
 ME=$0
+bDoCypher=${bDoCypher:-0}
 
-#
-#
-#
-function do_zip()
-{
-    base=$1
+# #
+# # à reprendre pour y mettre les fonctions de general.sh (soon)
+# #
+# function do_zip()
+# {
+#     base=$1
 
-    zip -qr9 -P $ZIP_PASSWD $BAK_DIR/$base.sql.zip $BAK_DIR/$base.sql 2>>$ERR_FILE
-    res=$?
-    if [ $res -eq 0 ]; then
-        csum=`checkSum $BAK_DIR/$base.sql.zip 2>>$ERR_FILE`
-        size=`sizeOf $BAK_DIR/$base.sql.zip 2>>$ERR_FILE`
-        echo $csum > $BAK_DIR/$base.sql.zip.csum
-        fileLogger "[ ok ] backup $base.sql OK ($size octets)"
-    else
-        rm -f $BAK_DIR/$base.sql.zip
-        fileLogger  "[ KO ] zip $base.sql ERR (code $res)"
-        hasFailed
-    fi
+#     zip -qr9 -P $ZIP_PASSWD $BAK_DIR/$base.sql.zip $BAK_DIR/$base.sql 2>>$ERR_FILE
+#     res=$?
+#     if [ $res -eq 0 ]; then
+#         csum=`checkSum $BAK_DIR/$base.sql.zip 2>>$ERR_FILE`
+#         size=`sizeOf $BAK_DIR/$base.sql.zip 2>>$ERR_FILE`
+#         echo $csum > $BAK_DIR/$base.sql.zip.csum
+#         fileLogger "[ ok ] backup $base.sql OK ($size octets)"
+#     else
+#         rm -f $BAK_DIR/$base.sql.zip
+#         fileLogger  "[ KO ] zip $base.sql ERR (code $res)"
+#         hasFailed
+#     fi
 
-}
+# }
 
 
 #bERROR=0 #deprecated
 GENERAL_SUCCESS=$EXIT_SUCCESS
 
-function doZip()
-{
-    toZip=$1
-    zip -qr9 -P $ZIP_PASSWD $BAK_DIR/${toZip}.sql.zip $BAK_DIR/${toZip}.sql 2>>$ERR_FILE
-    res=$?
-    if [ $res -eq 0 ]; then
-      csum=`checkSum $BAK_DIR/${toZip}.sql.zip 2>>$ERR_FILE`
-      size=`sizeOf $BAK_DIR/${toZip}.sql.zip 2>>$ERR_FILE`
-      echo $csum > $BAK_DIR/${toZip}.sql.zip.csum
-      fileLogger "$ok backup ${toZip}.sql $size octets)"
-    else
-      rm -f $BAK_DIR/$base.sql.zip
-      fileLogger  "$KO zip ${toZip}.sql (code $res)"
-      bERROR=1
-    fi
-    rm -f $BAK_DIR/${toZip}.sql 2>>$ERR_FILE
-}
+# function doZip()
+# {
+#     toZip=$1
+#     zip -qr9 -P $ZIP_PASSWD $BAK_DIR/${toZip}.sql.zip $BAK_DIR/${toZip}.sql 2>>$ERR_FILE
+#     res=$?
+#     if [ $res -eq 0 ]; then
+#       csum=`checkSum $BAK_DIR/${toZip}.sql.zip 2>>$ERR_FILE`
+#       size=`sizeOf $BAK_DIR/${toZip}.sql.zip 2>>$ERR_FILE`
+#       echo $csum > $BAK_DIR/${toZip}.sql.zip.csum
+#       fileLogger "$ok backup ${toZip}.sql $size octets)"
+#     else
+#       rm -f $BAK_DIR/$base.sql.zip
+#       fileLogger  "$KO zip ${toZip}.sql (code $res)"
+#       bERROR=1
+#     fi
+#     rm -f $BAK_DIR/${toZip}.sql 2>>$ERR_FILE
+# }
 
 
 # dumpBase $serveur $base $user $passwd $*
@@ -89,7 +90,7 @@ function dumpBase()
     pass=$4
     exclude=''
 
-    rm -f BAK_DIR/$base.sql.zip
+    rm -f $BAK_DIR/$base.sql.zip
     if [ "x$srv" = "x" ]; then
         fileLogger "$KO $0 : pas de serveur indiqué... abandon"
         hasFailed
@@ -110,7 +111,8 @@ function dumpBase()
         hasFailed
         return 1
     fi
-
+    export MYSQL_PWD="$pass"
+    
     if [ "x$5" != "x" ]; then
         shift; shift; shift; shift; #drop $1 $2 $3 $4 for $@
         for table in $@
@@ -118,14 +120,14 @@ function dumpBase()
             exclude="$exclude --ignore-table=${base}.${table}"
             name=${base}.${table}
             ## Attention au -n pour pas créer de DB
-            mysqldump -h $srv -u $user -p$pass -l -n $base $table \
-                1>$BAK_DIR/${name}.sql 2>>$ERR_FILE
+            mysqldump -h $srv -u $user -l -n $base $table \
+                1>"$BAK_DIR/${name}.sql" 2>>$ERR_FILE
             res=$?
             if [ $res -eq 0 ]; then
-                doZip ${name}
+                fileLogger "$ok $L_DUMP $base $table"
+                do_moveXferZone "$BAK_DIR/${name}.sql"
             else
-                fileLogger "mysqldump -h $srv -u $user -pPASSWORD -l -n $base $table"
-                fileLogger "mysqldump has failed (rc=$res)"
+                fileLogger "$KO $L_DUMP $srv/$base/$table (rc=$res)"
                 hasFailed
             fi
         done
@@ -133,28 +135,35 @@ function dumpBase()
     fi
 
     # bug ! Fallait pas le -B
-    mysqldump -h $srv -u $user -p$pass $exclude -l $base \
+    mysqldump -h $srv -u $user $exclude -l $base \
         1>$BAK_DIR/$base.sql 2>>$ERR_FILE
     res=$?
 
     if [ $res -eq 0 ]; then
-        doZip $base
+        fileLogger "$ok $L_DUMP $base $table"
+        do_moveXferZone "$BAK_DIR/$base.sql"
         let iNbTargetOk++
     else
+        fileLogger "$KO $L_DUMP $srv/$base/$table (rc=$res)"
         hasFailed
-        fileLogger "$KO mysqldump $base ERR (code $res)"
     fi
 }
 
+#######
 # Main
-
+########
 if [ ! \( -d $BAK_DIR -a -w $BAK_DIR \) ]; then
-  fileLogger "$KO ERR dossier `basename $BAK_DIR` inaccessible"
+  fileLogger "$KO ERR directory `basename $BAK_DIR` not found or not writeable"
   exit 1
 fi
-if [ ! -f $BAK_DIR/.htaccess ]; then
-  fileLogger "$KO ERR fichier .htaccess inaccessible"
-  rm -f $BAK_DIR/$SQL_BASE1.sql.zip $BAK_DIR/$SQL_BASE2.sql.zip
+if [ ! \( -d $BAK_DIR_PUB -a -w $BAK_DIR_PUB \) ]; then
+  fileLogger "$KO ERR firectory `basename $BAK_DIR_PUB` not found or not writeable ?"
+  exit 1
+fi
+
+if [ ! -f ${BAK_DIR_PUB}/.htaccess ]; then
+  fileLogger "$KO ERR file .htaccess not found in `basename $BAK_DIR_PUB`"
+  rm -f $BAK_DIR_PUB/$SQL_BASE1.sql.zip $BAK_DIR_PUB/$SQL_BASE2.sql.zip
   exit 1
 fi
 if [ "x$ZIP_PASSWD" = "x" ]; then
@@ -165,14 +174,17 @@ if [ "x$ZIP_PASSWD" = "x" ]; then
 fi
 
 let iNbTargetOk=0
+let iNbTarget=0
 cd $BAK_DIR
 debug "dumpBase $SQL_SERVER1,$SQL_BASE1,$SQL_USER1,$SQL_PASSWD1"
 dumpBase $SQL_SERVER1 $SQL_BASE1 $SQL_USER1 $SQL_PASSWD1 $SQL_TABLES1
+let iNbTarget++
+
 
 # 2016-05-29 Sur la demande d'olivier
 #debug "dumpBase $SQL_SERVER2,$SQL_BASE2,$SQL_USER2,$SQL_PASSWD2"
 #dumpBase $SQL_SERVER2 $SQL_BASE2 $SQL_USER2 $SQL_PASSWD2
-
+#let iNbTarget++
 
 # if [ $GENERAL_SUCCESS -eq $EXIT_FAILURE ]; then
 #     if [ $bUseMailWarning -eq 1 ]; then
@@ -182,16 +194,16 @@ dumpBase $SQL_SERVER1 $SQL_BASE1 $SQL_USER1 $SQL_PASSWD1 $SQL_TABLES1
 
 if [ $GENERAL_SUCCESS -eq $EXIT_SUCCESS ]; then
     sLabel="[KO]"
-elif [ $iNbTargetOk -ne 2 ]; then
+elif [ $iNbTargetOk -ne $iNbTarget ]; then
     sLabel="[KO]"
 else
     sLabel="[ok]"
 fi
 
 if [ $bUseMailWarning -eq 1 ]; then
-    sReport="$sLabel[$iNbTargetOk/2] DB saved"
+    sReport="$sLabel[$iNbTargetOk/$iNbTarget] DB saved"
     view_today_logs| notify_email_stdin "$sReport"
 fi
 
-
+logStop
 exit $GENERAL_SUCCESS
