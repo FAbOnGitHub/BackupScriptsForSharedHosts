@@ -66,21 +66,6 @@ if [ ${#aDB[*]} -eq 0 ]; then
     die " $KO no databases found."
 fi
 
-vars="$(echo "show variables;" | mysql -u $MYSQL_USER \
-                          | grep innodb_version| cut -c 16- \
-                          |sed -e "s@\([0-9]\).\([0-9]\)\(.*\)@maj=\1 min=\2@")"
-
-export $vars
-#echo "[maj=$maj][min=$min]"
-COMPAT56=true
-if [ $maj -eq 5 ]; then
-    if [ $min -ge 7 ]; then
-        COMPAT56=false
-    fi
-elif [ $maj -gt 5 ]; then
-    COMPAT56=false
-fi
-
 cd $BAK_DIR
 rm -rf $dir
 mkdir -m 0700 $dir
@@ -89,6 +74,7 @@ cd $dir || die "Cannot access to dir '$dir'"
 date=$(date  +"%Y%m%d-%H%M%S")
 #Loop
 let iNbTargetOk=0
+let iNbTargetErr=0
 let iCountThisOne=1
 let iSkipThisOne=0
 for db in ${aDB[*]}
@@ -98,7 +84,8 @@ do
         "information_schema"|"performance_schema")
             let iCountThisOne=0
             let iSkipThisOne++
-            sLock="--skip-lock-tables"
+            #sLock="--skip-lock-tables"
+            fileLogger "$ok '$db' skipped ${date} "
             continue # New ; skip virtual databases
             ;;
         *)
@@ -106,29 +93,18 @@ do
             #sLock="-l";;
             ;;        
     esac
-
-    if [ "$db" = "performance_schema" ]; then
-        debug  "$WARN performance_schema ignored"
-        continue
-    fi
-    if [ "$db" = "information_schema" ]; then
-        if [ $COMPAT56 = "false" ]; then
-            debug  "$WARN information_schema ignored (no compat56)"
-            continue
-        fi
-    fi
-
     
-    fileLogger "$ME '$db' found ${date}"
 #    dumpfile="${db}_${date}.sql"
     dumpfile="${db}.sql"
 
     mysqldump -h $MYSQL_HOST -u $MYSQL_USER $MYSQL_OPT $sLock $mysql_opt ${db} >"$dumpfile" 2>>$ERR_FILE
     rc=$?
     if [ $rc -ne $EXIT_SUCCESS ]; then
-        error "$KO mysqldump '$db' failed (rc=$rc)"
+        fileLogger "$KO '$db' failed (rc=$rc)"
+        let iNbTargetErr++
         continue
     else
+        fileLogger "$ok '$db' dumped ${date} ok"
         let iNbTargetOk+=$iCountThisOne
     fi
 
@@ -136,7 +112,7 @@ done
 
 cd ..
 buffer="$(du --si -s "$dir")"
-fileLogger "$buffer"
+fileLogger "$ok $L_DUMP $buffer"
 
 if [ $bDoCompressAll -eq 1 ]; then
     do_compress_clean  "$DIR".zip "$dir"
@@ -148,10 +124,7 @@ if [ $bDoCompressAll -eq 1 ]; then
     rm -rf "$dir"
 fi
 
-# if [ $bUseMailWarning -eq 1 ]; then
-#     sReport="DB saved = $iNbTargetOk / ${#aDB[*]}"
-#     view_today_logs| notify_email_stdin "$sReport"
-# fi
+logStop
 
 let c=${#aDB[*]}
 let iSum=$iNbTargetOk+$iSkipThisOne
@@ -161,8 +134,38 @@ else
     sLabel="[KO]"
 fi
 
-sReport="$sLabel[$iNbTargetOk+$iSkipThisOne/$c] DB saved "
+sReport="$sLabel[$iNbTargetOk+$iSkipThisOne/$c($iNbTargetErr)] DB saved "
 reportByMail "$sReport" "$ME"
 
 # see to use rc=$? and then exit $rc
 exit $EXIT_SUCCESS
+
+
+
+
+# vars="$(echo "show variables;" | mysql -u $MYSQL_USER \
+#                           | grep innodb_version| cut -c 16- \
+#                           |sed -e "s@\([0-9]\).\([0-9]\)\(.*\)@maj=\1 min=\2@")"
+
+# export $vars
+# #echo "[maj=$maj][min=$min]"
+# COMPAT56=true
+# if [ $maj -eq 5 ]; then
+#     if [ $min -ge 7 ]; then
+#         COMPAT56=false
+#     fi
+# elif [ $maj -gt 5 ]; then
+#     COMPAT56=false
+# fi
+
+
+    # if [ "$db" = "performance_schema" ]; then
+    #     debug  "$WARN performance_schema ignored"
+    #     continue
+    # fi
+    # if [ "$db" = "information_schema" ]; then
+    #     if [ $COMPAT56 = "false" ]; then
+    #         debug  "$WARN information_schema ignored (no compat56)"
+    #         continue
+    #     fi
+    # fi

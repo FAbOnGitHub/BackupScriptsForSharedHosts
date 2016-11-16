@@ -57,21 +57,36 @@ TASK_NAME="serveur"
 PRJ="B4SH"
 
 
+ROOT=/tmp # Fixme
+
 ##
-# root of the web server
-WWW_DIR=~/www
+# root of the web server : CHANGE ME 
+WWW_DIR=/tmp/ 
 #FR: Racine web
 
 ##
-# Where archives are store on the server
-# See BAK_DIR_CLI 
-BAK_DIR=$WWW_DIR/backup_LH5Y59v
+# Where archives are built on the server, private
+# See BAK_DIR
+BAK_DIR=$ROOT/backup_priv_a7da1ebf034
 #FR: Dossier de backup
+
+##
+# Where archives are offered to the client
+#
+BAK_DIR_PUB=$WWW_DIR/backup_pub_335f6f97c5c3c0ee
+#FR: Dossier de backup
+
+##
+# Where archives are store on the server
+# See BAK_DIR_CLI below
+#BAK_DIR_CLI= 
+#FR: Dossier de téléchargement
+
 
 
 ##
 #  Lock file to prevent multi-backup
-LOCK_FILE=$BAK_DIR/rl.lock
+LOCK_FILE=$BAK_DIR/b4sh.lock
 #FR : fichier verrour pour éviter les sauvegardes concurrentielles
 # Lock, ne pas déclarer cette variable est dangereux.
 
@@ -220,6 +235,10 @@ BAK_URL=https://login:password@you_domain.tld/backup_SecretToken
 URL_USER="mylogin"
 URL_PASS="MySecretPassword"
 BAK_URL="http://${URL_USER}:${URL_PASS}@domain.tld/Token"
+
+# URL to trigger commands
+CMD_URL=https://login:password@you_domain.tld/other/token
+
 # Liste archives
 TARGET_SRV=antaya
 
