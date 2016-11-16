@@ -57,9 +57,11 @@ TASK_NAME="serveur"
 PRJ="B4SH"
 
 
+ROOT=/tmp # Fixme
+
 ##
-# root of the web server
-WWW_DIR=~/www
+# root of the web server : CHANGE ME 
+WWW_DIR=/tmp/ 
 #FR: Racine web
 
 ##
