@@ -285,7 +285,10 @@ function hasFailed()
 #
 function error()
 {
-    echo -e "$*" 1>&2
+    if [ "x$LOG_FILE" = "x" ]; then
+        echo -e "$*" 1>&2
+    fi
+    fileLogger "$ERRO $*"
 }
 
 #
@@ -307,6 +310,40 @@ say_mode_restore()
 {
     SAY_MODE=$SAY_MODE_OLD
 }
+
+
+#
+# Fonctions sur les dates
+#
+date2stamp () {
+    date --utc --date "$1" +%s
+}
+
+stamp2date (){
+    date --utc --date "1970-01-01 $1 sec" "+%Y-%m-%d %T"
+}
+# Use dateDelta as result
+dateDiff ()
+{
+    dateDelta=0
+    case $1 in
+        -s)   sec=1;      shift;;
+        -m)   sec=60;     shift;;
+        -h)   sec=3600;   shift;;
+        -d)   sec=86400;  shift;;
+        *)    sec=86400;;
+    esac
+    dte1=$(date2stamp $1)
+    dte2=$(date2stamp $2)
+    diffSec=$((dte2-dte1))
+    if ((diffSec < 0)); then abs=-1; else abs=1; fi
+    dateDelta=$((diffSec/sec*abs))
+    return 0
+}
+
+
+
+
 ####
 #### Fonctions agissant sur des fichiers et qui pourraient être utiles en scripts
 ####
