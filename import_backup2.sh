@@ -122,8 +122,10 @@ function update_distant_list()
 #set -x
 DATE=$(date +"%Y%m%d-%H%M%S")
 GENERAL_SUCCESS=$EXIT_SUCCESS
-fileLogger  "$ok $ME starting  >>>>>"
-echo "$DATE start" >> $ERR_FILE
+
+let maxTime=3600*25
+
+logStart
 
 # Normalement le client n'est pas obligé d'avoir la même arborescence que le
 # serveur. Si c'est le cas, son répertoire BAK_DIR est BAK_DIR_CLI
@@ -195,6 +197,22 @@ for raw_file in ${BAK_FILES[*]}; do
           continue
       fi
 
+      wgetFile "$file.meta"
+      if [ $? -ne 0 ]; then
+          fileLogger "$WARN wget metafile failed (future feature)"
+          continue
+      else
+          nowTS="$(date +"%s")"
+          distTS="$(date --date="@""$epochFile" +"%F %T")"
+          dateDiff -s "@$nowTS" "@$distTS"
+          delta=dateDelta
+          if [ $delta -gt $maxTime ]; then
+              sMsg="$WARN delta=$delta > max=$max on $file"
+              error $sMsg
+          fi
+      fi
+
+      
       servCsum=`head -n 1 $BAK_DIR/$file.csum 2>> $ERR_FILE`
       localCsum=`checkSum $BAK_DIR/$file 2>> $ERR_FILE`
       rm -f $BAK_DIR/$file.csum
