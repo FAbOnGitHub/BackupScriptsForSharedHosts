@@ -100,7 +100,7 @@ do
     mysqldump -h $MYSQL_HOST -u $MYSQL_USER $MYSQL_OPT $sLock $mysql_opt ${db} >"$dumpfile" 2>>$ERR_FILE
     rc=$?
     if [ $rc -ne $EXIT_SUCCESS ]; then
-        error "$KO '$db' failed (rc=$rc)"
+        fileLogger "$KO '$db' failed (rc=$rc)"
         let iNbTargetErr++
         continue
     else
@@ -124,10 +124,7 @@ if [ $bDoCompressAll -eq 1 ]; then
     rm -rf "$dir"
 fi
 
-# if [ $bUseMailWarning -eq 1 ]; then
-#     sReport="DB saved = $iNbTargetOk / ${#aDB[*]}"
-#     view_today_logs| notify_email_stdin "$sReport"
-# fi
+logStop
 
 let c=${#aDB[*]}
 let iSum=$iNbTargetOk+$iSkipThisOne
@@ -140,7 +137,6 @@ fi
 sReport="$sLabel[$iNbTargetOk+$iSkipThisOne/$c($iNbTargetErr)] DB saved "
 reportByMail "$sReport" "$ME"
 
-logStop
 # see to use rc=$? and then exit $rc
 exit $EXIT_SUCCESS
 
