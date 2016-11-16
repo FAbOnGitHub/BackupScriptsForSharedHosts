@@ -521,6 +521,10 @@ function do_moveXferZone()
     return $EXIT_SUCCESS
 }
 
+#
+# Write the metadata of a file.
+# Used by do_moveXferZone
+# 
 function writeMetaData()
 {
     file="$1"
@@ -540,20 +544,34 @@ function writeMetaData()
 
 }
 
+#
+# Read the metadata file and populate variables
+# 
 function readMetaData()
 {
     metafile="$1"
+    csumFile=
+    sizeFile=
+    epochFile=
+
     if [ ! -f "$metafile" ]; then
         error "readMetaData() file '$metafile' not found"
     fi
-    mapfile -t $META < "$metafile"
-    echo "Metal = " ${META[*]}
-    echo "csum: " ${META[0]}
-    echo "size: " ${META[1]}
-    echo "date: " ${META[2]}
-    shift; shift; shift
-    echo "DATE: ${META[*]}"
-    cat "$metafile"
+    mapfile -t META < "$metafile"
+    csumFile=${META[0]}
+    sizeFile=${META[1]}
+    epochFile=${META[2]}
+    unset META[0]; unset META[1]; unset META[2]        
+    dateFile="${META[*]}"
+    
+    if [ $DEBUG -eq 1 ]; then
+        echo "Metal = " ${META[*]}
+        echo "csum: " $csumFile
+        echo "size: " $sizeFile
+        echo "date: " $epochFile
+        unset META[0]; unset META[1]; unset META[2]
+        echo "DATE: " $dateFile
+    fi
 }
 
 ####
