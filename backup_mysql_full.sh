@@ -71,7 +71,6 @@ rm -rf $dir
 mkdir -m 0700 $dir
 cd $dir || die "Cannot access to dir '$dir'"
 
-date=$(date  +"%Y%m%d-%H%M%S")
 #Loop
 let iNbTargetOk=0
 let iNbTargetErr=0
@@ -79,6 +78,7 @@ let iCountThisOne=1
 let iSkipThisOne=0
 for db in ${aDB[*]}
 do
+    date=$(date  +"%Y%m%d-%H%M%S")
 # 3 Save each DB
     case "$db" in
         "information_schema"|"performance_schema")
@@ -94,8 +94,8 @@ do
             ;;        
     esac
     
-#    dumpfile="${db}_${date}.sql"
-    dumpfile="${db}.sql"
+    dumpfile="${db}_${date}.sql"
+#    dumpfile="${db}.sql"
 
     mysqldump -h $MYSQL_HOST -u $MYSQL_USER $MYSQL_OPT $sLock $mysql_opt ${db} >"$dumpfile" 2>>$ERR_FILE
     rc=$?
