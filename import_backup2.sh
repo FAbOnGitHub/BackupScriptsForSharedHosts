@@ -64,7 +64,7 @@ function wgetFile()
         sWgetMsg=""
         wget $wget_quiet -t 3 --no-check-certificate --auth-no-challenge \
              -U $HTTP_AGENT \
-             -P $BAK_DIR_CLI "$BAK_URL/$target" 2>> $ERR_FILE
+             -P $BAK_DIR_CLI "$LOG_URL/$target" 2>> $ERR_FILE
         rc=$?
         # Ne pas activer la ligne suivante en prod ou penser à purger les log
         #debug "wget $BAK_URL/$target -> $BAK_DIR_CLI (rc=$rc)(errfile=$ERR_FILE)"
@@ -154,8 +154,10 @@ if [ ! -w $LTS_DIR ]; then
 fi
 if [ "x$BAK_URL" = "x" ]; then
     fileLogger  "\$BAK_URL is not set"
-    exit 1
+    exit 1    
 fi
+
+## URL à afficher dans log, sans le mot de passe
 LOG_URL="$(echo "$BAK_URL"|cut -d'@' -f2-)"
 
 # test
