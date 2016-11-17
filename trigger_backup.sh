@@ -99,5 +99,6 @@ do
         ;;
     esac
 done
-fileLogger "$ok $ME stopping <<<<<< "
+
+logStop
 exit $rc_global

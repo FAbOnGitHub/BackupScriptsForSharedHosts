@@ -53,15 +53,15 @@ rm -rf $dir
 mkdir -m 0700 $dir
 cd $dir || die "Cannot access to dir '$dir'"
 
-date=$(date  +"%Y%m%d-%H%M%S")
 #Loop
 let iNbDbTotal=${#aDB[*]}
 let iNbDbOk=0
 for db in ${aDB[*]}
 do
 # 3 Save each DB
+    date=$(date  +"%Y%m%d-%H%M%S")
     [ "$db" = "information_schema" ] && sLock="--skip-lock-tables" || sLock="-l"
-    fileLogger "$ME '$db' found @${date} "
+    fileLogger "$ok '$db' found @${date} "
     dumpfile="$(basename ${db})"".svndump"
     /usr/bin/svnadmin dump "$db" >"$dumpfile" 2>>/dev/null
     rc=$?
