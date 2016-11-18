@@ -1,0 +1,20 @@
+#+OPTIONS: ':nil *:t -:t ::t <:t H:3 \n:nil ^:t arch:headline author:nil c:nil
+#+OPTIONS: creator:nil d:(not "LOGBOOK") date:t e:t email:nil f:t inline:t
+#+OPTIONS: num:t p:nil pri:nil prop:nil stat:t tags:t tasks:t tex:t timestamp:t
+#+OPTIONS: title:t toc:nil todo:t |:t
+#+TITLE: Backup scripts for shared Hosts
+#+DATE: <2016-07-10 Sun>
+#+AUTHOR: FAb
+#+EMAIL: fab@antaya.fr
+#+LANGUAGE: en
+#+SELECT_TAGS: export
+#+EXCLUDE_TAGS: noexport
+#+CREATOR: Emacs 24.5.1 (Org mode 8.3.4)
+
+* BackupScriptsForSharedHosts : ROAD MAP 
+
+** TODO 
+   - Enhance security and security configuration control
+   - Enhance feeback after a =backup_import2.sh= operation towards the source server
+   - Do something better with log files.
+   - Add an option to permit the check-certificat with is bypassed...

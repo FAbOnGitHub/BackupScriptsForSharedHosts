@@ -15,20 +15,22 @@ PRJ="RLBackup"
 
 ##
 # Variable pour les backups MySQL, les tables dont le nom commencent
-# par cette chaîne sont exclue de backup_mysql_full.sh
+# par cette chaîne sont exclues de backup_mysql_full.sh
 MYSQL_DB_EXCLUDE_PREFIX=
 
 ##
 # Compress et crypto variables
-sCompressProg=gzip
+sCompressProg=/bin/gzip
 sCompressArgs='-9'
-sCypherProg=gpg
+sCypherProg=/usr/bin/gpg2
 sCypherArgs=
 ##
 # Mail variables
 bUseMailWarning=1
 bMailCommandAvaible=1
 NOTIFY_SUBJECT="Errors occured, please inspect log='%LOG_FILE'"
+## Attention %LOG_FILE = template
+
 # $LOG_FILE n'est pas encore définie
 ##
 # Système qui permet au serveur source (à sauvegarder) de définir des fichiers
@@ -41,6 +43,7 @@ NOTIFY_SUBJECT="Errors occured, please inspect log='%LOG_FILE'"
 bUseDistantBakFile=1
 sDistantBakFilename="Please_backup.lst"
 
+DEBUG=${DEBUG:-0}
 
 ###
 # Functions
@@ -48,10 +51,9 @@ sDistantBakFilename="Please_backup.lst"
 # sizeOf $file
 #
 # Taille d'un fichier en octets
-
-sizeOf ()
+function sizeOf()
 {
- wc -c $1 | awk '{print $1}'
+    wc -c $1 | awk '{print $1}'
 }
 
 # lineOf $file
@@ -71,12 +73,12 @@ linesOf ()
 #
 # Retourne la somme de contrôle de $file
 
-checkSum ()
+function checkSum()
 {
   cksum $1 | awk '{print $1}'
 }
 
-checkSumFile()
+function checkSumFile()
 {
     checkSum "$1" > "$1".csum
 }
@@ -84,6 +86,7 @@ checkSumFile()
 # log $file $msg
 #
 # Ecrit un message dans un journal FIFO d'au plus LOG_MAX_SIZE entrées.
+#  OBSOLETE
 function log()
 {
   echo `date +%a\ %d/%m/%g\ %X` `basename $0` ":" $2 > $TMP_FILE
@@ -94,6 +97,7 @@ function log()
 # fileRotate $file $nCopy
 #
 # Rotation file.1 -> file.2 -> file.nCopy -> drop
+#   OBSOLETE
 function fileRotate ()
 {
     if [ "x$1" = "x" ]; then
@@ -118,18 +122,71 @@ function fileRotate ()
 # Affiche un message de débogage
 function debug()
 {
-    if [ $DEBUG -gt 0 ]; then
-        [ $DEBUG -gt 1 ] && echo -e "DBG : $@"
-        echo -e "`date +"%F %T"` DBG : $@" >>$LOG_FILE
+    if [ ! -f $LOG_FILE ]; then
+        echo -e "`date +"%F %T"` DBG : $@" 2>&1
+        return 0
     fi
+    case "x$DEBUG" in
+        "x0"|"x1"|"x2")
+            if [ $DEBUG -gt 0 ]; then
+                [ $DEBUG -gt 1 ] && echo -e "DBG : $@"
+                echo -e "`date +"%F %T"` DBG : $@" >>$LOG_FILE
+            fi
+            ;;
+        *)
+            echo "debug() error : [DEBUG=$DEBUG]"
+            __fm_error
+            exit 123
+            ;;
+    esac
 }
+
+function __fm_trace()
+{
+    iNbLines=$(awk 'BEGIN{ i=0}
+        { i++}
+        END{ printf("%d\n", log(i) / log(10) +1)}' "${BASH_SOURCE[0]}")
+    [ "x$1" = "x" ] && iSkip=0 || iSkip=$1
+    error "Call stack:"
+    for((i=$iSkip; i<${#BASH_LINENO[*]}; i++))
+    do
+        printf "%s: line %0"$iNbLines"d: call %s\n" "${BASH_SOURCE[$i]}" \
+            "${BASH_LINENO[$i]}"  ${FUNCNAME[$i]} 1>&2
+
+    done
+    return 0
+}
+function __fm_error()
+{
+    __fm_trace 2
+    return 1
+}
+
+
 
 # Formate le message de debut et le pousse dans le fichier
 function fileLogger()
 {
+    if [ $bUseLogger -eq 1 ]; then
+        logger "b4sh $(basename $0) : $@"
+    fi
+    
     LOG_FILE=${LOG_FILE:-'/tmp/backup_scripts.log'}
-    echo "$(date +"%F %T") $(basename $0) : $@" >> $LOG_FILE
+    if [ ! -f $LOG_FILE ]; then
+        __fm_error
+    fi
+    echo "$(date +"%F %T") b4sh $(basename $0) : $@" >> $LOG_FILE
 }
+
+function logStart()
+{
+    fileLogger "<<<<<<< $ME starting"    
+}
+function logStop()
+{
+    fileLogger ">>>>>>> $ME stopping"    
+}
+
 
 ###
 # Afficher les logs du jour, pour envoi par email par exemple.
@@ -208,7 +265,11 @@ function reportByMail ()
         else
             sReport="$1"
         fi
-        view_today_logs| notify_email_stdin "$sReport"
+        if [ "x$2" != "x" ]; then
+            view_today_logs | grep "$2" | notify_email_stdin "$sReport"
+        else
+            view_today_logs| notify_email_stdin "$sReport"
+        fi
     fi
 }
 
@@ -228,7 +289,10 @@ function hasFailed()
 #
 function error()
 {
-    echo -e "$*" 1>&2
+    if [ "x$LOG_FILE" = "x" ]; then
+        echo -e "$*" 1>&2
+    fi
+    fileLogger "$ERRO $*"
 }
 
 #
@@ -250,6 +314,40 @@ say_mode_restore()
 {
     SAY_MODE=$SAY_MODE_OLD
 }
+
+
+#
+# Fonctions sur les dates
+#
+date2stamp () {
+    date --utc --date "$1" +%s
+}
+
+stamp2date (){
+    date --utc --date "1970-01-01 $1 sec" "+%Y-%m-%d %T"
+}
+# Use dateDelta as result
+dateDiff ()
+{
+    dateDelta=0
+    case $1 in
+        -s)   sec=1;      shift;;
+        -m)   sec=60;     shift;;
+        -h)   sec=3600;   shift;;
+        -d)   sec=86400;  shift;;
+        *)    sec=86400;;
+    esac
+    dte1=$(date2stamp $1)
+    dte2=$(date2stamp $2)
+    diffSec=$((dte2-dte1))
+    if ((diffSec < 0)); then abs=-1; else abs=1; fi
+    dateDelta=$((diffSec/sec*abs))
+    return 0
+}
+
+
+
+
 ####
 #### Fonctions agissant sur des fichiers et qui pourraient être utiles en scripts
 ####
@@ -294,9 +392,11 @@ function do_compress_clean()
     rc=$?
     if [ $rc -eq $EXIT_SUCCESS ]; then
         rm -rf "$src"
+        fileLogger "$ok $L_COMPRESS $ME"
     else
-        fileLogger " $KO compress '$src' failed, not cleaned"
+        fileLogger "$KO $L_COMPRESS $ME '$src' failed, not cleaned"
     fi
+    return $rc
 }
 
 #
@@ -318,39 +418,46 @@ function init_cypher()
     # Zip in default. ZIP_PASSWD always set.
     sCypherFct="do_cypher_zip"
 
-    which gpg  >/dev/null 2>&1
+    which $sCypherProg >/dev/null
     rc=$?
     if [ $rc -eq 0 ]; then
         if [ "x$GPG_KEYFILE" != "x" ]; then
             if [ -f "$GPG_KEYFILE" ]; then
                 echo "GPG with public key not ready";
                 fileLogger "gpg happy, gpg keyfile found !"
+                fileLogger "$WARN gpg never tested !"
                 sCypherFct="do_cypher_gpg_a"
                 bCypherInit=1
                 return $EXIT_SUCCESS
             else
-                fileLogger "Warning gpg cannot access to key:$GPG_KEYFILE ! Continue"
+                fileLogger "$WARN $sCypherProg cannot access to key:$GPG_KEYFILE ! Continue"
             fi
-        fi
-        if [ "x$GPG_PASSWD" != "x" ]; then
+        elif [ "x$GPG_PASSWD" != "x" ]; then
             sCypherFct="do_cypher_gpg_s"
+	    if [ $sCypherProg = "/bin/gpg" ]; then
+		sCypherArgs=" $sCypherArgs --no-use-agent"
+            else
+                sCypherArgs=" $sCypherArgs --batch"
+	    fi
             bCypherInit=1
             return $EXIT_SUCCESS
         else
-            fileLogger "Warning gpg no passphrase ! Continue"
+            fileLogger "$WARN $sCypherProg has neither passphrase nor keyfile ! Continue"
         fi
+    else
+        ### Zip fallback
+        which zip  >/dev/null 2>&1
+        rc=$?
+        if [ $rc -ne 0 ]; then
+            error "CYPHER PANIC !! CYPHER PANIC !! (no zip program)"
+            bCypherInit=0
+            sCypherFct=echo
+            sCypherArgs=
+            return $EXIT_FAILURE
+        fi        
     fi
 
-    which zip  >/dev/null 2>&1
-    rc=$?
-    if [ $rc -ne 0 ]; then
-        error "CYPHER PANIC !! CYPHER PANIC !! (no zip program)"
-        bCypherInit=0
-        sCypherFct=echo
-        sCypherArgs=
-        return $EXIT_FAILURE
-    fi
-    fileLogger "Warning gpg not found ! using zip to cypher : WEAK !"
+    fileLogger "$WARN $sCypherProg not found ! using zip to cypher : WEAK !"
     bCypherInit=1
     return $EXIT_SUCCESS
 }
@@ -365,6 +472,12 @@ function do_cypher()
     fi
     $sCypherFct "$f"
     rc=$?
+    if [ $rc -eq $EXIT_SUCCESS ]; then
+        # rm -f "$f"
+        fileLogger "$ok $L_CYPHER $ME"
+    else
+        fileLogger "$KO $L_CYPHER $ME '$f' failed"
+    fi
     return $rc
 }
 
@@ -379,8 +492,9 @@ function do_cypher_zip()
 }
 function do_cypher_gpg_a()
 {
+    echo "$ME: WARNING ! No tested!"
     f="$1"
-    gpg  $GPG_KEYFILE --yes  "$f"
+    $sCypherProg  $sCypherArgs  $GPG_KEYFILE --yes  "$f"
     rc=$?
     [ $rc -eq 0 ] && echo "$f".gpg || echo ""
     return $rc
@@ -390,9 +504,11 @@ function do_cypher_gpg_a()
 function do_cypher_gpg_s()
 {
     f="$1"
-    gpg --no-use-agent -q -c --passphrase "$GPG_PASSWD" --yes "$f"
+
+    $sCypherProg $sCypherArgs -q -c --passphrase "$GPG_PASSWD" --yes "$f"
     rc=$?
     [ $rc -eq 0 ] && echo "$f".gpg || echo ""
+
     return $rc
     #mv "$f".gpg "$f".X
 }
@@ -416,24 +532,88 @@ function do_moveXferZone()
         fileLogger "do_moveXferZone() : no argument"
         return $EXIT_FAILURE
     fi
+    if [ ! -f "$BAK_DIR_PUB/.htaccess" ]; then
+        fileLogger "$KO $L_OFFER BAK_DIR_PUB <> .htaccess ! Abort."
+        return $EXIT_FAILURE
+    fi
+
+    do_compress "$f"
+    rc=$?
+    if [ $rc -eq $EXIT_SUCCESS ]; then
+        f="$f_current"
+    fi
+    
     X="$(do_cypher "$f")"
     rc=$?
     [ $rc -ne 0 ] && die "ERROR cypher f='f' (rc=$rc)"
+    rm "$f"
     F="$(basename "$X")"
     debug "[f=$f][X=$X][F=$F] $do_cypher_fct"
     debug "[BAK_DIR=$BAK_DIR][BAK_DIR_PUB=$BAK_DIR_PUB]"
 
-    if [ ! -f "$BAK_DIR_PUB/.htaccess" ]; then
-        fileLogger "Oups ! BAK_DIR_PUB <> .htaccess ! Abort."
-        return $EXIT_FAILURE
-    fi
-
     buffer=$(du --si -s "$X")
-    mv -f "$X" "$BAK_DIR_PUB/$F" 2>/dev/null
+    if [ "x$BAK_DIR" != "x$BAK_DIR_PUB" ]; then
+        mv -f "$X" "$BAK_DIR_PUB/$F" 2>/dev/null
+    fi
     checkSumFile "$BAK_DIR_PUB/$F"
-    fileLogger "do_moveXferZone() offer : $buffer"
+    writeMetaData "$BAK_DIR_PUB/$F"
+    readMetaData "$BAK_DIR_PUB/$F".meta
+    fileLogger "$ok $L_OFFER do_moveXferZone() : $buffer"
+    return $EXIT_SUCCESS
 }
 
+#
+# Write the metadata of a file.
+# Used by do_moveXferZone
+# 
+function writeMetaData()
+{
+    file="$1"
+    if [ ! -f "$file" ]; then
+        error "writeMetaData() file '$file' not found"
+    fi
+    metafile="$file".meta
+
+    # simple chekcum
+    cksum "$file" | awk '{print $1}' > "$metafile"
+    # Size
+    du -b "$file" | awk '{print $1}' >> "$metafile"
+    # time of last status change, seconds since Epoch
+    stat -c "%Z" "$file" >> "$metafile"
+    # Human reable version (not used)
+    stat -c "%z" "$file" >> "$metafile"
+
+}
+
+#
+# Read the metadata file and populate variables
+# 
+function readMetaData()
+{
+    metafile="$1"
+    csumFile=
+    sizeFile=
+    epochFile=
+
+    if [ ! -f "$metafile" ]; then
+        error "readMetaData() file '$metafile' not found"
+    fi
+    mapfile -t META < "$metafile"
+    csumFile=${META[0]}
+    sizeFile=${META[1]}
+    epochFile=${META[2]}
+    unset META[0]; unset META[1]; unset META[2]        
+    dateFile="${META[*]}"
+    
+    if [ $DEBUG -eq 1 ]; then
+        echo "Metal = " ${META[*]}
+        echo "csum: " $csumFile
+        echo "size: " $sizeFile
+        echo "date: " $epochFile
+        unset META[0]; unset META[1]; unset META[2]
+        echo "DATE: " $dateFile
+    fi
+}
 
 ####
 #### Fonctions de vérifications du système de fichier
@@ -442,15 +622,15 @@ function check_cmd()
 {
     if [ ! -f "$1" ]; then
         if [ "x$2" = "xoption" ]; then
-            say " [NOTFND] optional command $1 not found."
+            say " $NOTFOUND optional command $1 not found."
             return $EXIT_SUCCESS
         else
-            say " [NOTFND] command $1 not found."
+            say " $NOTFOUND command    $1 not found."
             return $EXIT_FAILURE
         fi
     fi
     if [ ! -x "$1" ]; then
-        say " [NOEXEC] command $1 not executable."
+        say " $NOTEXEC command $1 not executable."
         return $EXIT_FAILURE
     fi
     say " $ok command   '$1'."
@@ -575,7 +755,7 @@ function fix_execbit()
     shift
     rc=$EXIT_SUCCESS
     if [ ! -f "$f" ]; then
-        say " $NTFOUND execbit     '$f'"
+        say " $NOTFOUND execbit   '$f'"
         return $EXIT_FAILURE
     fi
     if [ ! -x "$f" ]; then

@@ -14,8 +14,8 @@
 
 ME=$0
 #  (À INCLURE) Chemin fichiers inclus, auto-ajustement
-LIB_PATH=$(dirname $0)
-export LIB_PATH
+DIR=$(dirname $0) #Resolving path
+cd $DIR 2>/dev/null; export LIB_PATH=$PWD; cd - >/dev/null
 . $LIB_PATH/boot.sh
 
 
@@ -74,11 +74,15 @@ fileLogger "$Self : starting"
 cd $BAK_DIR
 crontab -l > $dumpfile 2>>$ERR_FILE
 rc=$?
-fileLogger "$Self : $dumpfile (rc:$rc)"
 if [ $rc -eq $EXIT_SUCCESS ]; then
+    fileLogger "$ok $L_DUMP $dumpfile (rc:$rc)"
     do_moveXferZone "$dumpfile"
+    rc=$?
+else
+    fileLogger "$KO $L_DUMP $dumpfile (rc:$rc)"
 fi
 
+logStop
 # see to use rc=$? and then exit $rc
-exit $EXIT_SUCCESS
+exit $rc
 

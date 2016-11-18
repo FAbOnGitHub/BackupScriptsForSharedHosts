@@ -23,8 +23,8 @@ VERSION=0.0.1
 ######################################################(FAb)###################
 ME=$0
 #  (À INCLURE) Chemin fichiers inclus, auto-ajustement
-LIB_PATH=$(dirname $0)
-export LIB_PATH
+DIR=$(dirname $0) #Resolving path
+cd $DIR 2>/dev/null; export LIB_PATH=$PWD; cd - >/dev/null
 . $LIB_PATH/boot.sh
 
 bDoCompress=${bDoCompress:-1}
@@ -53,15 +53,15 @@ rm -rf $dir
 mkdir -m 0700 $dir
 cd $dir || die "Cannot access to dir '$dir'"
 
-date=$(date  +"%Y%m%d-%H%M%S")
 #Loop
 let iNbDbTotal=${#aDB[*]}
 let iNbDbOk=0
 for db in ${aDB[*]}
 do
 # 3 Save each DB
+    date=$(date  +"%Y%m%d-%H%M%S")
     [ "$db" = "information_schema" ] && sLock="--skip-lock-tables" || sLock="-l"
-    fileLogger "$ME '$db' found @${date} "
+    fileLogger "$ok '$db' found @${date} "
     dumpfile="$(basename ${db})"".svndump"
     /usr/bin/svnadmin dump "$db" >"$dumpfile" 2>>/dev/null
     rc=$?
