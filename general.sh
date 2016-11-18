@@ -123,7 +123,8 @@ function fileRotate ()
 function debug()
 {
     if [ ! -f $LOG_FILE ]; then
-        LOG_FILE=/dev/stderr
+        echo -e "`date +"%F %T"` DBG : $@" 2>&1
+        return 0
     fi
     case "x$DEBUG" in
         "x0"|"x1"|"x2")
