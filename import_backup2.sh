@@ -223,7 +223,7 @@ for raw_file in ${BAK_FILES[*]}; do
                 error $sMsg
                 fileLogger $sMsg
             else
-                fileLogger "$ok '$file' is not too old"
+                fileLogger "$ok  age $file is not too old :  $distTS"
             fi 
         fi
 
@@ -267,26 +267,9 @@ for raw_file in ${BAK_FILES[*]}; do
 done
 
 # Conclusion ##################################################################
+#   Now distant log files must be passed in BAK_FILES
 
-bRequired=0
-for distLogFile in log.txt err.txt
-do
-    wgetFile $distLogFile $bRequired
-    if [ $? -eq 0 ]; then
-	mv $BAK_DIR_CLI/$distLogFile $BAK_DIR_CLI/$TASK_NAME.$distLogFile
-    fi
-done
-
-# # if [ $GENERAL_SUCCESS -eq $EXIT_FAILURE ]; then
-# #     if [ $bUseMailWarning -eq 1 ]; then
-# #         sReport="DL files = $iNbTargetOk / ${#BAK_FILES[*]}"
-# #         view_today_logs| notify_email_stdin "$sReport"
-# #     fi
-# # fi
-# if [ $bUseMailWarning -eq 1 ]; then
-#     sReport="DL files = $iNbTargetOk / $iNbTargetTotal"
-#     view_today_logs| notify_email_stdin "$sReport"
-# fi
+#
 if [ $iNbTargetOk -eq $iNbTargetTotal ]; then
     sLabel="[ok]"
 else
