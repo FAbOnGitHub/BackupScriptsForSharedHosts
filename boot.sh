@@ -18,17 +18,26 @@ export EXIT_SUCCESS=0
 export EXIT_FAILURE=1
 ok='[__ok__]'
 KO='[**KO**]'
-NTFOUND='[NTFOUND]'
+NOTFOUND='[NOTFND]'
+NOTEXEC='[NOTEXE]'
 INFO='[__..__]'
-INFO='  info  '
+INFO='[ info ]'
 WARN='[=WARN=]'
+ERRO='[ERROR!]'
 t2='=='
 t3='==='
 t4='==='
-export ok KO NTFOUND INFO WARN t2 t3 t4
 DEBUG=${DEBUG:-0}
 VERBOSE=${VERBOSE:-0}
+export ok KO NTFOUND INFO WARN t2 t3 t4
 export DEBUG VERBOSE
+
+# Labels :
+L_DUMP="_DUMP_____"
+L_COMPRESS="_COMPRESS_"
+L_CYPHER="_CYPHER___"
+L_OFFER="_OFFER____"
+export L_DUMP L_COMPRESS L_CYPHER L_OFFER
 
 ### Variables:
 # BAK_DIR :	répertoire où sont fabriquées les archives
@@ -41,8 +50,8 @@ msg="Loading $LIB_PATH/general.sh"
 . $LIB_PATH/general.sh
 
 # Chargement de la config par défaut (OVH), serveur de prod
-msg=$msg"\nloading $LIB_PATH/config_ovh.sh"
-. $LIB_PATH/config_ovh.sh
+msg=$msg"\nloading $LIB_PATH/config_default.sh"
+. $LIB_PATH/config_default.sh
 
 
 ## Chargement éventuel d'une config alternative par machine
@@ -51,6 +60,9 @@ msg=$msg"\nloading $LIB_PATH/config_ovh.sh"
 #  hostname varie... Donc je fixe un nom à config_priv comme
 #  privée
 export D_ETC="$(echo $LIB_PATH | sed -e "s@\/cgi-bin\$@\/cgi-etc@" )"
+if [ ! -d "$D_ETC" ]; then
+    die "Cannot find \$D_ETC from \$LIB_PATH=$LIB_PATH"
+fi
 f=$D_ETC/config_priv.sh
 if [ -f "$f" ]; then
     msg=$msg"\nloading config_priv.sh"
@@ -84,9 +96,11 @@ case $ME in
     *)
         msg=$msg"\nDist script... bonus !"
         cfg_dist="$D_ETC/config_${hostname}_dist.sh"
+        #echo "cfg_dist=$cfg_dist"
         if [ -f "$cfg_dist" ]; then
             msg=$msg"\nloading $cfg_dist"
             . "$cfg_dist"
+            ZIP_PASSWD=${ZIP_PASSWD:-"NoPassUsedButControlledAnyway"}
         else
             msg=$msg"\nno '$cfg_dist' found"
         fi
@@ -94,28 +108,43 @@ case $ME in
 esac
 debug "$msg"
 
+if [ $bUseLogger -eq 1 ]; then
+    which logger >/dev/null 2>&1
+    rc=$?
+    if [ $rc -ne 0 ]; then
+        fileLogger "sorry, can't use logger"
+        bUseLogger=0
+    fi
+fi    
+
 if [ "x$BAK_DIR_PUB" = "x" ]; then
     fileLogger "BAK_DIR_PUB not defined: set to BAK_DIR=$BAK_DIR"
     #echo "BAK_DIR_PUB not defined: set to BAK_DIR=$BAK_DIR"
     BAK_DIR_PUB=$BAK_DIR
 fi
 mkdir -p $BAK_DIR $LTS_DIR $BAK_DIR_PUB
+chmod 700 $BAK_DIR
+chmod a+rx $BAK_DIR_PUB 2>/dev/null
 
 if [ "x$LOG_FILE" = "x" ]; then
-    export LOG_FILE=/tmp/scripts_RL.txt
-    echo "LOG_FILE not set, using default $LOG_FILE"
+    export LOG_FILE=/tmp/scripts_b4sh_${USER}.txt
+    touch $LOG_FILE
+    chmod o-rwx $LOG_FILE
+    echo "ALERT: LOG_FILE not set, using default $LOG_FILE"
 fi
 if [ "x$ERR_FILE" = "x" ]; then
     export ERR_FILE=$LOG_FILE
-    date > $ERR_FILE
+    echo "Set error file to log file $(date)" >> $ERR_FILE
     chmod o-rwx $ERR_FILE
 fi
+
 if [ ! -f "$LOG_FILE" ]; then
-    date > $LOG_FILE
+    echo "new log file ($date)" > $LOG_FILE
     chmod o-rwx $LOG_FILE
 fi
+
 if [ ! -f "$ERR_FILE" ]; then
-    date > $ERR_FILE
+    echo "no such ERR_FILE=$ERR_FILE $(date) " > $ERR_FILE
     chmod o-rwx $ERR_FILE
 fi
 if [ "x$ZIP_PASSWD" = "x" ]; then
@@ -128,11 +157,16 @@ if [ "x$BAK_DIR_PUB" = "x" ]; then
     BAK_DIR_PUB=$BAK_DIR
 fi
 
+if [ "x$BAK_DIR_PUB" = "x$BAK_DIR" ]; then
+    fileLogger "$WARN BAK_DIR_PUB and BAK__DIR are the same, this a bad idea"
+fi
+
 
 function viewConfig()
 {
     say " viewConfig"
     check_dir $BAK_DIR "BAK_DIR"
+    check_dir $BAK_DIR_PUB "BAK_DIR_PUB"
     check_file $LOCK_FILE  "[LOCK_FILE=$LOCK_FILE]"
     check_dir $LTS_DIR "LTS_DIR"
     check_file $LOG_FILE "LOG_FILE"
@@ -148,3 +182,4 @@ function viewConfig()
      fi
  fi
 
+logStart

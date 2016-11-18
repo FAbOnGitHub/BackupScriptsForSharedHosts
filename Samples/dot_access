@@ -1,0 +1,27 @@
+AuthUserFile	/path/to/secret/file/rl.pw
+AuthGroupFile	/dev/null
+AuthName	"Say hello to Backup System"
+AuthType	Basic
+
+  <ifModule mod_authz_core.c>
+     # Apache 2.4
+     <RequireAll>
+       Require valid-user
+       Require ip IP1 IP2
+       Require expr %{HTTP_USER_AGENT} == 'MySecretUserAgent'
+     </RequireAll>
+  </ifModule>
+  <ifModule !mod_authz_core.c>
+    # Not tested because I haven't apache 2.2 anymorex
+    order allow,deny
+    allow from IP1 IP2
+    require valid-user
+    SetEnvIfNoCase User-Agent MySecretAgent agent_ok
+    Allow from env=agent_ok
+          #https://httpd.apache.org/docs/2.2/howto/access.html
+          #SetEnvIf User-Agent BadBot GoAway=1
+          #Order allow,deny
+          #Allow from all
+          #Deny from env=GoAway 
+  </ifModule>
+

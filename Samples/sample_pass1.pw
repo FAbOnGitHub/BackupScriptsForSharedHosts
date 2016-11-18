@@ -1,0 +1,4 @@
+# Example how to create a passwrod file :
+# touch sample_pass1.pw
+# htpasswd -B sample_pass1.pw admin 
+admin:$2y$05$xDplHsF7xdghfpTRWukY6uqdAf5h8L7VDRjYPVT/thfLt1jCBNr7K

@@ -31,8 +31,13 @@ let rc_error=666
 function wgetFile()
 {
     try=$TRUE
+    ## Uncomment to debug and simulate download
     #try=$FALSE
-
+    if [ $try -eq $FALSE ]; then
+        rc_default=$EXIT_SUCCESS
+        status="[-fake-]"
+    fi
+        
     debug "wgetFile(\$1=$1, \$2=$2)"
     target="$1"
     [ "x$target" = "x" ] && return $rc_error
@@ -46,12 +51,11 @@ function wgetFile()
     fi
     debug "wgetFile [taget=$target][bRequired=$bRequired]"
 
-    if [ -f $BAK_DIR/$target ]; then
-        mv -f $BAK_DIR/$target $BAK_DIR/$target.orig
+    if [ -f $BAK_DIR_CLI/$target ]; then
+        mv -f $BAK_DIR_CLI/$target $BAK_DIR_CLI/$target.orig
     fi
 
     [ $VERBOSE -eq 1 ] && wget_quiet='' || wget_quiet="-q"
-
     #debug "wget $target..."
     rc=$rc_default
     let count=1
@@ -59,11 +63,11 @@ function wgetFile()
     do
         sWgetMsg=""
         wget $wget_quiet -t 3 --no-check-certificate --auth-no-challenge \
-            -U $HTTP_AGENT \
-            -P $BAK_DIR "$BAK_URL/$target" 2>> $ERR_FILE
+             -U $HTTP_AGENT \
+             -P $BAK_DIR_CLI "$BAK_URL/$target" 2>> $ERR_FILE
         rc=$?
         # Ne pas activer la ligne suivante en prod ou penser à purger les log
-        #debug "wget $BAK_URL/$target -> $BAK_DIR (rc=$rc)(errfile=$ERR_FILE)"
+        #debug "wget $BAK_URL/$target -> $BAK_DIR_CLI (rc=$rc)(errfile=$ERR_FILE)"
         if [ $rc -eq 0 ]; then
             status="$ok"
             try=$FALSE
@@ -104,11 +108,11 @@ function update_distant_list()
     if [ $rc -ne 0 ]; then
 	return $rc
     fi
-    if [ ! -f $BAK_DIR/$sDistantBakFilename ]; then
+    if [ ! -f $BAK_DIR_CLI/$sDistantBakFilename ]; then
         fileLogger "$fn \$sDistantBakFilename(=$sDistantBakFilename) not found"
 	return $FALSE
     fi
-    aDistFiles=( $(sed -e "s@ @%20@g" -e "/^$/ d" $BAK_DIR/$sDistantBakFilename ) )
+    aDistFiles=( $(sed -e "s@ @%20@g" -e "/^$/ d" $BAK_DIR_CLI/$sDistantBakFilename ) )
     BAK_FILES=( ${BAK_FILES[*]} ${aDistFiles[*]} )
     #BAK_FILES=( $BAK_FILES $aDistFiles )
     #echo "BAK_FILES="${BAK_FILES[*]}
@@ -122,21 +126,22 @@ function update_distant_list()
 #set -x
 DATE=$(date +"%Y%m%d-%H%M%S")
 GENERAL_SUCCESS=$EXIT_SUCCESS
-fileLogger  "$ok $ME starting  >>>>>"
-echo "$DATE start" >> $ERR_FILE
+
+let maxTime=3600*28
+
 
 # Normalement le client n'est pas obligé d'avoir la même arborescence que le
 # serveur. Si c'est le cas, son répertoire BAK_DIR est BAK_DIR_CLI
-[ "x$BAK_DIR_CLI" != "x" ] && BAK_DIR=$BAK_DIR_CLI
+## removed # [ "x$BAK_DIR_CLI" != "x" ] && BAK_DIR=$BAK_DIR_CLI
 LTS_PATTERN=${LTS_PATTERN:-"4-Thu"}
 TASK_NAME=${TASK_NAME:-"OutThere"}
 
-if [ ! -d $BAK_DIR ]; then
-    fileLogger  "$KO BAK_DIR ('$BAK_DIR') is missing"
+if [ ! -d $BAK_DIR_CLI ]; then
+    fileLogger  "$KO BAK_DIR_CLI ('$BAK_DIR_CLI') is missing"
     exit 1
 fi
-if [ ! -w $BAK_DIR ]; then
-    fileLogger  "$KO BAK_DIR ('$BAK_DIR') is not writable"
+if [ ! -w $BAK_DIR_CLI ]; then
+    fileLogger  "$KO BAK_DIR_CLI ('$BAK_DIR_CLI') is not writable"
     exit 1
 fi
 if [ ! -d $LTS_DIR ]; then
@@ -149,8 +154,10 @@ if [ ! -w $LTS_DIR ]; then
 fi
 if [ "x$BAK_URL" = "x" ]; then
     fileLogger  "\$BAK_URL is not set"
-    exit 1
+    exit 1    
 fi
+
+## URL à afficher dans log, sans le mot de passe
 LOG_URL="$(echo "$BAK_URL"|cut -d'@' -f2-)"
 
 # test
@@ -172,81 +179,101 @@ for raw_file in ${BAK_FILES[*]}; do
     #  SUCCESS=$FALSE
     SUCCESS=$TRUE
 
-  ff=$DATE-$file
-  rm -f $BAK_DIR/$ff $BAK_DIR/$file.csum
+    ff=$DATE-$file
+    rm -f $BAK_DIR_CLI/$ff $BAK_DIR_CLI/$file.csum
 
-  wgetFile $file
-  if [ $? -ne 0 ]; then
-      # fileLogger  "$KO wget file='$file' failed. Skip checks"
-      hasFailed
-      continue
-  fi
-  let iNbTargetOk++
+    wgetFile $file
+    rc=$?
+    if [ $rc -ne $EXIT_SUCCESS ]; then
+        fileLogger  "$KO wget file='$file' failed ($rc). Skip checks"
+        hasFailed
+        continue
+    fi
+    let iNbTargetOk++
 
-  case $file in
-      *.txt) bSkipCS=1 ;;
-      *) bSkipCS=0;;
-  esac
-  if [ $bSkipCS -eq 0 ]; then
-      wgetFile "$file.csum"
-      if [ $? -ne 0 ]; then
-          fileLogger "$KO wget CRC failed. Skip checks"
-          hasFailed
-          continue
-      fi
+    case $file in
+        *.txt) bSkipCS=1 ;;
+        *) bSkipCS=0;;
+    esac
+    if [ $bSkipCS -eq 0 ]; then
+        wgetFile "$file.csum"
+        rc=$?
+        if [ $rc -ne $EXIT_SUCCESS ]; then
+            fileLogger "$KO wget CRC failed ($rc). Skip checks"
+            hasFailed
+            continue
+        fi
 
-      servCsum=`head -n 1 $BAK_DIR/$file.csum 2>> $ERR_FILE`
-      localCsum=`checkSum $BAK_DIR/$file 2>> $ERR_FILE`
-      rm -f $BAK_DIR/$file.csum
-      if [ "$localCsum" = "$servCsum" ]
-      then
-          size="$(du --si -s  $BAK_DIR/$file| awk '{print $1}')"
-          fileLogger "$ok $file: CRC  ($size - $localSum crc)"
-          SUCCESS=$TRUE
-          debug "cksum valid ($file) $localCsum = $servCsum "
-      else
-          mv $BAK_DIR/$file $BAK_DIR/$ff.MAY_BE_CORRUPTED 2>> $ERR_FILE
-          fileLogger  "$KO $file: CRC ERR ('$localCsum' vs '$servCsum')"
-          hasFailed
-          debug "cksum error ($file)"
-          SUCCESS=$FALSE
-      fi
-      debug "Skip CheckSum for $file"
-      else SUCCESS=$TRUE
-  fi
+        wgetFile "$file.meta" 0
+        rc=$?
+        if [ $rc -ne $EXIT_SUCCESS ]; then
+            fileLogger "$WARN wget metafile failed ($rc)(future feature)"
+            continue
+        else
+            readMetaData "$BAK_DIR_CLI/$file.meta"
+            if [ "x$epochFile" = "x" ]; then
+                error " cannot read timestamp in metadata ! "
+            fi
+            nowTS="$(LANG=C date +"%s")"
+            distTS="$(LANC=C date --date="@""$epochFile" +"%F %T")"
+            dateDiff -s "@""$nowTS" "@""$epochFile"
+            delta=$dateDelta
+            if [ $delta -gt $maxTime ]; then
+                sMsg="$KO  $file too old (delta=$delta > max=$maxTime) $distTS"
+                error $sMsg
+                fileLogger $sMsg
+            else
+                fileLogger "$ok '$file' is not too old"
+            fi 
+        fi
 
-  if [ $SUCCESS -eq $TRUE ]; then
-      day="$(LANG=C date +"%u-%a")"
-      mv $BAK_DIR/$file $BAK_DIR/$day-$file 2>> $ERR_FILE
-      rc=$?
-      debug "mv($rc)  $BAK_DIR/$file $BAK_DIR/$day-$file"
-#      if [ "$day" = "7-Sun" ]; then
-      if [ "$day" = "$LTS_PATTERN" ]; then
-          cp $BAK_DIR/$day-$file $LTS_DIR/$ff 2>> $ERR_FILE
-          rc=$?
-          debug "cp($rc) $BAK_DIR/$day-$file $LTS_DIR/$ff"
-      fi
-  fi
+
+        servCsum=`head -n 1 $BAK_DIR_CLI/$file.csum 2>> $ERR_FILE`
+        localCsum=`checkSum $BAK_DIR_CLI/$file 2>> $ERR_FILE`
+        rm -f $BAK_DIR_CLI/$file.csum
+        if [ "$localCsum" = "$servCsum" ]
+        then
+            size="$(du --si -s  $BAK_DIR_CLI/$file| awk '{print $1}')"
+            fileLogger "$ok $file: CRC  ($size - $localSum crc)"
+            SUCCESS=$TRUE
+            debug "cksum valid ($file) $localCsum = $servCsum "
+        else
+            mv $BAK_DIR_CLI/$file $BAK_DIR_CLI/$ff.MAY_BE_CORRUPTED 2>> $ERR_FILE
+            fileLogger  "$KO $file: CRC ERR ('$localCsum' vs '$servCsum')"
+            hasFailed
+            debug "cksum error ($file)"
+            SUCCESS=$FALSE
+        fi
+        debug "Skip CheckSum for $file"
+    else
+        SUCCESS=$TRUE
+    fi
+
+    if [ $SUCCESS -eq $TRUE ]; then
+        day="$(LANG=C date +"%u-%a")"
+        mv $BAK_DIR_CLI/$file $BAK_DIR_CLI/$day-$file 2>> $ERR_FILE
+        rc=$?
+        debug "mv($rc)  $BAK_DIR_CLI/$file $BAK_DIR_CLI/$day-$file"
+        #      if [ "$day" = "7-Sun" ]; then
+        if [ "$day" = "$LTS_PATTERN" ]; then
+            cp $BAK_DIR_CLI/$day-$file $LTS_DIR/$ff 2>> $ERR_FILE
+            rc=$?
+            debug "cp($rc) $BAK_DIR_CLI/$day-$file $LTS_DIR/$ff"
+        fi
+    else
+        fileLogger "$WARN no global success for file '$file', so no rename '$day-'"
+    fi
 
 done
 
 # Conclusion ##################################################################
 
-# #wgetFile log.txt
-# wget -q -t 3 --no-check-certificate -U $HTTP_AGENT \
-#     -P $BAK_DIR "$BAK_URL/../log.txt" 2>> $ERR_FILE
-# if [ $? -ne 0 ]; then
-#     fileLogger  "$KO log.txt wget failed."
-# else
-#     mv $BAK_DIR/log.txt $BAK_DIR/log.ovh.txt
-#     fileLogger  "$ok log.txt wget OK"
-# fi
 bRequired=0
 for distLogFile in log.txt err.txt
 do
     wgetFile $distLogFile $bRequired
     if [ $? -eq 0 ]; then
-	mv $BAK_DIR/$distLogFile $BAK_DIR/$TASK_NAME.$distLogFile
+	mv $BAK_DIR_CLI/$distLogFile $BAK_DIR_CLI/$TASK_NAME.$distLogFile
     fi
 done
 
@@ -265,16 +292,8 @@ if [ $iNbTargetOk -eq $iNbTargetTotal ]; then
 else
     sLabel="[KO]"
 fi
+
+logStop
 reportByMail "$sLabel[$iNbTargetOk/$iNbTargetTotal] DL files  "
 
-
-if [ $DEBUG -ne 0 ] ; then
-    echo "[bUseMailWarning=$bUseMailWarning]"
-fi
-
-#(echo "test 2015-03-17" ; view_today_logs)| notify_email_stdin
-
-
-fileLogger "[bUseMailWarning=$bUseMailWarning]"
-fileLogger "$ok $ME stopping <<<<<< "
 exit $GENERAL_SUCCESS

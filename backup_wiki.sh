@@ -9,11 +9,11 @@
 # Licence : GPL v3
 
 
-
-#set -x
-# (À INCLURE) Chemin fichiers inclus, auto-ajustement
-LIB_PATH=$(dirname $0)
+#  (À INCLURE) Chemin fichiers inclus, auto-ajustement
+DIR=$(dirname $0) #Resolving path
+cd $DIR 2>/dev/null; export LIB_PATH=$PWD; cd - >/dev/null
 . $LIB_PATH/boot.sh
+
 
 ZIP_FILE=$BAK_DIR/wiki.zip    # Archive zipée
 
@@ -39,13 +39,15 @@ fi
 rm -f $ZIP_FILE
 zip -qr9 -P $ZIP_PASSWD $ZIP_FILE $WIKI_DIR \
     2>>$ERR_FILE
-res=$?
-if [ $res -eq 0 ]; then
-    csum=`checkSum $ZIP_FILE 2>>$ERR_FILE`
-    size=`sizeOf $ZIP_FILE 2>>$ERR_FILE`
-    echo $csum > $ZIP_FILE.csum
-    fileLogger "$ok zip / OK ($size octets)"
+rc=$?
+
+if [ $rc -eq 0 ]; then
+    fileLogger "$ok $L_DUMP $ZIP_FILE"
+    do_moveXferZone $ZIP_FILE
+    rc=$?
 else
-    rm -f $ZIP_FILE
-    fileLogger "$KO zip / ERR (code $res)"
+    fileLogger "$KO $L_DUMP $ZIP_FILE"
 fi
+
+logStop
+exit $rc
