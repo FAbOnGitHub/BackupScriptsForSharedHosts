@@ -210,8 +210,12 @@ for raw_file in ${BAK_FILES[*]}; do
             fileLogger "$WARN wget metafile failed ($rc)(future feature)"
             continue
         else
+            readMetaData "$BAK_DIR_CLI/$file.meta"
             nowTS="$(date +"%s")"
             distTS="$(date --date="@""$epochFile" +"%F %T")"
+            if [ "x$distTS" = "x" ]; then
+                error " cannot read timestamp in metadata ! "
+            fi
             dateDiff -s "@""$nowTS" "@""$distTS"
             delta=$dateDelta
             if [ $delta -gt $maxTime ]; then
