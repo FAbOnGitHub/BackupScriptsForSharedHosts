@@ -212,7 +212,7 @@ for raw_file in ${BAK_FILES[*]}; do
         else
             nowTS="$(date +"%s")"
             distTS="$(date --date="@""$epochFile" +"%F %T")"
-            dateDiff -s "@$nowTS" "@$distTS"
+            dateDiff -s "@""$nowTS" "@""$distTS"
             delta=$dateDelta
             if [ $delta -gt $maxTime ]; then
                 sMsg="$WARN delta=$delta > max=$max on $file"
@@ -253,6 +253,8 @@ for raw_file in ${BAK_FILES[*]}; do
             rc=$?
             debug "cp($rc) $BAK_DIR_CLI/$day-$file $LTS_DIR/$ff"
         fi
+    else
+        fileLogger "$WARN no global success for file '$file', so no rename '$day-'"
     fi
 
 done
@@ -283,8 +285,8 @@ if [ $iNbTargetOk -eq $iNbTargetTotal ]; then
 else
     sLabel="[KO]"
 fi
-reportByMail "$sLabel[$iNbTargetOk/$iNbTargetTotal] DL files  "
-
 
 logStop
+reportByMail "$sLabel[$iNbTargetOk/$iNbTargetTotal] DL files  "
+
 exit $GENERAL_SUCCESS
