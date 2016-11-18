@@ -211,11 +211,11 @@ for raw_file in ${BAK_FILES[*]}; do
             continue
         else
             readMetaData "$BAK_DIR_CLI/$file.meta"
-            nowTS="$(date +"%s")"
-            distTS="$(date --date="@""$epochFile" +"%F %T")"
-            if [ "x$distTS" = "x" ]; then
+            if [ "x$epochFile" = "x" ]; then
                 error " cannot read timestamp in metadata ! "
             fi
+            nowTS="$(LANG=C date +"%s")"
+            distTS="$(LANC=C date --date="@""$epochFile" +"%F %T")"
             dateDiff -s "@""$nowTS" "@""$distTS"
             delta=$dateDelta
             if [ $delta -gt $maxTime ]; then
