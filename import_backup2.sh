@@ -127,7 +127,7 @@ function update_distant_list()
 DATE=$(date +"%Y%m%d-%H%M%S")
 GENERAL_SUCCESS=$EXIT_SUCCESS
 
-let maxTime=3600*25
+let maxTime=3600*28
 
 
 # Normalement le client n'est pas obligé d'avoir la même arborescence que le
@@ -219,7 +219,7 @@ for raw_file in ${BAK_FILES[*]}; do
             dateDiff -s "@""$nowTS" "@""$epochFile"
             delta=$dateDelta
             if [ $delta -gt $maxTime ]; then
-                sMsg="$WARN delta=$delta > max=$max on $file ($distTS)"
+                sMsg="$WARN delta=$delta > max=$maxTime on $file ($distTS)"
                 error $sMsg
             fi
         fi
