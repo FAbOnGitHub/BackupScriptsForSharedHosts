@@ -219,9 +219,12 @@ for raw_file in ${BAK_FILES[*]}; do
             dateDiff -s "@""$nowTS" "@""$epochFile"
             delta=$dateDelta
             if [ $delta -gt $maxTime ]; then
-                sMsg="$WARN delta=$delta > max=$maxTime on $file ($distTS)"
+                sMsg="$KO  $file too old (delta=$delta > max=$maxTime) $distTS"
                 error $sMsg
-            fi
+                fileLogger $sMsg
+            else
+                fileLogger "$ok '$file' is not too old"
+            fi 
         fi
 
 
