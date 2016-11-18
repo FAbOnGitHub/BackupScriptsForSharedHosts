@@ -213,7 +213,7 @@ for raw_file in ${BAK_FILES[*]}; do
             nowTS="$(date +"%s")"
             distTS="$(date --date="@""$epochFile" +"%F %T")"
             dateDiff -s "@$nowTS" "@$distTS"
-            delta=dateDelta
+            delta=$dateDelta
             if [ $delta -gt $maxTime ]; then
                 sMsg="$WARN delta=$delta > max=$max on $file"
                 error $sMsg
