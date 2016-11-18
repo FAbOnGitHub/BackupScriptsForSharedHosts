@@ -123,7 +123,7 @@ if [ "x$BAK_DIR_PUB" = "x" ]; then
 fi
 mkdir -p $BAK_DIR $LTS_DIR $BAK_DIR_PUB
 chmod 700 $BAK_DIR
-chmod a+rx $BAK_DIR_PUB
+chmod a+rx $BAK_DIR_PUB 2>/dev/null
 
 if [ "x$LOG_FILE" = "x" ]; then
     export LOG_FILE=/tmp/scripts_b4sh_${USER}.txt
