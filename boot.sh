@@ -100,6 +100,7 @@ case $ME in
         if [ -f "$cfg_dist" ]; then
             msg=$msg"\nloading $cfg_dist"
             . "$cfg_dist"
+            ZIP_PASSWD=${ZIP_PASSWD:-"NoPassUsedButControlledAnyway"}
         else
             msg=$msg"\nno '$cfg_dist' found"
         fi
