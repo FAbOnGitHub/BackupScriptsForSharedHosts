@@ -361,24 +361,21 @@ f_current=  # Nom du fichier manipulé. Permet de chaîner des foncions en y
 # Compresse un fichier avec le paramètre kivabien
 function do_compress()
 {
-    # if [ "x$sCompressProg" = "x" ]; then
-    #     error "$ME misconfiguration sCompressProg"
-    #     return $EXIT_FAILURE
-    # fi
     arch="$1.zip"
     src="$1"
     if [ "x$2" != "x" ]; then
         arch="$1"
         src="$2"
     fi
+    if [ $bDoCompress -eq 0 ]; then
+        f_current="$src"
+        return 0
+    fi
     rm -f "$arch"
     zip -qr9 -P $ZIP_PASSWD "$arch" "$src" >/dev/null
     rc=$?
+    rm -f "$src"
     f_current="$arch"
-    # if [ $rc -eq $EXIT_SUCCESS ]; then
-    #     checkSumFile "$new"
-    #     f_current="$new"
-    # fi
     return $rc
 }
 function do_compress_clean()
@@ -474,7 +471,7 @@ function do_cypher()
     $sCypherFct "$f"
     rc=$?
     if [ $rc -eq $EXIT_SUCCESS ]; then
-        # rm -f "$f"
+        #rm -f "$f"
         fileLogger "$ok $L_CYPHER $ME"
     else
         fileLogger "$KO $L_CYPHER $ME '$f' failed"
@@ -547,7 +544,7 @@ function do_moveXferZone()
     X="$(do_cypher "$f")"
     rc=$?
     [ $rc -ne 0 ] && die "ERROR cypher f='f' (rc=$rc)"
-    rm "$f"
+    rm -f "$f"
     F="$(basename "$X")"
     debug "[f=$f][X=$X][F=$F] $do_cypher_fct"
     debug "[BAK_DIR=$BAK_DIR][BAK_DIR_PUB=$BAK_DIR_PUB]"
@@ -872,6 +869,11 @@ function check_local_server_variables()
         fileLogger "BAK_DIR not defined: how can it be possible?"
         exit 123
     fi
+    if [ ! \( -d $BAK_DIR -a -w $BAK_DIR \) ]; then
+        fileLogger "$KO ERR $BAK_DIR not dir or writeable"
+        exit 1
+    fi
+
     if [ "x$BAK_DIR_PUB" = "x" ]; then
         fileLogger "BAK_DIR_PUB not defined: set to BAK_DIR=$BAK_DIR"
         #echo "BAK_DIR_PUB not defined: set to BAK_DIR=$BAK_DIR"
@@ -933,17 +935,39 @@ function check_local_server_variables()
 function check_client_variables()
 {
     ZIP_PASSWD=${ZIP_PASSWD:-"NoPassUsedButControlledAnyway"}
-    mkdir -p $LTS_DIR
-    chmod a+rx $LTS_DIR
+   
+    if [ ! -d $BAK_DIR_CLI ]; then
+        fileLogger  "$KO BAK_DIR_CLI ('$BAK_DIR_CLI') is not a directory"
+        exit 1
+    fi
+    if [ ! -w $BAK_DIR_CLI ]; then
+        fileLogger  "$KO BAK_DIR_CLI ('$BAK_DIR_CLI') is not writable"
+        exit 1
+    fi
+    if [ ! -f $BAK_DIR_PUB/.htaccess ]; then
+        fileLogger "$KO you must have an .htaccess in $BAK_DIR_PUB"
+        exit 1
+    fi
+    if [ ! -d $LTS_DIR ]; then
+        fileLogger  "$WARN LTS_DIR ('$LTS_DIR') is not a directory"
+        mkdir -p $LTS_DIR
+        chmod a+rx $LTS_DIR
+    fi
+    if [ ! -w $LTS_DIR ]; then
+        fileLogger  "$KO LTS_DIR ('$LTS_DIR') is not writable"
+        exit 1
+    fi
+    
+    
 
     if [ ! -f "$LOG_FILE" ]; then
         echo "new log file ($date)" > $LOG_FILE
-        chmod o-rwx $LOG_FILE
+        chmod a-rw $LOG_FILE
     fi
     
     if [ ! -f "$ERR_FILE" ]; then
         echo "no such ERR_FILE=$ERR_FILE $(date) " > $ERR_FILE
-        chmod o-rwx $ERR_FILE
+        chmod a-rw $ERR_FILE
     fi
     
 }

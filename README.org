@@ -89,7 +89,7 @@ $ git clone https://github.com/FAbOnGitHub/BackupScriptsForSharedHosts cgi-bin
     Like «Get the  code», you can overwrite the code  directory (except for your
     own scripts). 
     Read  the  documentation  for  the  new variables  and/or  use  the  command
-    «=diff_config.sh=» 
+    « =diff_config.sh= » 
 
 *** Configuration
     
@@ -98,13 +98,13 @@ $ git clone https://github.com/FAbOnGitHub/BackupScriptsForSharedHosts cgi-bin
 
     But, fortunately, configuration file =config_default.sh= is widely commented.
     
-    Scripts (=HOST A= can use three level of configuration file :
+    Scripts on =HOST A= can use three level of configuration file :
     1. First =config_default.sh= in =cgi-bin= (default parameters)
-    2. =config_priv.sh= in =cgi=etc=  (your param)
-    3. =config_<hostname>.sh= in =cgi=etc=  (optional)
+    2. =config_priv.sh= in =cgi-etc=  (your param)
+    3. =config_<hostname>.sh= in =cgi-etc=  (optional)
 
     =HOST B= which hosts =import_backup2.sh= use this file *in addition* :
-    =config_<hostname>_dist.sh= in =cgi=etc=
+    =config_<hostname>_dist.sh= in =cgi-etc=
 
     *Nota* :  <hostname> is the  result of bash  command "hostname -s".  In some
     clusters this  command could  return something not  trivial. Test  it before
@@ -114,9 +114,11 @@ $ git clone https://github.com/FAbOnGitHub/BackupScriptsForSharedHosts cgi-bin
 
     - Server Host A can  ask to retrieve additional files unknown  by host B via
       the file "=Please_backup.lst="
-    - nearly every thing  is logged and the  logs of =Host A= are  retrieve to =
-      Host B= anyway
+    - nearly every thing  is logged and the  logs of =Host A= are  retrieve to 
+      =Host B= anyway
     - notification by email provided
+    - Client checkes the date of the dumped archive via a metadata file
+    - Like date, CRC is checked
     - script to check configuration is provided
     - Long Term Support directory for imported archives : archives are retrieved
       and stored  by day except  that you can  specify a day  to push them  in a
@@ -190,7 +192,7 @@ $ git clone https://github.com/FAbOnGitHub/BackupScriptsForSharedHosts cgi-bin
 
 **** Missing mail command :
      
-     This case is not  handled gracefully... A script able to  send mail will be
+     This case is not handled gracefully... A script, able to send mail, will be
      provide soon. You should watch the logs file.
 
 ** French version : en Français
