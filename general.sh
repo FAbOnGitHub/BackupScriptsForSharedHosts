@@ -841,6 +841,20 @@ function check_var_URL()
 
 function check_local_server_variables()
 {
+    # We need logfile immediatly
+    # but they can be declared in BAK_DIR with could not exists yet
+    if [ "x$LOG_FILE" = "x" ]; then
+        export LOG_FILE=/tmp/scripts_b4sh_${USER}.txt
+        touch $LOG_FILE
+        chmod o-rwx $LOG_FILE
+        echo "ALERT: LOG_FILE not set, using default $LOG_FILE"
+    fi
+    if [ "x$ERR_FILE" = "x" ]; then
+        export ERR_FILE=$LOG_FILE
+        echo "Set error file to log file $(date)" >> $ERR_FILE
+        chmod o-rwx $ERR_FILE
+    fi
+
     if [ $bUseLogger -eq 1 ]; then
         which logger >/dev/null 2>&1
         rc=$?
@@ -863,27 +877,20 @@ function check_local_server_variables()
     if [ "x$BAK_DIR_PUB" = "x$BAK_DIR" ]; then
         fileLogger "$WARN BAK_DIR_PUB and BAK__DIR are the same, this a bad idea"
     fi
-    if [ "x$BAK_DIR_PUB" = "x$BAK_DIR" ]; then
-        fileLogger "$WARN BAK_DIR_PUB and BAK__DIR are the same, this a bad idea"
-    fi
+    case "$BAK_DIR_PUB" in
+        ${BAK_DIR}*)
+            fileLogger "$WARN BAK_DIR_PUB is sub directory of BAK_DIR. Bad idea"
+            ;;
+        *)
+            nope="We're cool"
+            ;;
+    esac
 
 
 
     mkdir -p $BAK_DIR $BAK_DIR_PUB
     chmod 700 $BAK_DIR
     chmod a+rx $BAK_DIR_PUB 2>/dev/null
-
-    if [ "x$LOG_FILE" = "x" ]; then
-        export LOG_FILE=/tmp/scripts_b4sh_${USER}.txt
-        touch $LOG_FILE
-        chmod o-rwx $LOG_FILE
-        echo "ALERT: LOG_FILE not set, using default $LOG_FILE"
-    fi
-    if [ "x$ERR_FILE" = "x" ]; then
-        export ERR_FILE=$LOG_FILE
-        echo "Set error file to log file $(date)" >> $ERR_FILE
-        chmod o-rwx $ERR_FILE
-    fi
 
     if [ ! -f "$LOG_FILE" ]; then
         echo "new log file ($date)" > $LOG_FILE
@@ -894,6 +901,24 @@ function check_local_server_variables()
         echo "no such ERR_FILE=$ERR_FILE $(date) " > $ERR_FILE
         chmod o-rwx $ERR_FILE
     fi
+    case "$LOG_FILE" in
+        ${BAK_DIR_PUB}*)
+            nope="We're cool"
+            ;;
+        *)
+            fileLogger "$WARN LOG_FILE should be under BAK_DIR_PUB"
+            ;;
+    esac
+    case "$ERR_FILE" in
+        ${BAK_DIR_PUB}*)
+            nope="We're cool"
+            ;;
+        *)
+            fileLogger "$WARN ERR_FILE should be under BAK_DIR_PUB"
+            ;;
+    esac
+
+    
     if [ "x$ZIP_PASSWD" = "x" ]; then
         fileLogger "ZIP_PASSWD is not defined... default value"
         ZIP_PASSWD="NeverForgetToSetAPassowrd"

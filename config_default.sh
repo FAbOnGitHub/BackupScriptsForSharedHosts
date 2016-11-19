@@ -67,13 +67,13 @@ WWW_DIR=/tmp/
 ##
 # Where archives are built on the server, private
 # See BAK_DIR
-BAK_DIR=$ROOT/backup_priv_a7da1ebf034
+BAK_DIR=$ROOT/backup_priv_a7da1ebf034_default
 #FR: Dossier de backup
 
 ##
 # Where archives are offered to the client
 #
-BAK_DIR_PUB=$WWW_DIR/backup_pub_335f6f97c5c3c0ee
+BAK_DIR_PUB=$WWW_DIR/backup_pub_335f6f97c5c3c0ee_default
 #FR: Dossier de backup
 
 ##
