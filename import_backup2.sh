@@ -13,11 +13,6 @@
 LIB_PATH=$(dirname $0)
 . $LIB_PATH/boot.sh
 
-# À configurer dans les fichiers de conf plutôt!
-DEBUG=0
-#DEBUG=1
-
-
 FALSE=0
 TRUE=1
 let rc_default=999
@@ -31,13 +26,13 @@ let rc_error=666
 function wgetFile()
 {
     try=$TRUE
-    ## Uncomment to debug and simulate download
+    ## Uncomment to debug and simulate download #hmm nope pb with metafile
     #try=$FALSE
     if [ $try -eq $FALSE ]; then
         rc_default=$EXIT_SUCCESS
         status="[-fake-]"
     fi
-        
+    
     debug "wgetFile(\$1=$1, \$2=$2)"
     target="$1"
     [ "x$target" = "x" ] && return $rc_error
@@ -86,6 +81,71 @@ function wgetFile()
     fileLogger "$status wget $target (rc=${rc}${sWgetMsg}) (try: $count/3)"
     debug " wgetFile(): fin wget($rc) $LOG_URL/$target"
     return $rc
+}
+
+##
+#  Fait les contrôles d'intégrité sur le fichier téléchargé dans BAK_DIR_CLI
+#
+function check_downloaded_file()
+{
+    file="$1"
+
+    wgetFile "$file.csum"
+    rc=$?
+    if [ $rc -ne $EXIT_SUCCESS ]; then
+        fileLogger "$KO wget CRC failed ($rc). Skip checks"
+        hasFailed
+        return $EXIT_FAILURE
+    fi
+    
+    wgetFile "$file.meta" 0
+    rc=$?
+    if [ $rc -ne $EXIT_SUCCESS ]; then
+        fileLogger "$WARN ${file}.meta wget metafile failed ($rc)(future feature)"
+    else
+        readMetaData "$BAK_DIR_CLI/$file.meta"
+        rc=$?
+        if [ $rc -ne $EXIT_SUCCESS -o  "x$epochFile" = "x" ]; then
+            error " cannot read timestamp in metadata ! "
+            hasFailed
+            return $EXIT_FAILURE
+        fi
+
+        nowTS="$(LANG=C date +"%s")"
+        distTS="$(LANC=C date --date="@""$epochFile" +"%F %T")"
+        dateDiff -s "@""$nowTS" "@""$epochFile"
+        delta=$dateDelta
+        if [ $delta -gt $maxTime ]; then
+            sMsg="$KO  $file too old (delta=$delta > max=$maxTime) $distTS"
+            error $sMsg
+            fileLogger $sMsg
+        else
+            fileLogger "$ok  age $file is not too old :  $distTS"
+        fi
+    fi
+    
+
+
+    servCsum=`head -n 1 $BAK_DIR_CLI/$file.csum 2>> $ERR_FILE`
+    localCsum=`checkSum $BAK_DIR_CLI/$file 2>> $ERR_FILE`
+    rm -f $BAK_DIR_CLI/$file.csum
+    if [ "$localCsum" = "$servCsum" ]
+    then
+        size="$(du --si -s  $BAK_DIR_CLI/$file| awk '{print $1}')"
+        fileLogger "$ok $file: CRC  ($size - $localSum crc)"
+        SUCCESS=$TRUE
+        debug "cksum valid ($file) $localCsum = $servCsum "
+    else
+        mv $BAK_DIR_CLI/$file $BAK_DIR_CLI/$ff.MAY_BE_CORRUPTED 2>> $ERR_FILE
+        fileLogger  "$KO $file: CRC ERR ('$localCsum' vs '$servCsum')"
+        hasFailed
+        debug "cksum error ($file)"
+        SUCCESS=$FALSE
+        
+        return $EXIT_FAILURE
+    fi
+
+    return $EXIT_SUCCESS
 }
 
 ##
@@ -194,72 +254,15 @@ for raw_file in ${BAK_FILES[*]}; do
 
     case $file in
         *.txt) bSkipCS=1 ;;
-        *) bSkipCS=0;;
-    esac
-    if [ $bSkipCS -eq 0 ]; then
-        wgetFile "$file.csum"
-        rc=$?
-        if [ $rc -ne $EXIT_SUCCESS ]; then
-            fileLogger "$KO wget CRC failed ($rc). Skip checks"
-            hasFailed
-            continue
-        fi
+        *) bSkipCS=0           
+           check_downloaded_file "$file"
+           rc=$?
+           SUCCESS=$rc
+           ;;
+    esac    
 
-        wgetFile "$file.meta" 0
-        rc=$?
-        if [ $rc -ne $EXIT_SUCCESS ]; then
-            fileLogger "$WARN ${file}.meta wget metafile failed ($rc)(future feature)"
-        else
-            readMetaData "$BAK_DIR_CLI/$file.meta"
-            if [ "x$epochFile" = "x" ]; then
-                error " cannot read timestamp in metadata ! "
-            fi
-            nowTS="$(LANG=C date +"%s")"
-            distTS="$(LANC=C date --date="@""$epochFile" +"%F %T")"
-            dateDiff -s "@""$nowTS" "@""$epochFile"
-            delta=$dateDelta
-            if [ $delta -gt $maxTime ]; then
-                sMsg="$KO  $file too old (delta=$delta > max=$maxTime) $distTS"
-                error $sMsg
-                fileLogger $sMsg
-            else
-                fileLogger "$ok  age $file is not too old :  $distTS"
-            fi 
-        fi
-
-
-        servCsum=`head -n 1 $BAK_DIR_CLI/$file.csum 2>> $ERR_FILE`
-        localCsum=`checkSum $BAK_DIR_CLI/$file 2>> $ERR_FILE`
-        rm -f $BAK_DIR_CLI/$file.csum
-        if [ "$localCsum" = "$servCsum" ]
-        then
-            size="$(du --si -s  $BAK_DIR_CLI/$file| awk '{print $1}')"
-            fileLogger "$ok $file: CRC  ($size - $localSum crc)"
-            SUCCESS=$TRUE
-            debug "cksum valid ($file) $localCsum = $servCsum "
-        else
-            mv $BAK_DIR_CLI/$file $BAK_DIR_CLI/$ff.MAY_BE_CORRUPTED 2>> $ERR_FILE
-            fileLogger  "$KO $file: CRC ERR ('$localCsum' vs '$servCsum')"
-            hasFailed
-            debug "cksum error ($file)"
-            SUCCESS=$FALSE
-        fi
-        debug "Skip CheckSum for $file"
-    else
-        SUCCESS=$TRUE
-    fi
-
-    if [ $SUCCESS -eq $TRUE ]; then
-        day="$(LANG=C date +"%u-%a")"
-        mv $BAK_DIR_CLI/$file $BAK_DIR_CLI/$day-$file 2>> $ERR_FILE
-        rc=$?
-        debug "mv($rc)  $BAK_DIR_CLI/$file $BAK_DIR_CLI/$day-$file"
-        #      if [ "$day" = "7-Sun" ]; then
-        if [ "$day" = "$LTS_PATTERN" ]; then
-            cp $BAK_DIR_CLI/$day-$file $LTS_DIR/$ff 2>> $ERR_FILE
-            rc=$?
-            debug "cp($rc) $BAK_DIR_CLI/$day-$file $LTS_DIR/$ff"
-        fi
+    if [ $SUCCESS -eq $EXIT_SUCCESS ]; then
+        archive_downloaded_file "$file"
     else
         fileLogger "$WARN no global success for file '$file', so no rename '$day-'"
     fi
@@ -277,6 +280,6 @@ else
 fi
 
 logStop
-reportByMail "$sLabel[$iNbTargetOk/$iNbTargetTotal] DL files  "
+reportByMail "$sLabel[$iNbTargetOk/$iNbTargetTotal] DL files"
 
 exit $GENERAL_SUCCESS
