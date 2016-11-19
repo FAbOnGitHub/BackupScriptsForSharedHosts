@@ -361,24 +361,21 @@ f_current=  # Nom du fichier manipulé. Permet de chaîner des foncions en y
 # Compresse un fichier avec le paramètre kivabien
 function do_compress()
 {
-    # if [ "x$sCompressProg" = "x" ]; then
-    #     error "$ME misconfiguration sCompressProg"
-    #     return $EXIT_FAILURE
-    # fi
     arch="$1.zip"
     src="$1"
     if [ "x$2" != "x" ]; then
         arch="$1"
         src="$2"
     fi
+    if [ $bDoCompress -eq 0 ]; then
+        f_current="$src"
+        return 0
+    fi
     rm -f "$arch"
     zip -qr9 -P $ZIP_PASSWD "$arch" "$src" >/dev/null
     rc=$?
+    rm -f "$src"
     f_current="$arch"
-    # if [ $rc -eq $EXIT_SUCCESS ]; then
-    #     checkSumFile "$new"
-    #     f_current="$new"
-    # fi
     return $rc
 }
 function do_compress_clean()
@@ -474,7 +471,7 @@ function do_cypher()
     $sCypherFct "$f"
     rc=$?
     if [ $rc -eq $EXIT_SUCCESS ]; then
-        # rm -f "$f"
+        #rm -f "$f"
         fileLogger "$ok $L_CYPHER $ME"
     else
         fileLogger "$KO $L_CYPHER $ME '$f' failed"
@@ -547,7 +544,7 @@ function do_moveXferZone()
     X="$(do_cypher "$f")"
     rc=$?
     [ $rc -ne 0 ] && die "ERROR cypher f='f' (rc=$rc)"
-    rm "$f"
+    rm -f "$f"
     F="$(basename "$X")"
     debug "[f=$f][X=$X][F=$F] $do_cypher_fct"
     debug "[BAK_DIR=$BAK_DIR][BAK_DIR_PUB=$BAK_DIR_PUB]"
