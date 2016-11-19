@@ -17,10 +17,6 @@ cd $DIR 2>/dev/null; export LIB_PATH=$PWD; cd - >/dev/null
 
 ZIP_FILE=$BAK_DIR/wiki.zip    # Archive zipée
 
-if [ ! \( -d $BAK_DIR -a -w $BAK_DIR \) ]; then
-    fileLogger "$KO ERR dossier `basename $BAK_DIR` inaccessible"
-    exit 1
-fi
 if [ ! -f $BAK_DIR/.htaccess ]; then
     fileLogger "$KO ERR fichier .htaccess inaccessible"
     rm -f $ZIP_FILE
@@ -41,6 +37,7 @@ zip -qr9 -P $ZIP_PASSWD $ZIP_FILE $WIKI_DIR \
     2>>$ERR_FILE
 rc=$?
 
+bCompress=0
 if [ $rc -eq 0 ]; then
     fileLogger "$ok $L_DUMP $ZIP_FILE"
     do_moveXferZone $ZIP_FILE
