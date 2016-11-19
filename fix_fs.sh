@@ -96,8 +96,12 @@ say "*** $ME : starting $(date) ***"
 say " Le champ status peut prendre plusieurs valeur. Si c'est en MAJUSCULES c'est"
 say " qu'il n'est pas content et qu'il faut regarder."
 say "== Vérification de la configuration =="
-check_var ROOT WWW_DIR WIKI_DIR
-check_var BAK_DIR BAK_DIR_PUB BAK_LEVEL
+check_var ROOT
+check_var BAK_DIR
+check_var WWW_DIR
+check_var BAK_DIR_PUB
+check_var WIKI_DIR
+check_var BAK_LEVEL
 check_var SQL_SERVER1 SQL_BASE1 SQL_USER1
 check_var_secret SQL_PASSWD1
 check_var SQL_SERVER2 SQL_BASE2 SQL_USER2
@@ -110,7 +114,7 @@ check_var_secret GPG_PASSWD
 check_var LOG_FILE ERR_FILE
 check_var_URL  BAK_URL
 check_var BAK_FILES
-check_var BAK_DIR_CLI HTTP_AGENT
+check_var BAK_DIR_CLI LTS_DIR HTTP_AGENT
 
 
 say "== Vérification du fichier de log =="

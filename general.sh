@@ -863,6 +863,9 @@ function check_local_server_variables()
     if [ "x$BAK_DIR_PUB" = "x$BAK_DIR" ]; then
         fileLogger "$WARN BAK_DIR_PUB and BAK__DIR are the same, this a bad idea"
     fi
+    if [ "x$BAK_DIR_PUB" = "x$BAK_DIR" ]; then
+        fileLogger "$WARN BAK_DIR_PUB and BAK__DIR are the same, this a bad idea"
+    fi
 
 
 
