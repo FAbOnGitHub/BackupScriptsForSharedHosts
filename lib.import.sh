@@ -112,7 +112,7 @@ function check_downloaded_file()
             error $sMsg
             fileLogger $sMsg
         else
-            fileLogger "$ok  age $file is not too old :  $distTS"
+            fileLogger "$ok _age $file is not too old :  $distTS"
         fi
     fi
     
@@ -120,12 +120,12 @@ function check_downloaded_file()
 
     #servCsum=`head -n 1 $BAK_DIR_CLI/$file.csum 2>> $ERR_FILE`
     servCsum=$csumFile
-    localCsum=`checkSum $BAK_DIR_CLI/$file 2>> $ERR_FILE`
+    localCsum=$(checkSum $BAK_DIR_CLI/$file 2>> $ERR_FILE)
     #rm -f $BAK_DIR_CLI/$file.csum
     if [ "$localCsum" = "$servCsum" ]
     then
         size="$(du --si -s  $BAK_DIR_CLI/$file| awk '{print $1}')"
-        fileLogger "$ok $file: CRC  ($size - $localSum crc)"
+        fileLogger "$ok csum $file ($localCsum / $sizeFile bytes)"
         SUCCESS=$TRUE
         debug "cksum valid ($file) $localCsum = $servCsum "
     else
