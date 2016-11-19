@@ -1,4 +1,5 @@
-# general.sh
+# lib.backup.sh
+#   ex general.sh
 #  - initial author : meo
 #  - main dev : FAb
 #
@@ -555,26 +556,11 @@ function do_moveXferZone()
     if [ "x$BAK_DIR" != "x$BAK_DIR_PUB" ]; then
         mv -f "$X" "$BAK_DIR_PUB/$F" 2>/dev/null
     fi
-    checkSumFile "$BAK_DIR_PUB/$F"
+#    checkSumFile "$BAK_DIR_PUB/$F"
     writeMetaData "$BAK_DIR_PUB/$F"
     readMetaData "$BAK_DIR_PUB/$F".meta
-    fileLogger "$ok $L_OFFER do_moveXferZone() : $buffer"
+    fileLogger "$ok $L_OFFER $buffer csum:$csumFile at $dateFile"
     return $EXIT_SUCCESS
-}
-
-function archive_downloaded_file()
-{
-    file="$1"
-    day="$(LANG=C date +"%u-%a")"
-    mv $BAK_DIR_CLI/$file $BAK_DIR_CLI/$day-$file 2>> $ERR_FILE
-    rc=$?
-    debug "mv($rc)  $BAK_DIR_CLI/$file $BAK_DIR_CLI/$day-$file"
-    if [ "$day" = "$LTS_PATTERN" ]; then
-        cp $BAK_DIR_CLI/$day-$file $LTS_DIR/$ff 2>> $ERR_FILE
-        rc=$?
-        debug "cp($rc) $BAK_DIR_CLI/$day-$file $LTS_DIR/$ff"
-    fi
-
 }
 
 #

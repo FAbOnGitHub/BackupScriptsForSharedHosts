@@ -73,6 +73,7 @@ function wgetFile()
     return $rc
 }
 
+
 ##
 #  Fait les contrôles d'intégrité sur le fichier téléchargé dans BAK_DIR_CLI
 #
@@ -80,19 +81,20 @@ function check_downloaded_file()
 {
     file="$1"
 
-    wgetFile "$file.csum"
-    rc=$?
-    if [ $rc -ne $EXIT_SUCCESS ]; then
-        fileLogger "$KO wget CRC failed ($rc). Skip checks"
-        hasFailed
-        return $EXIT_FAILURE
-    fi
+    # wgetFile "$file.csum"
+    # rc=$?
+    # if [ $rc -ne $EXIT_SUCCESS ]; then
+    #     fileLogger "$KO wget CRC failed ($rc). Skip checks"
+    #     hasFailed
+    #     return $EXIT_FAILURE
+    # fi
     
     wgetFile "$file.meta" 0
     rc=$?
     if [ $rc -ne $EXIT_SUCCESS ]; then
         fileLogger "$WARN ${file}.meta wget metafile failed ($rc)(future feature)"
     else
+        # Fixing : csumFile sizeFile epochFile dateFile
         readMetaData "$BAK_DIR_CLI/$file.meta"
         rc=$?
         if [ $rc -ne $EXIT_SUCCESS -o  "x$epochFile" = "x" ]; then
@@ -116,9 +118,10 @@ function check_downloaded_file()
     
 
 
-    servCsum=`head -n 1 $BAK_DIR_CLI/$file.csum 2>> $ERR_FILE`
+    #servCsum=`head -n 1 $BAK_DIR_CLI/$file.csum 2>> $ERR_FILE`
+    servCsum=$csumFile
     localCsum=`checkSum $BAK_DIR_CLI/$file 2>> $ERR_FILE`
-    rm -f $BAK_DIR_CLI/$file.csum
+    #rm -f $BAK_DIR_CLI/$file.csum
     if [ "$localCsum" = "$servCsum" ]
     then
         size="$(du --si -s  $BAK_DIR_CLI/$file| awk '{print $1}')"
@@ -168,3 +171,21 @@ function update_distant_list()
     #BAK_FILES=( $BAK_FILES $aDistFiles )
     #echo "BAK_FILES="${BAK_FILES[*]}
 }
+
+##
+##
+function archive_downloaded_file()
+{
+    file="$1"
+    day="$(LANG=C date +"%u-%a")"
+    mv $BAK_DIR_CLI/$file $BAK_DIR_CLI/$day-$file 2>> $ERR_FILE
+    rc=$?
+    debug "mv($rc)  $BAK_DIR_CLI/$file $BAK_DIR_CLI/$day-$file"
+    if [ "$day" = "$LTS_PATTERN" ]; then
+        cp $BAK_DIR_CLI/$day-$file $LTS_DIR/$ff 2>> $ERR_FILE
+        rc=$?
+        debug "cp($rc) $BAK_DIR_CLI/$day-$file $LTS_DIR/$ff"
+    fi
+
+}
+
