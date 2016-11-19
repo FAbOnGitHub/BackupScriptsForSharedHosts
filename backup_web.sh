@@ -19,8 +19,8 @@ cd $DIR 2>/dev/null; export LIB_PATH=$PWD; cd - >/dev/null
 
 ARCH_FILE=$BAK_DIR/www.tar
 rm -f $ARCH_FILE
-# Zip is also done by do_moveXferZone
 # tar is more efficient and will be able to perfom incremental backups.
+# Zip is also done by do_moveXferZone (no more with bDoCompress=0)
 # 
 # zip -qr9 -P $ZIP_PASSWD $ARCH_FILE $WWW_DIR \
 #     -x $BAK_DIR/\* -x $WIKI_DIR/\* -x $WWW_DIR/backup_\* \
