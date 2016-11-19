@@ -48,7 +48,7 @@ export L_DUMP L_COMPRESS L_CYPHER L_OFFER
 ME=$(basename $0)
 # Chargement des fonctions générales
 msg="Loading $LIB_PATH/general.sh"
-. $LIB_PATH/general.sh
+. $LIB_PATH/lib.backup.sh
 
 # Chargement de la config par défaut (OVH), serveur de prod
 msg=$msg"\nloading $LIB_PATH/config_default.sh"
@@ -117,6 +117,8 @@ case $ME in
 
             ## Perform controls now
             check_client_variables
+
+            . $LIB_PATH/lib.import.sh
             
         else
             msg=$msg"\nno '$cfg_dist' found"
