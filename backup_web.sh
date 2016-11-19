@@ -17,14 +17,7 @@ cd $DIR 2>/dev/null; export LIB_PATH=$PWD; cd - >/dev/null
 . $LIB_PATH/boot.sh
 
 
-ARCH_FILE=$BAK_DIR/www.zip
-
-if [ "x$ZIP_PASSWD" = "x" ]; then
-    fileLogger "$KO ZIP_PASSWD est vide... abandon"
-    exit 1
-fi
-
-
+ARCH_FILE=$BAK_DIR/www.tar
 rm -f $ARCH_FILE
 # Zip is also done by do_moveXferZone
 # tar is more efficient and will be able to perfom incremental backups.

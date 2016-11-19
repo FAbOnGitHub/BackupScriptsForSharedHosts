@@ -872,6 +872,11 @@ function check_local_server_variables()
         fileLogger "BAK_DIR not defined: how can it be possible?"
         exit 123
     fi
+    if [ ! \( -d $BAK_DIR -a -w $BAK_DIR \) ]; then
+        fileLogger "$KO ERR $BAK_DIR not dir or writeable"
+        exit 1
+    fi
+
     if [ "x$BAK_DIR_PUB" = "x" ]; then
         fileLogger "BAK_DIR_PUB not defined: set to BAK_DIR=$BAK_DIR"
         #echo "BAK_DIR_PUB not defined: set to BAK_DIR=$BAK_DIR"
@@ -933,6 +938,19 @@ function check_local_server_variables()
 function check_client_variables()
 {
     ZIP_PASSWD=${ZIP_PASSWD:-"NoPassUsedButControlledAnyway"}
+
+    if [ ! \( -d $BAK_DIR_PUB -a -w $BAK_DIR_PUB \) ]; then
+        fileLogger "$KO ERR $BAK_DIR_PUB not dir or writeable"
+        exit 1
+    fi
+    if [ ! -f $BAK_DIR_PUB/.htaccess ]; then
+        fileLogger "$KO you must have an .htaccess in $BAK_DIR_PUB"
+        rm -f $ZIP_FILE
+        exit 1
+    fi
+
+    
+    
     mkdir -p $LTS_DIR
     chmod a+rx $LTS_DIR
 
