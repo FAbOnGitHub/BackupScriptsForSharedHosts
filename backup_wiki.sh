@@ -37,9 +37,9 @@ zip -qr9 -P $ZIP_PASSWD $ZIP_FILE $WIKI_DIR \
     2>>$ERR_FILE
 rc=$?
 
-bCompress=0
 if [ $rc -eq 0 ]; then
     fileLogger "$ok $L_DUMP $ZIP_FILE"
+    bCompress=0
     do_moveXferZone $ZIP_FILE
     rc=$?
 else

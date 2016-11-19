@@ -28,7 +28,7 @@ rm -f $ARCH_FILE
 #     2>>$ERR_FILE
 # rc=$?
 
-tar c -f $ARCH_FILE \
+tar zcf $ARCH_FILE \
     --exclude=$BAK_DIR \
     --exclude=$BAK_DIR_PUB \
     --exclude=$WIKI_DIR \
@@ -37,6 +37,7 @@ tar c -f $ARCH_FILE \
     $WWW_DIR
 rc=$?
 if [ $rc -eq 0 ]; then
+    bDoCompress=0
     fileLogger "$ok $L_DUMP $ARCH_FILE"
     do_moveXferZone "$ARCH_FILE"
     rc=$?
