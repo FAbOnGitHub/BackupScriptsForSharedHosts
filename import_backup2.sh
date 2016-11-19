@@ -68,12 +68,13 @@ function wgetFile()
         rc=$?
         # Ne pas activer la ligne suivante en prod ou penser à purger les log
         #debug "wget $BAK_URL/$target -> $BAK_DIR_CLI (rc=$rc)(errfile=$ERR_FILE)"
-        if [ $rc -eq 0 ]; then
+        if [ $rc -eq $EXIT_SUCCESS ]; then
             status="$ok"
             try=$FALSE
         elif [ $bRequired -eq 0 ]; then
             status="$WARN"
-            sWgetMsg=":optional file missing"
+            sWgetMsg=":"$(wget_translate_error $rc )                        
+            sWgetMsg="$sWgetMsg:optional file missing"
 	    rc=$rc_default
 	else
             status="$KO"
@@ -207,8 +208,7 @@ for raw_file in ${BAK_FILES[*]}; do
         wgetFile "$file.meta" 0
         rc=$?
         if [ $rc -ne $EXIT_SUCCESS ]; then
-            fileLogger "$WARN wget metafile failed ($rc)(future feature)"
-            continue
+            fileLogger "$WARN ${file}.meta wget metafile failed ($rc)(future feature)"
         else
             readMetaData "$BAK_DIR_CLI/$file.meta"
             if [ "x$epochFile" = "x" ]; then
