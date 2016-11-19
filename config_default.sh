@@ -249,7 +249,7 @@ BAK_FILES="$BAK_FILES $SQL_BASE1.sql.zip"
 BAK_FILES="$BAK_FILES $SQL_BASE2.sql.zip"
 
 # BAK pour le client
-BAK_DIR_CLI=$BAK_DIR
+BAK_DIR_CLI=$ROOT/backup_dist_b4dl00t
 # LTS_DIR : Sert de répertoire de dépôt (par import_backup2.sh) de longue durée
 # pour les cas où aucun admin ne serait disponible pendant une longue
 # durée. Comme les dumps tournent sur une semaine et finissent par être écrasés

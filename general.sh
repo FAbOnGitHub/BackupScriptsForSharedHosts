@@ -839,6 +839,98 @@ function check_var_URL()
     done
 }
 
+function check_local_server_variables()
+{
+    if [ $bUseLogger -eq 1 ]; then
+        which logger >/dev/null 2>&1
+        rc=$?
+        if [ $rc -ne 0 ]; then
+            fileLogger "sorry, can't use logger"
+            bUseLogger=0
+        fi
+    fi    
+
+    if [ "x$BAK_DIR" = "x" ]; then
+        fileLogger "BAK_DIR not defined: how can it be possible?"
+        exit 123
+    fi
+    if [ "x$BAK_DIR_PUB" = "x" ]; then
+        fileLogger "BAK_DIR_PUB not defined: set to BAK_DIR=$BAK_DIR"
+        #echo "BAK_DIR_PUB not defined: set to BAK_DIR=$BAK_DIR"
+        BAK_DIR_PUB=$BAK_DIR
+    fi
+
+    if [ "x$BAK_DIR_PUB" = "x$BAK_DIR" ]; then
+        fileLogger "$WARN BAK_DIR_PUB and BAK__DIR are the same, this a bad idea"
+    fi
+
+
+
+    mkdir -p $BAK_DIR $BAK_DIR_PUB
+    chmod 700 $BAK_DIR
+    chmod a+rx $BAK_DIR_PUB 2>/dev/null
+
+    if [ "x$LOG_FILE" = "x" ]; then
+        export LOG_FILE=/tmp/scripts_b4sh_${USER}.txt
+        touch $LOG_FILE
+        chmod o-rwx $LOG_FILE
+        echo "ALERT: LOG_FILE not set, using default $LOG_FILE"
+    fi
+    if [ "x$ERR_FILE" = "x" ]; then
+        export ERR_FILE=$LOG_FILE
+        echo "Set error file to log file $(date)" >> $ERR_FILE
+        chmod o-rwx $ERR_FILE
+    fi
+
+    if [ ! -f "$LOG_FILE" ]; then
+        echo "new log file ($date)" > $LOG_FILE
+        chmod o-rwx $LOG_FILE
+    fi
+
+    if [ ! -f "$ERR_FILE" ]; then
+        echo "no such ERR_FILE=$ERR_FILE $(date) " > $ERR_FILE
+        chmod o-rwx $ERR_FILE
+    fi
+    if [ "x$ZIP_PASSWD" = "x" ]; then
+        fileLogger "ZIP_PASSWD is not defined... default value"
+        ZIP_PASSWD="NeverForgetToSetAPassowrd"
+    fi
+
+}
+
+function check_client_variables()
+{
+    ZIP_PASSWD=${ZIP_PASSWD:-"NoPassUsedButControlledAnyway"}
+    mkdir -p $LTS_DIR
+    chmod a+rx $LTS_DIR
+
+    if [ ! -f "$LOG_FILE" ]; then
+        echo "new log file ($date)" > $LOG_FILE
+        chmod o-rwx $LOG_FILE
+    fi
+    
+    if [ ! -f "$ERR_FILE" ]; then
+        echo "no such ERR_FILE=$ERR_FILE $(date) " > $ERR_FILE
+        chmod o-rwx $ERR_FILE
+    fi
+    
+}
+
+function viewConfig()
+{
+    say " viewConfig"
+    check_dir $BAK_DIR "BAK_DIR"
+    check_dir $BAK_DIR_PUB "BAK_DIR_PUB"
+    check_dir $BAK_DIR_PUB "BAK_DIR_PUB"
+    check_file $LOCK_FILE  "[LOCK_FILE=$LOCK_FILE]"
+    check_dir $LTS_DIR "LTS_DIR"
+    check_file $LOG_FILE "LOG_FILE"
+    check_file $ERR_FILE "ERR_FILE"
+#    echo "[=]"
+    echo "[DEBUG=$DEBUG]"
+
+}
+
 
 ###
 # wget_error
