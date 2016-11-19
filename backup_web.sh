@@ -26,10 +26,22 @@ fi
 
 
 rm -f $ARCH_FILE
-zip -qr9 -P $ZIP_PASSWD $ARCH_FILE $WWW_DIR \
-    -x $BAK_DIR/\* -x $WIKI_DIR/\* -x $WWW_DIR/backup_\* \
-    -x $UPLOAD_DIR -x $WWW_DIR/upload\*
-    2>>$ERR_FILE
+# Zip is also done by do_moveXferZone
+# tar is more efficient and will be able to perfom incremental backups.
+# 
+# zip -qr9 -P $ZIP_PASSWD $ARCH_FILE $WWW_DIR \
+#     -x $BAK_DIR/\* -x $WIKI_DIR/\* -x $WWW_DIR/backup_\* \
+#     -x $UPLOAD_DIR -x $WWW_DIR/upload\*
+#     2>>$ERR_FILE
+# rc=$?
+
+tar c -f $ARCH_FILE \
+    --exclude=$BAK_DIR \
+    --exclude=$BAK_DIR_PUB \
+    --exclude=$WIKI_DIR \
+    --exclude=$UPLOAD_DIR \
+    --exclude=$WWW_DIR/upload\* \
+    $WWW_DIR
 rc=$?
 if [ $rc -eq 0 ]; then
     fileLogger "$ok $L_DUMP $ARCH_FILE"
@@ -41,4 +53,4 @@ else
 fi
 
 logStop
-return $rc
+exit $rc
