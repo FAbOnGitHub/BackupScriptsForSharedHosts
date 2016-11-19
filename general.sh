@@ -562,6 +562,21 @@ function do_moveXferZone()
     return $EXIT_SUCCESS
 }
 
+function archive_downloaded_file()
+{
+    file="$1"
+    day="$(LANG=C date +"%u-%a")"
+    mv $BAK_DIR_CLI/$file $BAK_DIR_CLI/$day-$file 2>> $ERR_FILE
+    rc=$?
+    debug "mv($rc)  $BAK_DIR_CLI/$file $BAK_DIR_CLI/$day-$file"
+    if [ "$day" = "$LTS_PATTERN" ]; then
+        cp $BAK_DIR_CLI/$day-$file $LTS_DIR/$ff 2>> $ERR_FILE
+        rc=$?
+        debug "cp($rc) $BAK_DIR_CLI/$day-$file $LTS_DIR/$ff"
+    fi
+
+}
+
 #
 # Write the metadata of a file.
 # Used by do_moveXferZone
@@ -571,6 +586,7 @@ function writeMetaData()
     file="$1"
     if [ ! -f "$file" ]; then
         error "writeMetaData() file '$file' not found"
+        return $EXIT_FAILURE
     fi
     metafile="$file".meta
 
@@ -582,7 +598,7 @@ function writeMetaData()
     stat -c "%Z" "$file" >> "$metafile"
     # Human reable version (not used)
     stat -c "%z" "$file" >> "$metafile"
-
+    return $EXIT_SUCCESS
 }
 
 #
@@ -597,6 +613,7 @@ function readMetaData()
 
     if [ ! -f "$metafile" ]; then
         error "readMetaData() file '$metafile' not found"
+        return $EXIT_FAILURE
     fi
     mapfile -t META < "$metafile"
     csumFile=${META[0]}
@@ -613,6 +630,7 @@ function readMetaData()
         unset META[0]; unset META[1]; unset META[2]
         echo "DATE: " $dateFile
     fi
+    return $EXIT_SUCCESS
 }
 
 ####
