@@ -935,30 +935,39 @@ function check_local_server_variables()
 function check_client_variables()
 {
     ZIP_PASSWD=${ZIP_PASSWD:-"NoPassUsedButControlledAnyway"}
-
-    if [ ! \( -d $BAK_DIR_PUB -a -w $BAK_DIR_PUB \) ]; then
-        fileLogger "$KO ERR $BAK_DIR_PUB not dir or writeable"
+   
+    if [ ! -d $BAK_DIR_CLI ]; then
+        fileLogger  "$KO BAK_DIR_CLI ('$BAK_DIR_CLI') is not a directory"
+        exit 1
+    fi
+    if [ ! -w $BAK_DIR_CLI ]; then
+        fileLogger  "$KO BAK_DIR_CLI ('$BAK_DIR_CLI') is not writable"
         exit 1
     fi
     if [ ! -f $BAK_DIR_PUB/.htaccess ]; then
         fileLogger "$KO you must have an .htaccess in $BAK_DIR_PUB"
-        rm -f $ZIP_FILE
         exit 1
     fi
-
+    if [ ! -d $LTS_DIR ]; then
+        fileLogger  "$WARN LTS_DIR ('$LTS_DIR') is not a directory"
+        mkdir -p $LTS_DIR
+        chmod a+rx $LTS_DIR
+    fi
+    if [ ! -w $LTS_DIR ]; then
+        fileLogger  "$KO LTS_DIR ('$LTS_DIR') is not writable"
+        exit 1
+    fi
     
     
-    mkdir -p $LTS_DIR
-    chmod a+rx $LTS_DIR
 
     if [ ! -f "$LOG_FILE" ]; then
         echo "new log file ($date)" > $LOG_FILE
-        chmod o-rwx $LOG_FILE
+        chmod a-rw $LOG_FILE
     fi
     
     if [ ! -f "$ERR_FILE" ]; then
         echo "no such ERR_FILE=$ERR_FILE $(date) " > $ERR_FILE
-        chmod o-rwx $ERR_FILE
+        chmod a-rw $ERR_FILE
     fi
     
 }
