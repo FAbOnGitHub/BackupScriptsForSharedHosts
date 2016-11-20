@@ -185,16 +185,61 @@ function logStart()
 }
 function logStop()
 {
-    fileLogger ">>>>>>> $ME stopping"    
+    fileLogger ">>>>>>> $ME stopping : $@"    
 }
 
+##
+## Functions and variables to count good task and erors...
+function taskReportInit()
+{
+    _taskReportCounters="(ok:/w:/e:)"
+    _taskReportLabel="[--] $_taskReportCounters"
+    let _iNbTaskCount=0
+    let _iNbTaskOk=0
+    let _iNbTaskErr=0
+    let _iNbTaskWarn=0
+}
+function taskCount()
+{
+    let _iNbTaskCount++
+}
+function taskOk()
+{
+    let _iNbTaskOk++
+}
+function taskErr()
+{
+    let _iNbTaskErr++
+}
+function taskWarn()
+{
+    let _iNbTaskWarn++
+}
+function taskReportStatus()
+{
+    local status
+    taskReportCounters
+    let _iNbTaskTotal=$_iNbTaskOk+$_iNbTaskErr+$_iNbTaskWarn
+    if [ $_iNbTaskTotal -ne $_iNbTaskCount ]; then
+        status="[!!]"
+    elif [ $_iNbTaskErr -eq 0 ]; then
+        status="[ok]"
+    else
+        status="[KO]"
+    fi
+    _taskReportLabel="$status $_taskReportCounters"
+}
+function taskReportCounters()
+{
+    _taskReportCounters="(ok:${_iNbTaskOk}/w:${_iNbTaskWarn}/e:${_iNbTaskErr}/T:${_iNbTaskCount})"
+}
 
 ###
 # Afficher les logs du jour, pour envoi par email par exemple.
 #
 function view_today_logs()
 {
-    grep "$(date +"%F")" $LOG_FILE
+    grep "^$(date +"%F")" $LOG_FILE
 }
 
 bMailInit=0

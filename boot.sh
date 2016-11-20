@@ -133,4 +133,7 @@ debug "$msg"
      fi
  fi
 
+ ### Start!
+
+taskReportInit
 logStart

@@ -16,7 +16,7 @@ DIR=$(dirname $0) #Resolving path
 cd $DIR 2>/dev/null; export LIB_PATH=$PWD; cd - >/dev/null
 . $LIB_PATH/boot.sh
 
-
+taskCount
 ARCH_FILE=$BAK_DIR/www.tgz
 rm -f $ARCH_FILE
 # tar is more efficient and will be able to perfom incremental backups.
@@ -41,10 +41,21 @@ if [ $rc -eq 0 ]; then
     fileLogger "$ok $L_DUMP $ARCH_FILE "
     do_moveXferZone "$ARCH_FILE"
     rc=$?
+    if [ $rc -eq $EXIT_SUCCESS ]; then
+        taskOk
+    else
+        taskErr
+    fi
 else
     rm -rf $ARCH_FILE
+    taskErr
     fileLogger  "$KO $L_DUMP ERR (code $?). rm'."
 fi
 
-logStop
-exit $rc
+
+### Reporting
+taskReportStatus
+sReport="$_taskReportLabel web"
+logStop "$sReport"
+reportByMail "$sReport" "$ME"
+exit $_iNbTaskErr

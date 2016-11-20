@@ -68,6 +68,7 @@ Self=$(basename $ME)
 U=$(whoami)
 H=$(hostname -s)
 dumpfile=$H.crontab.$U.dump
+taskCount
 
 fileLogger "$Self : starting"
 
@@ -78,11 +79,19 @@ if [ $rc -eq $EXIT_SUCCESS ]; then
     fileLogger "$ok $L_DUMP $dumpfile (rc:$rc)"
     do_moveXferZone "$dumpfile"
     rc=$?
+    if [ $rc -eq $EXIT_SUCCESS ]; then
+        taskOk
+    else
+        taskErr
+    fi
 else
+    taskErr
     fileLogger "$KO $L_DUMP $dumpfile (rc:$rc)"
 fi
 
-logStop
-# see to use rc=$? and then exit $rc
-exit $rc
-
+### Reporting
+taskReportStatus
+sReport="$_taskReportLabel crontab"
+logStop "$sReport"
+reportByMail "$sReport" "$ME"
+exit $_iNbTaskErr

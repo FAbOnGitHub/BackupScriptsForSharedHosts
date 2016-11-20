@@ -38,6 +38,8 @@ rm -f $ZIP_FILE
 #     2>>$ERR_FILE
 # rc=$?
 
+taskCount
+
 cd $WWW_DIR
 tar zcf $ZIP_FILE $WIKI_DIR
 if [ $rc -eq 0 ]; then
@@ -45,10 +47,21 @@ if [ $rc -eq 0 ]; then
     bDoCompress=0
     do_moveXferZone $ZIP_FILE
     rc=$?
+    if [ $rc -eq $EXIT_SUCCESS ]; then
+        taskOk
+    else
+        taskErr
+    fi
 else
+    taskErr
     rm -rf $ZIP_FILE
     fileLogger "$KO $L_DUMP $ZIP_FILE (rc=$rc)"
 fi
 
-logStop
-exit $rc
+
+### Reporting
+taskReportStatus
+sReport="$_taskReportLabel wiki"
+logStop "$sReport"
+reportByMail "$sReport" "$ME"
+exit $_iNbTaskErr

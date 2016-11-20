@@ -26,52 +26,8 @@ cd $DIR 2>/dev/null; export LIB_PATH=$PWD; cd - >/dev/null
 
 
 ME=$0
-bDoCypher=${bDoCypher:-0}
 
-# #
-# # à reprendre pour y mettre les fonctions de general.sh (soon)
-# #
-# function do_zip()
-# {
-#     base=$1
-
-#     zip -qr9 -P $ZIP_PASSWD $BAK_DIR/$base.sql.zip $BAK_DIR/$base.sql 2>>$ERR_FILE
-#     res=$?
-#     if [ $res -eq 0 ]; then
-#         csum=`checkSum $BAK_DIR/$base.sql.zip 2>>$ERR_FILE`
-#         size=`sizeOf $BAK_DIR/$base.sql.zip 2>>$ERR_FILE`
-#         echo $csum > $BAK_DIR/$base.sql.zip.csum
-#         fileLogger "[ ok ] backup $base.sql OK ($size octets)"
-#     else
-#         rm -f $BAK_DIR/$base.sql.zip
-#         fileLogger  "[ KO ] zip $base.sql ERR (code $res)"
-#         hasFailed
-#     fi
-
-# }
-
-
-#bERROR=0 #deprecated
 GENERAL_SUCCESS=$EXIT_SUCCESS
-
-# function doZip()
-# {
-#     toZip=$1
-#     zip -qr9 -P $ZIP_PASSWD $BAK_DIR/${toZip}.sql.zip $BAK_DIR/${toZip}.sql 2>>$ERR_FILE
-#     res=$?
-#     if [ $res -eq 0 ]; then
-#       csum=`checkSum $BAK_DIR/${toZip}.sql.zip 2>>$ERR_FILE`
-#       size=`sizeOf $BAK_DIR/${toZip}.sql.zip 2>>$ERR_FILE`
-#       echo $csum > $BAK_DIR/${toZip}.sql.zip.csum
-#       fileLogger "$ok backup ${toZip}.sql $size octets)"
-#     else
-#       rm -f $BAK_DIR/$base.sql.zip
-#       fileLogger  "$KO zip ${toZip}.sql (code $res)"
-#       bERROR=1
-#     fi
-#     rm -f $BAK_DIR/${toZip}.sql 2>>$ERR_FILE
-# }
-
 
 # dumpBase $serveur $base $user $passwd $*
 #          $1       $2    $3    $4	le reste
@@ -83,14 +39,14 @@ GENERAL_SUCCESS=$EXIT_SUCCESS
 #
 function dumpBase()
 {
-
+    taskCount
     srv=$1
     base=$2
     user=$3
     pass=$4
     exclude=''
 
-    rm -f $BAK_DIR/$base.sql.zip
+    rm -f $BAK_DIR/$base.sql*
     if [ "x$srv" = "x" ]; then
         fileLogger "$KO $0 : pas de serveur indiqué... abandon"
         hasFailed
@@ -124,11 +80,13 @@ function dumpBase()
                 1>"$BAK_DIR/${name}.sql" 2>>$ERR_FILE
             res=$?
             if [ $res -eq 0 ]; then
+                taskOk
                 fileLogger "$ok $L_DUMP $base $table"
                 do_moveXferZone "$BAK_DIR/${name}.sql"
             else
+                taskWarn
                 fileLogger "$KO $L_DUMP $srv/$base/$table (rc=$res)"
-                hasFailed
+                #hasFailed #No it's an option
             fi
         done
 
@@ -140,11 +98,12 @@ function dumpBase()
     res=$?
 
     if [ $res -eq 0 ]; then
+        taskOk
         fileLogger "$ok $L_DUMP $base $table"
         do_moveXferZone "$BAK_DIR/$base.sql"
-        let iNbTargetOk++
     else
         fileLogger "$KO $L_DUMP $srv/$base/$table (rc=$res)"
+        taskErr
         hasFailed
     fi
 }
@@ -152,58 +111,22 @@ function dumpBase()
 #######
 # Main
 ########
-if [ ! \( -d $BAK_DIR -a -w $BAK_DIR \) ]; then
-  fileLogger "$KO ERR directory `basename $BAK_DIR` not found or not writeable"
-  exit 1
-fi
-if [ ! \( -d $BAK_DIR_PUB -a -w $BAK_DIR_PUB \) ]; then
-  fileLogger "$KO ERR firectory `basename $BAK_DIR_PUB` not found or not writeable ?"
-  exit 1
-fi
 
-if [ ! -f ${BAK_DIR_PUB}/.htaccess ]; then
-  fileLogger "$KO ERR file .htaccess not found in `basename $BAK_DIR_PUB`"
-  rm -f $BAK_DIR_PUB/$SQL_BASE1.sql.zip $BAK_DIR_PUB/$SQL_BASE2.sql.zip
-  exit 1
-fi
-if [ "x$ZIP_PASSWD" = "x" ]; then
-    msg="$KO ZIP_PASSWD est vide... abandon"
-    fileLogger "$msg"
-    echo "$msg" | notify_email_stdin
-    exit 1
-fi
-
-let iNbTargetOk=0
-let iNbTarget=0
 cd $BAK_DIR
 debug "dumpBase $SQL_SERVER1,$SQL_BASE1,$SQL_USER1,$SQL_PASSWD1"
 dumpBase $SQL_SERVER1 $SQL_BASE1 $SQL_USER1 $SQL_PASSWD1 $SQL_TABLES1
-let iNbTarget++
+
 
 
 # 2016-05-29 Sur la demande d'olivier
 #debug "dumpBase $SQL_SERVER2,$SQL_BASE2,$SQL_USER2,$SQL_PASSWD2"
 #dumpBase $SQL_SERVER2 $SQL_BASE2 $SQL_USER2 $SQL_PASSWD2
-#let iNbTarget++
 
-# if [ $GENERAL_SUCCESS -eq $EXIT_FAILURE ]; then
-#     if [ $bUseMailWarning -eq 1 ]; then
-#         view_today_logs| notify_email_stdin
-#     fi
-#fi
 
-if [ $GENERAL_SUCCESS -eq $EXIT_SUCCESS ]; then
-    sLabel="[KO]"
-elif [ $iNbTargetOk -ne $iNbTarget ]; then
-    sLabel="[KO]"
-else
-    sLabel="[ok]"
-fi
-
+taskReportStatus
+sReport="$_taskReportLabel DB saved (by $ME)"
+logStop "$sReport"
 if [ $bUseMailWarning -eq 1 ]; then
-    sReport="$sLabel[$iNbTargetOk/$iNbTarget] DB saved"
     view_today_logs| notify_email_stdin "$sReport"
 fi
-
-logStop
-exit $GENERAL_SUCCESS
+exit $_iNbTaskErr

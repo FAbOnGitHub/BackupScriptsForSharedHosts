@@ -90,6 +90,7 @@ do
             ;;
         *)
             let iCountThisOne=1
+            taskCount
             #sLock="-l";;
             ;;        
     esac
@@ -102,9 +103,11 @@ do
     if [ $rc -ne $EXIT_SUCCESS ]; then
         fileLogger "$KO '$db' failed (rc=$rc)"
         let iNbTargetErr++
+        taskErr
         continue
     else
         fileLogger "$ok '$db' dumped ${date} ok"
+        taskOk
         let iNbTargetOk+=$iCountThisOne
     fi
 
@@ -124,48 +127,9 @@ if [ $bDoCompressAll -eq 1 ]; then
     rm -rf "$dir"
 fi
 
-logStop
-
-let c=${#aDB[*]}
-let iSum=$iNbTargetOk+$iSkipThisOne
-if [ $iSum -eq $c ]; then
-    sLabel="[ok]"
-else
-    sLabel="[KO]"
-fi
-
-sReport="$sLabel[$iNbTargetOk+$iSkipThisOne/$c($iNbTargetErr)] DB saved "
+### Reporting
+taskReportStatus
+sReport="$_taskReportLabel DB saved (by $ME)"
+logStop "$sReport"
 reportByMail "$sReport" "$ME"
-
-# see to use rc=$? and then exit $rc
-exit $EXIT_SUCCESS
-
-
-
-
-# vars="$(echo "show variables;" | mysql -u $MYSQL_USER \
-#                           | grep innodb_version| cut -c 16- \
-#                           |sed -e "s@\([0-9]\).\([0-9]\)\(.*\)@maj=\1 min=\2@")"
-
-# export $vars
-# #echo "[maj=$maj][min=$min]"
-# COMPAT56=true
-# if [ $maj -eq 5 ]; then
-#     if [ $min -ge 7 ]; then
-#         COMPAT56=false
-#     fi
-# elif [ $maj -gt 5 ]; then
-#     COMPAT56=false
-# fi
-
-
-    # if [ "$db" = "performance_schema" ]; then
-    #     debug  "$WARN performance_schema ignored"
-    #     continue
-    # fi
-    # if [ "$db" = "information_schema" ]; then
-    #     if [ $COMPAT56 = "false" ]; then
-    #         debug  "$WARN information_schema ignored (no compat56)"
-    #         continue
-    #     fi
-    # fi
+exit $_iNbTaskErr
