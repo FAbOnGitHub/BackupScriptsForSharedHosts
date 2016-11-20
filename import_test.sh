@@ -44,7 +44,7 @@ let iNbTargetTotal=${#aTmp[*]}
 let iNbTargetOk=0
 
 ### Make our own test in relation with import_test.sh
-### 
+###  Docs.tgz.gpg ?
 for raw_file in ${BAK_FILES[*]}; do
 
     #   echo "file=$file"

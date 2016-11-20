@@ -16,7 +16,7 @@ cd $DIR 2>/dev/null; export LIB_PATH=$PWD; cd - >/dev/null
 
 cd $BAK_DIR
 #1 Dump
-sTarget1="Doc.tgz"
+sTarget1="Docs.tgz"
 tar zcf $sTarget1  $LIB_PATH/Docs 2>>$ERR_FILE
 rc=$?
 #2 Compress
