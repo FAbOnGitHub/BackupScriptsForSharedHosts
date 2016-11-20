@@ -38,11 +38,12 @@ rm -f $ZIP_FILE
 #     2>>$ERR_FILE
 # rc=$?
 
+cd $WWW_DIR
 tar zcvf $ZIP_FILE $WIKI_DIR
 
 if [ $rc -eq 0 ]; then
     fileLogger "$ok $L_DUMP $ZIP_FILE"
-    bCompress=0
+    bDoCompress=0
     do_moveXferZone $ZIP_FILE
     rc=$?
 else
