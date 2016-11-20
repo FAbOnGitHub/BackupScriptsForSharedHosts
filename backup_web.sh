@@ -17,7 +17,7 @@ cd $DIR 2>/dev/null; export LIB_PATH=$PWD; cd - >/dev/null
 . $LIB_PATH/boot.sh
 
 
-ARCH_FILE=$BAK_DIR/www.tar
+ARCH_FILE=$BAK_DIR/www.tgz
 rm -f $ARCH_FILE
 # tar is more efficient and will be able to perfom incremental backups.
 # Zip is also done by do_moveXferZone (no more with bDoCompress=0)
