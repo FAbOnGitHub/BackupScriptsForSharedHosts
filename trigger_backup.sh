@@ -29,7 +29,7 @@ function trigger_action()
 {
     target="$1"
     sWgetMsg=""
-    wget $wget_quiet -t 3 --no-check-certificate --auth-no-challenge \
+    wget $wget_quiet --no-check-certificate --auth-no-challenge \
          -U $HTTP_AGENT \
          -P $BAK_DIR "${CMD_URL}?action=$target"  2>> $ERR_FILE
     # -O -
