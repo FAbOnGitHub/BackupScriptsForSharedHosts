@@ -16,6 +16,7 @@ cd $DIR 2>/dev/null; export LIB_PATH=$PWD; cd - >/dev/null
 
 
 ZIP_FILE=$BAK_DIR/wiki.zip    # Archive zipée
+ZIP_FILE=$BAK_DIR/wiki.tar
 
 if [ ! -f $BAK_DIR/.htaccess ]; then
     fileLogger "$KO ERR fichier .htaccess inaccessible"
@@ -33,9 +34,11 @@ if [ "x$ZIP_PASSWD" = "x" ]; then
 fi
 
 rm -f $ZIP_FILE
-zip -qr9 -P $ZIP_PASSWD $ZIP_FILE $WIKI_DIR \
-    2>>$ERR_FILE
-rc=$?
+# zip -qr9 -P $ZIP_PASSWD $ZIP_FILE $WIKI_DIR \
+#     2>>$ERR_FILE
+# rc=$?
+
+tar zcvf $ZIP_FILE $WIKI_DIR
 
 if [ $rc -eq 0 ]; then
     fileLogger "$ok $L_DUMP $ZIP_FILE"
