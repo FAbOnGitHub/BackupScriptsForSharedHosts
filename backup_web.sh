@@ -36,9 +36,9 @@ tar zcf $ARCH_FILE \
     --exclude=$WWW_DIR/upload\* \
     $WWW_DIR
 rc=$?
-if [ $rc -eq 0 ]; then
+if [ $rc -eq 0 ]; then    
     bDoCompress=0
-    fileLogger "$ok $L_DUMP $sSize "
+    fileLogger "$ok $L_DUMP $ARCH_FILE "
     do_moveXferZone "$ARCH_FILE"
     rc=$?
 else
