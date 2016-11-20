@@ -38,12 +38,12 @@ tar zcf $ARCH_FILE \
 rc=$?
 if [ $rc -eq 0 ]; then
     bDoCompress=0
-    fileLogger "$ok $L_DUMP $ARCH_FILE"
+    fileLogger "$ok $L_DUMP $ARCH_FILE "
     do_moveXferZone "$ARCH_FILE"
     rc=$?
 else
-    rm -f $ZIP_FILE
-    fileLogger  "$KO $L_DUMP ERR (code $?)"
+    rm -rf $ARCH_FILE
+    fileLogger  "$KO $L_DUMP ERR (code $?). rm'."
 fi
 
 logStop
