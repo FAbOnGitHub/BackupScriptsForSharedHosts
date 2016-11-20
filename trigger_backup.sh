@@ -35,13 +35,16 @@ function trigger_action()
     # -O -
     rc=$?
     if [ $rc -eq 0 ]; then
-        status="[ok]"        
+        #status="[ok]"
+        x=$ok
+        let iNbOk++
     else
         status="[KO]"
+        x=$KO
+        let iNbErr++
         sWgetMsg=":"$(wget_translate_error $rc )
     fi
-    fileLogger "$status wget ${CMD_URL}?action=$target (rc=${rc}${sWgetMsg})"
-    reportByMail "$status wget $target (rc=${rc}${sWgetMsg})"
+    fileLogger "$x wget ${LOG_URL}?action=$target (rc=${rc}${sWgetMsg})"
     return $rc
 }
 
@@ -82,14 +85,18 @@ if [ "x$BAK_URL" = "x" ]; then
     fileLogger  "\$BAK_URL is not set"
     exit 1
 fi
-LOG_URL="$(echo "$BAK_URL"|cut -d'@' -f2-)"
+LOG_URL="$(echo "$CMD_URL"|cut -d'@' -f2-)"
 
-
+status="[ok]"
+let iNbActions=0
+let iNbErr=0
+let iNbOk=0
 rc_global=0
 for arg in $@
 do
+    let iNbActions++
     case $arg in
-        'mysql'|'web'|'wiki'|'sql'|'check')
+        'mysql'|'web'|'wiki'|'sql'|'check'|'safe')
             trigger_action $arg
             rc=$?
             let rc_global+=$rc
@@ -101,4 +108,5 @@ do
 done
 
 logStop
+reportByMail "$status [$iNbOk/$iNbActions] $ME" $ME
 exit $rc_global
