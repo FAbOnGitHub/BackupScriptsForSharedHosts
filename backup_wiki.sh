@@ -43,7 +43,8 @@ if [ $rc -eq 0 ]; then
     do_moveXferZone $ZIP_FILE
     rc=$?
 else
-    fileLogger "$KO $L_DUMP $ZIP_FILE"
+    rm -rf $ZIP_FILE
+    fileLogger "$KO $L_DUMP $ZIP_FILE (rc=$rc)"
 fi
 
 logStop

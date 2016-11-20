@@ -374,7 +374,11 @@ function do_compress()
     rm -f "$arch"
     zip -qr9 -P $ZIP_PASSWD "$arch" "$src" >/dev/null
     rc=$?
+    if [ $rc -ne 0 ]; then
+        fileLogger "$KO cmd zip failed rc=$rc"
+    fi
     rm -f "$src"
+        
     f_current="$arch"
     return $rc
 }
