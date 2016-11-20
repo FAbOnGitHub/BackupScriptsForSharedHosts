@@ -38,7 +38,7 @@ tar zcf $ARCH_FILE \
 rc=$?
 if [ $rc -eq 0 ]; then
     bDoCompress=0
-    fileLogger "$ok $L_DUMP $ARCH_FILE "
+    fileLogger "$ok $L_DUMP $sSize "
     do_moveXferZone "$ARCH_FILE"
     rc=$?
 else

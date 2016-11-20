@@ -539,6 +539,7 @@ function do_moveXferZone()
         return $EXIT_FAILURE
     fi
 
+    sSize="$(du --si -s $f| awk '{print $1}' )"    
     do_compress "$f"
     rc=$?
     if [ $rc -eq $EXIT_SUCCESS ]; then
@@ -553,7 +554,7 @@ function do_moveXferZone()
     debug "[f=$f][X=$X][F=$F] $do_cypher_fct"
     debug "[BAK_DIR=$BAK_DIR][BAK_DIR_PUB=$BAK_DIR_PUB]"
 
-    buffer=$(du --si -s "$X")
+    buffer=" $sSize->$(du --si -s "$X")"
     if [ "x$BAK_DIR" != "x$BAK_DIR_PUB" ]; then
         mv -f "$X" "$BAK_DIR_PUB/$F" 2>/dev/null
     fi
