@@ -39,7 +39,7 @@ rm -f $ZIP_FILE
 # rc=$?
 
 cd $WWW_DIR
-tar zcvf $ZIP_FILE $WIKI_DIR
+tar zcf $ZIP_FILE $WIKI_DIR
 
 if [ $rc -eq 0 ]; then
     fileLogger "$ok $L_DUMP $ZIP_FILE"
