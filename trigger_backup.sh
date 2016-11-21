@@ -23,10 +23,16 @@ function trigger_action()
 {
     target="$1"
     sWgetMsg=""
+    if [ $DEBUG -eq 0 ]; then
+        sOutput="/dev/null"
+    else
+        sOutput="-"
+    fi
     if [ $bFakeWget -eq 0 ]; then
         wget -t 1 $wget_quiet --no-check-certificate --auth-no-challenge \
              -U $HTTP_AGENT \
-             -P $BAK_DIR "${CMD_URL}?action=$target" -O - \
+             -P $BAK_DIR "${CMD_URL}?action=$target" \
+             -O $sOutput \
               --read-timeout=900 \
              2>> $ERR_FILE
 
