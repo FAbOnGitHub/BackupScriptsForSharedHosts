@@ -68,12 +68,13 @@ do
         'mysql'|'web'|'wiki'|'sql'|'check'|'safe')
             trigger_action $arg
             rc=$?
-            taskStatus $rc
-        ;;
+            ;;
         *)
-            error "unknown commmand"
-        ;;
+            error "unknown commmand arg='$arg'"
+            rc=$EXIT_FAILURE
+            ;;        
     esac
+    taskStatus $rc
 done
 
 ### Reporting
