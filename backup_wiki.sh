@@ -43,7 +43,9 @@ taskCount
 cd $WWW_DIR
 tar zcf $ZIP_FILE $WIKI_DIR
 if [ $rc -eq 0 ]; then
-    fileLogger "$ok $L_DUMP $ZIP_FILE"
+    szArch="$(du --si -s $ZIP_FILE | awk '{print $1}')"
+    szDir="$(du --si -s $WIKI_DIR | awk '{print $1}')"
+    fileLogger "$ok $L_DUMP $ZIP_FILE ($szDir->$szArch)"
     bDoCompress=0
     do_moveXferZone $ZIP_FILE
     rc=$?
