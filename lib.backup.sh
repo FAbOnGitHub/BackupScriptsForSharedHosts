@@ -298,11 +298,20 @@ function _notify_email()
 
     if [ $bMailCommandAvaible -eq 1 ]; then
         mail -s "$SUBJECT" $NOTIFY_TO
+        rc=$?
     else
         echo "$KO *** mail not found : $NOTIFY_TO" >> $LOG_FILE
         cat - >> $LOG_FILE
+        rc=13
     fi
-
+    if [ $rc -eq $EXIT_SUCCESS ]; then
+        status=$ok
+    else
+        status=$KO
+    fi
+    # I know !! It's after the mail. Too late but I don't want to lose any
+    # information
+    fileLogger "$status $L_MAIL to:'$NOTIFY_TO'"
 }
 ##
 # Envoi un message mais en laissant la lecture de stdin à faire.
