@@ -49,22 +49,26 @@ function dumpBase()
     rm -f $BAK_DIR/$base.sql*
     if [ "x$srv" = "x" ]; then
         fileLogger "$KO $0 : pas de serveur indiqué... abandon"
+        taskErr
         hasFailed
         return 1
     fi
     if [ "x$base" = "x" ]; then
         fileLogger "$KO $0 : pas de base SQL indiquée... abandon"
         hasFailed
+        taskErr
         return 1
     fi
     if [ "x$user" = "x" ]; then
         fileLogger "$KO $0 : user vide... abandon"
         hasFailed
+        taskErr
         return 1
     fi
     if [ "x$pass" = "x" ]; then
         fileLogger "$KO $0 : passwd est vide... abandon"
         hasFailed
+        taskErr
         return 1
     fi
     export MYSQL_PWD="$pass"
@@ -96,7 +100,6 @@ function dumpBase()
     mysqldump -h $srv -u $user $exclude -l $base \
         1>$BAK_DIR/$base.sql 2>>$ERR_FILE
     res=$?
-
     if [ $res -eq 0 ]; then
         taskOk
         fileLogger "$ok $L_DUMP $base $table"
