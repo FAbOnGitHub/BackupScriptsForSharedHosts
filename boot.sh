@@ -77,7 +77,9 @@ if [ -f "$f_priv" ]; then
     . "$f_priv"
 else
     if [ ! -f "$f_host" ]; then
-        die "Cannot find $f_priv (nor $f_host)"
+        echo "Cannot find $f_priv (nor $f_host)" 2>&1
+        # So no log files available
+        exit 666
     fi
 fi
 
