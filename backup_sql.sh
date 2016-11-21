@@ -89,7 +89,7 @@ function dumpBase()
                 do_moveXferZone "$BAK_DIR/${name}.sql"
             else
                 taskWarn
-                fileLogger "$KO $L_DUMP $srv/$base/$table (rc=$res)"
+                fileLogger "$WARN $L_DUMP $srv/$base/$table (rc=$res)"
                 #hasFailed #No it's an option
             fi
         done
