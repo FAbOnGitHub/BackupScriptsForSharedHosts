@@ -86,7 +86,7 @@ done
 
 ### Reporting
 taskReportStatus
-sReport="$_taskReportLabel trigger $@ (by $ME)"
+sReport="$_taskReportLabel trigger $@"
 logStop "$sReport"
 reportByMail "$sReport" "$ME"
 exit $_iNbTaskErr
