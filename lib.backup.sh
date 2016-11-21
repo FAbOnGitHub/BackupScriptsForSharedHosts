@@ -190,7 +190,7 @@ function logStop()
 {
     sMsg=">>>>>>> $ME stopping : $@"
     fileLogger "$sMsg"
-    echo "$sMsg" >> $ERR_FILE
+    echo "$sMsg" >> $ERR_FILE 
 }
 
 ##
@@ -216,6 +216,16 @@ function taskErr()
 {
     let _iNbTaskErr++
 }
+function taskStatus()
+{
+    rc="$1"
+    if [ $rc -eq $EXIT_SUCCESS ]; then
+        taskOk
+    else
+        taskErr
+    fi
+}
+
 function taskWarn()
 {
     let _iNbTaskWarn++
