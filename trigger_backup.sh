@@ -48,51 +48,23 @@ function trigger_action()
 # ###########################################################################
 #set -x
 
-GENERAL_SUCCESS=$EXIT_SUCCESS
-
-
 # Normalement le client n'est pas obligé d'avoir la même arborescence que le
 # serveur. Si c'est le cas, son répertoire BAK_DIR est BAK_DIR_CLI
 [ "x$BAK_DIR_CLI" != "x" ] && BAK_DIR=$BAK_DIR_CLI
 LTS_PATTERN=${LTS_PATTERN:-"4-Thu"}
 TASK_NAME=${TASK_NAME:-"OutThere"}
 
-if [ ! -d $BAK_DIR ]; then
-    fileLogger  "$KO BAK_DIR ('$BAK_DIR') is missing"
-    exit 1
-fi
-if [ ! -w $BAK_DIR ]; then
-    fileLogger  "$KO BAK_DIR ('$BAK_DIR') is not writable"
-    exit 1
-fi
-if [ ! -d $LTS_DIR ]; then
-    fileLogger  "$KO LTS_DIR ('$LTS_DIR') is missing"
-    exit 1
-fi
-if [ ! -w $LTS_DIR ]; then
-    fileLogger  "$KO LTS_DIR ('$LTS_DIR') is not writable"
-    exit 1
-fi
-if [ "x$BAK_URL" = "x" ]; then
-    fileLogger  "\$BAK_URL is not set"
-    exit 1
-fi
 LOG_URL="$(echo "$CMD_URL"|cut -d'@' -f2-)"
 
-status="[ok]"
-let iNbActions=0
-let iNbErr=0
-let iNbOk=0
-rc_global=0
 for arg in $@
 do
-    let iNbActions++
+    taskCount
     debug "$ME : arg=$arg"
     case $arg in
         'mysql'|'web'|'wiki'|'sql'|'check'|'safe')
             trigger_action $arg
             rc=$?
-            let rc_global+=$rc
+            taskStatus $rc
         ;;
         *)
             error "unknown commmand"
@@ -100,6 +72,9 @@ do
     esac
 done
 
-logStop
-reportByMail "$status [$iNbOk/$iNbActions] $ME" $ME
-exit $rc_global
+### Reporting
+taskReportStatus
+sReport="$_taskReportLabel trigger $@ (by $ME)"
+logStop "$sReport"
+reportByMail "$sReport" "$ME"
+exit $_iNbTaskErr
