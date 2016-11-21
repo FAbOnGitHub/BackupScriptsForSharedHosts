@@ -608,7 +608,11 @@ function do_moveXferZone()
 
     X="$(do_cypher "$f")"
     rc=$?
-    [ $rc -ne 0 ] && die "ERROR cypher f='f' (rc=$rc)"
+    if [ $rc -ne 0 ]; then
+        error "ERROR cypher f='$f' (rc=$rc)"
+        rm -rf "$f"
+        return $EXIT_FAILURE
+    fi
     rm -rf "$f"
     F="$(basename "$X")"
     debug "[f=$f][X=$X][F=$F] $do_cypher_fct"
