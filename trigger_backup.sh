@@ -26,10 +26,11 @@ function trigger_action()
     if [ $bFakeWget -eq 0 ]; then
         wget $wget_quiet --no-check-certificate --auth-no-challenge \
              -U $HTTP_AGENT \
-             -P $BAK_DIR "${CMD_URL}?action=$target"  2>> $ERR_FILE
-        # -O -
+             -P $BAK_DIR "${CMD_URL}?action=$target" -O - 2>> $ERR_FILE
+
         rc=$?
     else
+        
         rc=$EXIT_SUCCESS
     fi
     if [ $rc -eq $EXIT_SUCCESS ]; then
