@@ -47,10 +47,9 @@ function trigger_action()
 #
 # ###########################################################################
 #set -x
-DATE=$(date +"%Y%m%d-%H%M%S")
+
 GENERAL_SUCCESS=$EXIT_SUCCESS
-fileLogger  "$ok $ME starting  >>>>>"
-echo "$DATE start" >> $ERR_FILE
+
 
 # Normalement le client n'est pas obligé d'avoir la même arborescence que le
 # serveur. Si c'est le cas, son répertoire BAK_DIR est BAK_DIR_CLI

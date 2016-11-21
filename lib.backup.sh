@@ -181,13 +181,16 @@ function fileLogger()
 
 function logStart()
 {
-    fileLogger "<<<<<<< $ME starting"
-    echo "$DATE start" >> $ERR_FILE
-
+    sMsg="<<<<<<< $ME starting"
+    fileLogger "$sMsg"
+    DATE=$(date +"%Y%m%d-%H%M%S")
+    echo "$sMsg" >> $ERR_FILE
 }
 function logStop()
 {
-    fileLogger ">>>>>>> $ME stopping : $@"
+    sMsg=">>>>>>> $ME stopping : $@"
+    fileLogger "$sMsg"
+    echo "$sMsg" >> $ERR_FILE
 }
 
 ##
@@ -1059,3 +1062,4 @@ function wget_translate_error()
         echo ${aErrors[$1]}
     fi
 }
+
