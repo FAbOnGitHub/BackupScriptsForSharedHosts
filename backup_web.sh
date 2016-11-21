@@ -8,8 +8,6 @@
 #
 # Licence : GPL v3
 
-## TODO : change gzip by $sCompressProg  + do_moveXferZone()
-
 #
 #  (À INCLURE) Chemin fichiers inclus, auto-ajustement
 DIR=$(dirname $0) #Resolving path
@@ -28,12 +26,12 @@ rm -f $ARCH_FILE
 #     2>>$ERR_FILE
 # rc=$?
 
-tar zcf $ARCH_FILE \
-    --exclude=$BAK_DIR \
-    --exclude=$BAK_DIR_PUB \
-    --exclude=$WIKI_DIR \
-    --exclude=$UPLOAD_DIR \
-    --exclude=$WWW_DIR/upload\* \
+tar zcvf $ARCH_FILE \
+    --exclude="$(basename $BAK_DIR)" \
+    --exclude="$(basename $BAK_DIR_PUB)" \
+    --exclude="$(basename $WIKI_DIR)" \
+    --exclude="$(basename $UPLOAD_DIR)" \
+    --exclude="$(basename $WWW_DIR)/upload\*"  \
     $WWW_DIR
 rc=$?
 if [ $rc -eq 0 ]; then    

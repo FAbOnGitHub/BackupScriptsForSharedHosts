@@ -432,7 +432,7 @@ function do_compress()
         return 0
     fi
     rm -f "$arch"
-    zip -qr9 -P $ZIP_PASSWD "$arch" "$src" >/dev/null
+    zip -qr9 -P $ZIP_PASSWD "$arch" "$src"  2>&1 | tee -a $ERR_FILE
     rc=$?
     if [ $rc -ne 0 ]; then
         fileLogger "$KO cmd zip failed rc=$rc"
@@ -546,7 +546,7 @@ function do_cypher()
 function do_cypher_zip()
 {
     f="$1"
-    zip  -qr9 -P "$ZIP_PASSWD" "$f".zip "$f"
+    zip  -qr9 -P "$ZIP_PASSWD" "$f".zip "$f" 2>&1 | tee -a $ERR_FILE
     rc=$?
     [ $rc -eq 0 ] && echo "$f".zip || echo ""
     return $rc
@@ -556,7 +556,7 @@ function do_cypher_gpg_a()
 {
     echo "$ME: WARNING ! No tested!"
     f="$1"
-    $sCypherProg  $sCypherArgs  $GPG_KEYFILE --yes  "$f"
+    $sCypherProg  $sCypherArgs  $GPG_KEYFILE --yes  "$f" 2>&1 | tee -a $ERR_FILE
     rc=$?
     [ $rc -eq 0 ] && echo "$f".gpg || echo ""
     return $rc
@@ -567,7 +567,8 @@ function do_cypher_gpg_s()
 {
     f="$1"
 
-    $sCypherProg $sCypherArgs -q -c --passphrase "$GPG_PASSWD" --yes "$f"
+    $sCypherProg $sCypherArgs -q -c --passphrase "$GPG_PASSWD" \
+                 --yes "$f"  2>&1 | tee -a $ERR_FILE
     rc=$?
     [ $rc -eq 0 ] && echo "$f".gpg || echo ""
 
