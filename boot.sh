@@ -77,10 +77,8 @@ if [ -f "$f_priv" ]; then
     . "$f_priv"
 else
     if [ ! -f "$f_host" ]; then
-        debug "Cannot find $f_priv (nor $f_host)"
+        die "Cannot find $f_priv (nor $f_host)"
     fi
-    # else
-    # At least $f_host, so don't panic
 fi
 
 if [ -f "$f_host" ]; then
