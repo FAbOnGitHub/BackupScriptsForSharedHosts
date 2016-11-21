@@ -15,18 +15,18 @@ cd $DIR 2>/dev/null; export LIB_PATH=$PWD; cd - >/dev/null
 . $LIB_PATH/boot.sh
 
 taskCount
-ARCH_FILE=$BAK_DIR/www.tgz
-rm -f $ARCH_FILE
+ARCHIVE_FILE=$BAK_DIR/www.tgz
+rm -f $ARCHIVE_FILE
 # tar is more efficient and will be able to perfom incremental backups.
 # Zip is also done by do_moveXferZone (no more with bDoCompress=0)
 # 
-# zip -qr9 -P $ZIP_PASSWD $ARCH_FILE $WWW_DIR \
+# zip -qr9 -P $ZIP_PASSWD $ARCHIVE_FILE $WWW_DIR \
 #     -x $BAK_DIR/\* -x $WIKI_DIR/\* -x $WWW_DIR/backup_\* \
 #     -x $UPLOAD_DIR -x $WWW_DIR/upload\*
 #     2>>$ERR_FILE
 # rc=$?
 
-tar zcvf $ARCH_FILE \
+tar zcf $ARCHIVE_FILE \
     --exclude="$(basename $BAK_DIR)" \
     --exclude="$(basename $BAK_DIR_PUB)" \
     --exclude="$(basename $WIKI_DIR)" \
@@ -36,8 +36,8 @@ tar zcvf $ARCH_FILE \
 rc=$?
 if [ $rc -eq 0 ]; then    
     bDoCompress=0
-    fileLogger "$ok $L_DUMP $ARCH_FILE "
-    do_moveXferZone "$ARCH_FILE"
+    fileLogger "$ok $L_DUMP $ARCHIVE_FILE "
+    do_moveXferZone "$ARCHIVE_FILE"
     rc=$?
     if [ $rc -eq $EXIT_SUCCESS ]; then
         taskOk
@@ -45,7 +45,7 @@ if [ $rc -eq 0 ]; then
         taskErr
     fi
 else
-    rm -rf $ARCH_FILE
+    rm -rf $ARCHIVE_FILE
     taskErr
     fileLogger  "$KO $L_DUMP ERR (code $?). rm'."
 fi
