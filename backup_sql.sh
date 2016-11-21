@@ -77,6 +77,7 @@ function dumpBase()
         shift; shift; shift; shift; #drop $1 $2 $3 $4 for $@
         for table in $@
         do
+            taskCount
             exclude="$exclude --ignore-table=${base}.${table}"
             name=${base}.${table}
             ## Attention au -n pour pas créer de DB
