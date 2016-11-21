@@ -17,20 +17,19 @@
 LIB_PATH=$(dirname $0)
 . $LIB_PATH/boot.sh
 
-bFakeWget={bFakeWget:-0}
+bFakeWget=${bFakeWget:-0}
 
 function trigger_action()
 {
     target="$1"
     sWgetMsg=""
     if [ $bFakeWget -eq 0 ]; then
-        wget $wget_quiet --no-check-certificate --auth-no-challenge \
+        wget -t 1 $wget_quiet --no-check-certificate --auth-no-challenge \
              -U $HTTP_AGENT \
              -P $BAK_DIR "${CMD_URL}?action=$target" -O - 2>> $ERR_FILE
 
         rc=$?
-    else
-        
+    else        
         rc=$EXIT_SUCCESS
     fi
     if [ $rc -eq $EXIT_SUCCESS ]; then
