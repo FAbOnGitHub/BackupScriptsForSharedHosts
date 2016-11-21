@@ -26,7 +26,9 @@ function trigger_action()
     if [ $bFakeWget -eq 0 ]; then
         wget -t 1 $wget_quiet --no-check-certificate --auth-no-challenge \
              -U $HTTP_AGENT \
-             -P $BAK_DIR "${CMD_URL}?action=$target" -O - 2>> $ERR_FILE
+             -P $BAK_DIR "${CMD_URL}?action=$target" -O - \
+              --read-timeout=900 \
+             2>> $ERR_FILE
 
         rc=$?
     else        
