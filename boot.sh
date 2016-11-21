@@ -37,6 +37,7 @@ L_DUMP="_DUMP_____"
 L_COMPRESS="_COMPRESS_"
 L_CYPHER="_CYPHER___"
 L_OFFER="_OFFER____"
+L_MAIL="_MAIL_____"
 export L_DUMP L_COMPRESS L_CYPHER L_OFFER
 
 ### Variables:
