@@ -26,6 +26,7 @@ rm -f $ARCHIVE_FILE
 #     2>>$ERR_FILE
 # rc=$?
 
+cd $WWW_DIR
 tar zcf $ARCHIVE_FILE \
     --exclude="$(basename $BAK_DIR)" \
     --exclude="$(basename $BAK_DIR_PUB)" \
