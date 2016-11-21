@@ -17,13 +17,6 @@
 LIB_PATH=$(dirname $0)
 . $LIB_PATH/boot.sh
 
-# À configurer dans les fichiers de conf plutôt!
-DEBUG=0
-#DEBUG=1
-
-
-FALSE=0
-TRUE=1
 
 function trigger_action()
 {
@@ -95,6 +88,7 @@ rc_global=0
 for arg in $@
 do
     let iNbActions++
+    debug "$ME : arg=$arg"
     case $arg in
         'mysql'|'web'|'wiki'|'sql'|'check'|'safe')
             trigger_action $arg

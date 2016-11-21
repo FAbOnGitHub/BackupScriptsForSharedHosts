@@ -10,7 +10,7 @@
 LOG_MAX_SIZE=1000      # Nb d'entrées dans le journal
 TMP_FILE=/tmp/log.tmp  # Découpe journal
 
-### Nom interne du projet 
+### Nom interne du projet
 ###  Ne sert qu'au sujet du message mail
 PRJ="RLBackup"
 
@@ -171,7 +171,7 @@ function fileLogger()
     if [ $bUseLogger -eq 1 ]; then
         logger "b4sh $(basename $0) : $@"
     fi
-    
+
     LOG_FILE=${LOG_FILE:-'/tmp/backup_scripts.log'}
     if [ ! -f $LOG_FILE ]; then
         __fm_error
@@ -181,11 +181,13 @@ function fileLogger()
 
 function logStart()
 {
-    fileLogger "<<<<<<< $ME starting"    
+    fileLogger "<<<<<<< $ME starting"
+    echo "$DATE start" >> $ERR_FILE
+
 }
 function logStop()
 {
-    fileLogger ">>>>>>> $ME stopping : $@"    
+    fileLogger ">>>>>>> $ME stopping : $@"
 }
 
 ##
@@ -266,9 +268,9 @@ function _notify_email()
         fileLogger "notify_email() called but \$bUseMailWarning  is not set."
         return $EXIT_FAILURE
     fi
-    
+
     init_mail
-    
+
     if [ "x$NOTIFY_TO" = "x" ]; then
         error " NOTIFY_TO is not set"
         fileLogger "notify_email() NOTIFY_TO is empty."
@@ -423,7 +425,7 @@ function do_compress()
         fileLogger "$KO cmd zip failed rc=$rc"
     fi
     rm -f "$src"
-        
+
     f_current="$arch"
     return $rc
 }
@@ -501,7 +503,7 @@ function init_cypher()
             sCypherFct=echo
             sCypherArgs=
             return $EXIT_FAILURE
-        fi        
+        fi
     fi
 
     fileLogger "$WARN $sCypherProg not found ! using zip to cypher : WEAK !"
@@ -584,13 +586,13 @@ function do_moveXferZone()
         return $EXIT_FAILURE
     fi
 
-    sSize="$(du --si -s $f| awk '{print $1}' )"    
+    sSize="$(du --si -s $f| awk '{print $1}' )"
     do_compress "$f"
     rc=$?
     if [ $rc -eq $EXIT_SUCCESS ]; then
         f="$f_current"
     fi
-    
+
     X="$(do_cypher "$f")"
     rc=$?
     [ $rc -ne 0 ] && die "ERROR cypher f='f' (rc=$rc)"
@@ -613,7 +615,7 @@ function do_moveXferZone()
 #
 # Write the metadata of a file.
 # Used by do_moveXferZone
-# 
+#
 function writeMetaData()
 {
     file="$1"
@@ -636,7 +638,7 @@ function writeMetaData()
 
 #
 # Read the metadata file and populate variables
-# 
+#
 function readMetaData()
 {
     metafile="$1"
@@ -652,9 +654,9 @@ function readMetaData()
     csumFile=${META[0]}
     sizeFile=${META[1]}
     epochFile=${META[2]}
-    unset META[0]; unset META[1]; unset META[2]        
+    unset META[0]; unset META[1]; unset META[2]
     dateFile="${META[*]}"
-    
+
     if [ $DEBUG -eq 1 ]; then
         echo "Metal = " ${META[*]}
         echo "csum: " $csumFile
@@ -913,7 +915,7 @@ function check_local_server_variables()
             fileLogger "sorry, can't use logger"
             bUseLogger=0
         fi
-    fi    
+    fi
 
     if [ "x$BAK_DIR" = "x" ]; then
         fileLogger "BAK_DIR not defined: how can it be possible?"
@@ -974,7 +976,7 @@ function check_local_server_variables()
             ;;
     esac
 
-    
+
     if [ "x$ZIP_PASSWD" = "x" ]; then
         fileLogger "ZIP_PASSWD is not defined... default value"
         ZIP_PASSWD="NeverForgetToSetAPassowrd"
@@ -985,7 +987,7 @@ function check_local_server_variables()
 function check_client_variables()
 {
     ZIP_PASSWD=${ZIP_PASSWD:-"NoPassUsedButControlledAnyway"}
-   
+
     if [ ! -d $BAK_DIR_CLI ]; then
         fileLogger  "$KO BAK_DIR_CLI ('$BAK_DIR_CLI') is not a directory"
         exit 1
@@ -1007,19 +1009,19 @@ function check_client_variables()
         fileLogger  "$KO LTS_DIR ('$LTS_DIR') is not writable"
         exit 1
     fi
-    
-    
+
+
 
     if [ ! -f "$LOG_FILE" ]; then
         echo "new log file ($date)" > $LOG_FILE
         chmod a-rw $LOG_FILE
     fi
-    
+
     if [ ! -f "$ERR_FILE" ]; then
         echo "no such ERR_FILE=$ERR_FILE $(date) " > $ERR_FILE
         chmod a-rw $ERR_FILE
     fi
-    
+
 }
 
 function viewConfig()
