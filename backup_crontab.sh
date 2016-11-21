@@ -70,7 +70,6 @@ H=$(hostname -s)
 dumpfile=$H.crontab.$U.dump
 taskCount
 
-fileLogger "$Self : starting"
 
 cd $BAK_DIR
 crontab -l > $dumpfile 2>>$ERR_FILE
