@@ -17,24 +17,27 @@
 LIB_PATH=$(dirname $0)
 . $LIB_PATH/boot.sh
 
+bFakeWget={bFakeWget:-0}
 
 function trigger_action()
 {
     target="$1"
     sWgetMsg=""
-    wget $wget_quiet --no-check-certificate --auth-no-challenge \
-         -U $HTTP_AGENT \
-         -P $BAK_DIR "${CMD_URL}?action=$target"  2>> $ERR_FILE
-    # -O -
-    rc=$?
-    if [ $rc -eq 0 ]; then
+    if [ $bFakeWget -eq 0 ]; then
+        wget $wget_quiet --no-check-certificate --auth-no-challenge \
+             -U $HTTP_AGENT \
+             -P $BAK_DIR "${CMD_URL}?action=$target"  2>> $ERR_FILE
+        # -O -
+        rc=$?
+    else
+        rc=$EXIT_SUCCESS
+    fi
+    if [ $rc -eq $EXIT_SUCCESS ]; then
         #status="[ok]"
         x=$ok
-        let iNbOk++
     else
-        status="[KO]"
+        status="[KO]" # A single error could set all in error
         x=$KO
-        let iNbErr++
         sWgetMsg=":"$(wget_translate_error $rc )
     fi
     fileLogger "$x wget ${LOG_URL}?action=$target (rc=${rc}${sWgetMsg})"
