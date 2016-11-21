@@ -37,6 +37,9 @@ L_DUMP="_DUMP_____"
 L_COMPRESS="_COMPRESS_"
 L_CYPHER="_CYPHER___"
 L_OFFER="_OFFER____"
+L_MAIL="_MAIL_____"
+L_ARCH="_ARCH_____"
+L_LTS="_ARCH+LTS_"
 export L_DUMP L_COMPRESS L_CYPHER L_OFFER
 
 ### Variables:
@@ -77,10 +80,10 @@ if [ -f "$f_priv" ]; then
     . "$f_priv"
 else
     if [ ! -f "$f_host" ]; then
-        debug "Cannot find $f_priv (nor $f_host)"
+        echo "Cannot find $f_priv (nor $f_host)" 2>&1
+        # So no log files available
+        exit 666
     fi
-    # else
-    # At least $f_host, so don't panic
 fi
 
 if [ -f "$f_host" ]; then
@@ -133,4 +136,7 @@ debug "$msg"
      fi
  fi
 
+ ### Start!
+
+taskReportInit
 logStart

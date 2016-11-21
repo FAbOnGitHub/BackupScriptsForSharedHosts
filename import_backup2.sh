@@ -52,7 +52,7 @@ if [ ! -w $LTS_DIR ]; then
 fi
 if [ "x$BAK_URL" = "x" ]; then
     fileLogger  "\$BAK_URL is not set"
-    exit 1    
+    exit 1
 fi
 
 ## URL à afficher dans log, sans le mot de passe
@@ -75,6 +75,7 @@ fi
 
 for raw_file in ${BAK_FILES[*]}; do
 
+    taskCount
     #   echo "file=$file"
     # WTF ???
     file="$raw_file"
@@ -90,22 +91,35 @@ for raw_file in ${BAK_FILES[*]}; do
     if [ $rc -ne $EXIT_SUCCESS ]; then
         fileLogger  "$KO wget file='$file' failed ($rc). Skip checks"
         hasFailed
+        taskErr
         continue
     fi
     let iNbTargetOk++
 
     case $file in
-        *.txt) bSkipCS=1 ;;
-        *) bSkipCS=0           
-           check_downloaded_file "$file"
-           rc=$?
-           SUCCESS=$rc
-           ;;
-    esac    
+        *.txt)
+            bSkipCS=1
+            SUCCESS=$EXIT_SUCCESS
+            ;;
+        *)
+            bSkipCS=0
+            check_downloaded_file "$file"
+            rc=$?
+            SUCCESS=$rc
+            ;;
+    esac
 
     if [ $SUCCESS -eq $EXIT_SUCCESS ]; then
         archive_downloaded_file "$file"
+        rc=$?
+        if [ $rc -eq $EXIT_SUCCESS ]; then
+            taskOk
+        else
+            taskErr
+        fi
+
     else
+        taskErr
         fileLogger "$WARN no global success for file '$file', so no rename '$day-'"
     fi
 
@@ -115,13 +129,9 @@ done
 #   Now distant log files must be passed in BAK_FILES
 
 #
-if [ $iNbTargetOk -eq $iNbTargetTotal ]; then
-    sLabel="[ok]"
-else
-    sLabel="[KO]"
-fi
-
-logStop
-reportByMail "$sLabel[$iNbTargetOk/$iNbTargetTotal] DL files"
-
-exit $GENERAL_SUCCESS
+### Reporting
+taskReportStatus
+sReport="$_taskReportLabel DL files"
+logStop "$sReport"
+reportByMail "$sReport" "$ME"
+exit $_iNbTaskErr

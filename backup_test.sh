@@ -15,8 +15,9 @@ cd $DIR 2>/dev/null; export LIB_PATH=$PWD; cd - >/dev/null
 . $LIB_PATH/boot.sh
 
 cd $BAK_DIR
+taskCount
 #1 Dump
-sTarget1="Doc.tgz"
+sTarget1="Docs.tgz"
 tar zcf $sTarget1  $LIB_PATH/Docs 2>>$ERR_FILE
 rc=$?
 #2 Compress
@@ -28,9 +29,20 @@ if [ $rc -eq 0 ]; then
     bDoCompress=0
     do_moveXferZone "$sTarget1"
     rc=$?
+    if [ $rc -eq $EXIT_SUCCESS ]; then
+        taskOk
+    else
+        taskErr
+    fi
+
 else
+    taskErr
     fileLogger "$KO $L_DUMP $sTarget1"
 fi
 
-logStop
-exit $rc
+### Reporting
+taskReportStatus
+sReport="$_taskReportLabel backup test"
+logStop "$sReport"
+reportByMail "$sReport" "$ME"
+exit $_iNbTaskErr

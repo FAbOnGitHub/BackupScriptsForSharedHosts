@@ -10,7 +10,7 @@
 LOG_MAX_SIZE=1000      # Nb d'entrées dans le journal
 TMP_FILE=/tmp/log.tmp  # Découpe journal
 
-### Nom interne du projet 
+### Nom interne du projet
 ###  Ne sert qu'au sujet du message mail
 PRJ="RLBackup"
 
@@ -171,7 +171,7 @@ function fileLogger()
     if [ $bUseLogger -eq 1 ]; then
         logger "b4sh $(basename $0) : $@"
     fi
-    
+
     LOG_FILE=${LOG_FILE:-'/tmp/backup_scripts.log'}
     if [ ! -f $LOG_FILE ]; then
         __fm_error
@@ -181,20 +181,80 @@ function fileLogger()
 
 function logStart()
 {
-    fileLogger "<<<<<<< $ME starting"    
+    sMsg="<<<<<<< $ME starting"
+    fileLogger "$sMsg"
+    DATE=$(date +"%Y%m%d-%H%M%S")
+    echo "$sMsg" >> $ERR_FILE
 }
 function logStop()
 {
-    fileLogger ">>>>>>> $ME stopping"    
+    sMsg=">>>>>>> $ME stopping : $@"
+    fileLogger "$sMsg"
+    echo "$sMsg" >> $ERR_FILE 
 }
 
+##
+## Functions and variables to count good task and erors...
+function taskReportInit()
+{
+    _taskReportCounters="(ok:/w:/e:)"
+    _taskReportLabel="[--] $_taskReportCounters"
+    let _iNbTaskCount=0
+    let _iNbTaskOk=0
+    let _iNbTaskErr=0
+    let _iNbTaskWarn=0
+}
+function taskCount()
+{
+    let _iNbTaskCount++
+}
+function taskOk()
+{
+    let _iNbTaskOk++
+}
+function taskErr()
+{
+    let _iNbTaskErr++
+}
+function taskStatus()
+{
+    rc="$1"
+    if [ $rc -eq $EXIT_SUCCESS ]; then
+        taskOk
+    else
+        taskErr
+    fi
+}
+
+function taskWarn()
+{
+    let _iNbTaskWarn++
+}
+function taskReportStatus()
+{
+    local status
+    taskReportCounters
+    let _iNbTaskTotal=$_iNbTaskOk+$_iNbTaskErr+$_iNbTaskWarn
+    if [ $_iNbTaskTotal -ne $_iNbTaskCount ]; then
+        status="[!!]"
+    elif [ $_iNbTaskErr -eq 0 ]; then
+        status="[ok]"
+    else
+        status="[KO]"
+    fi
+    _taskReportLabel="$status $_taskReportCounters"
+}
+function taskReportCounters()
+{
+    _taskReportCounters="(ok:${_iNbTaskOk}/w:${_iNbTaskWarn}/e:${_iNbTaskErr}/T:${_iNbTaskCount})"
+}
 
 ###
 # Afficher les logs du jour, pour envoi par email par exemple.
 #
 function view_today_logs()
 {
-    grep "$(date +"%F")" $LOG_FILE
+    grep "^$(date +"%F")" $LOG_FILE
 }
 
 bMailInit=0
@@ -221,9 +281,9 @@ function _notify_email()
         fileLogger "notify_email() called but \$bUseMailWarning  is not set."
         return $EXIT_FAILURE
     fi
-    
+
     init_mail
-    
+
     if [ "x$NOTIFY_TO" = "x" ]; then
         error " NOTIFY_TO is not set"
         fileLogger "notify_email() NOTIFY_TO is empty."
@@ -238,11 +298,20 @@ function _notify_email()
 
     if [ $bMailCommandAvaible -eq 1 ]; then
         mail -s "$SUBJECT" $NOTIFY_TO
+        rc=$?
     else
         echo "$KO *** mail not found : $NOTIFY_TO" >> $LOG_FILE
         cat - >> $LOG_FILE
+        rc=13
     fi
-
+    if [ $rc -eq $EXIT_SUCCESS ]; then
+        status=$ok
+    else
+        status=$KO
+    fi
+    # I know !! It's after the mail. Too late but I don't want to lose any
+    # information
+    fileLogger "$status $L_MAIL to:'$NOTIFY_TO'"
 }
 ##
 # Envoi un message mais en laissant la lecture de stdin à faire.
@@ -372,9 +441,13 @@ function do_compress()
         return 0
     fi
     rm -f "$arch"
-    zip -qr9 -P $ZIP_PASSWD "$arch" "$src" >/dev/null
+    zip -qr9 -P $ZIP_PASSWD "$arch" "$src"  2>&1 | tee -a $ERR_FILE
     rc=$?
+    if [ $rc -ne 0 ]; then
+        fileLogger "$KO cmd zip failed rc=$rc"
+    fi
     rm -f "$src"
+
     f_current="$arch"
     return $rc
 }
@@ -452,7 +525,7 @@ function init_cypher()
             sCypherFct=echo
             sCypherArgs=
             return $EXIT_FAILURE
-        fi        
+        fi
     fi
 
     fileLogger "$WARN $sCypherProg not found ! using zip to cypher : WEAK !"
@@ -482,7 +555,7 @@ function do_cypher()
 function do_cypher_zip()
 {
     f="$1"
-    zip  -qr9 -P "$ZIP_PASSWD" "$f".zip "$f"
+    zip  -qr9 -P "$ZIP_PASSWD" "$f".zip "$f" 2>&1 | tee -a $ERR_FILE
     rc=$?
     [ $rc -eq 0 ] && echo "$f".zip || echo ""
     return $rc
@@ -492,7 +565,7 @@ function do_cypher_gpg_a()
 {
     echo "$ME: WARNING ! No tested!"
     f="$1"
-    $sCypherProg  $sCypherArgs  $GPG_KEYFILE --yes  "$f"
+    $sCypherProg  $sCypherArgs  $GPG_KEYFILE --yes  "$f" 2>&1 | tee -a $ERR_FILE
     rc=$?
     [ $rc -eq 0 ] && echo "$f".gpg || echo ""
     return $rc
@@ -503,7 +576,8 @@ function do_cypher_gpg_s()
 {
     f="$1"
 
-    $sCypherProg $sCypherArgs -q -c --passphrase "$GPG_PASSWD" --yes "$f"
+    $sCypherProg $sCypherArgs -q -c --passphrase "$GPG_PASSWD" \
+                 --yes "$f"  2>&1 | tee -a $ERR_FILE
     rc=$?
     [ $rc -eq 0 ] && echo "$f".gpg || echo ""
 
@@ -535,21 +609,26 @@ function do_moveXferZone()
         return $EXIT_FAILURE
     fi
 
+    sSize="$(du --si -s $f| awk '{print $1}' )"
     do_compress "$f"
     rc=$?
     if [ $rc -eq $EXIT_SUCCESS ]; then
         f="$f_current"
     fi
-    
+
     X="$(do_cypher "$f")"
     rc=$?
-    [ $rc -ne 0 ] && die "ERROR cypher f='f' (rc=$rc)"
-    rm -f "$f"
+    if [ $rc -ne 0 ]; then
+        error "ERROR cypher f='$f' (rc=$rc)"
+        rm -rf "$f"
+        return $EXIT_FAILURE
+    fi
+    rm -rf "$f"
     F="$(basename "$X")"
     debug "[f=$f][X=$X][F=$F] $do_cypher_fct"
     debug "[BAK_DIR=$BAK_DIR][BAK_DIR_PUB=$BAK_DIR_PUB]"
 
-    buffer=$(du --si -s "$X")
+    buffer=" $sSize->$(du --si -s "$X")"
     if [ "x$BAK_DIR" != "x$BAK_DIR_PUB" ]; then
         mv -f "$X" "$BAK_DIR_PUB/$F" 2>/dev/null
     fi
@@ -563,7 +642,7 @@ function do_moveXferZone()
 #
 # Write the metadata of a file.
 # Used by do_moveXferZone
-# 
+#
 function writeMetaData()
 {
     file="$1"
@@ -586,7 +665,7 @@ function writeMetaData()
 
 #
 # Read the metadata file and populate variables
-# 
+#
 function readMetaData()
 {
     metafile="$1"
@@ -602,9 +681,9 @@ function readMetaData()
     csumFile=${META[0]}
     sizeFile=${META[1]}
     epochFile=${META[2]}
-    unset META[0]; unset META[1]; unset META[2]        
+    unset META[0]; unset META[1]; unset META[2]
     dateFile="${META[*]}"
-    
+
     if [ $DEBUG -eq 1 ]; then
         echo "Metal = " ${META[*]}
         echo "csum: " $csumFile
@@ -863,7 +942,7 @@ function check_local_server_variables()
             fileLogger "sorry, can't use logger"
             bUseLogger=0
         fi
-    fi    
+    fi
 
     if [ "x$BAK_DIR" = "x" ]; then
         fileLogger "BAK_DIR not defined: how can it be possible?"
@@ -924,7 +1003,7 @@ function check_local_server_variables()
             ;;
     esac
 
-    
+
     if [ "x$ZIP_PASSWD" = "x" ]; then
         fileLogger "ZIP_PASSWD is not defined... default value"
         ZIP_PASSWD="NeverForgetToSetAPassowrd"
@@ -935,7 +1014,7 @@ function check_local_server_variables()
 function check_client_variables()
 {
     ZIP_PASSWD=${ZIP_PASSWD:-"NoPassUsedButControlledAnyway"}
-   
+
     if [ ! -d $BAK_DIR_CLI ]; then
         fileLogger  "$KO BAK_DIR_CLI ('$BAK_DIR_CLI') is not a directory"
         exit 1
@@ -957,19 +1036,19 @@ function check_client_variables()
         fileLogger  "$KO LTS_DIR ('$LTS_DIR') is not writable"
         exit 1
     fi
-    
-    
+
+
 
     if [ ! -f "$LOG_FILE" ]; then
         echo "new log file ($date)" > $LOG_FILE
         chmod a-rw $LOG_FILE
     fi
-    
+
     if [ ! -f "$ERR_FILE" ]; then
         echo "no such ERR_FILE=$ERR_FILE $(date) " > $ERR_FILE
         chmod a-rw $ERR_FILE
     fi
-    
+
 }
 
 function viewConfig()
@@ -1007,3 +1086,4 @@ function wget_translate_error()
         echo ${aErrors[$1]}
     fi
 }
+
