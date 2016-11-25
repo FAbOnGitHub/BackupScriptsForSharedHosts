@@ -440,13 +440,13 @@ function do_compress()
         f_current="$src"
         return 0
     fi
-    rm -f "$arch"
+    rm -rf "$arch"
     zip -qr9 -P $ZIP_PASSWD "$arch" "$src"  2>&1 | tee -a $ERR_FILE
     rc=$?
     if [ $rc -ne 0 ]; then
         fileLogger "$KO cmd zip failed rc=$rc"
     fi
-    rm -f "$src"
+    rm -rf "$src"
 
     f_current="$arch"
     return $rc
