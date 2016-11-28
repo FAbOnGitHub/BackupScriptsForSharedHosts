@@ -23,7 +23,7 @@ VERSION=0.0.1
 ######################################################(FAb)###################
 ME=$0
 #  (À INCLURE) Chemin fichiers inclus, auto-ajustement
-DIR=$(dirname $0) #Resolving path
+\cd $(dirname $0); DIR=$PWD; \cd - >/dev/null;  #Resolving path
 cd $DIR 2>/dev/null; export LIB_PATH=$PWD; cd - >/dev/null
 . $LIB_PATH/boot.sh
 
@@ -58,17 +58,20 @@ let iNbDbTotal=${#aDB[*]}
 let iNbDbOk=0
 for db in ${aDB[*]}
 do
-# 3 Save each DB
+    # 3 Save each DB
+    taskCount
     date=$(date  +"%Y%m%d-%H%M%S")
     [ "$db" = "information_schema" ] && sLock="--skip-lock-tables" || sLock="-l"
     fileLogger "$ok '$db' found @${date} "
     dumpfile="$(basename ${db})"".svndump"
     /usr/bin/svnadmin dump "$db" >"$dumpfile" 2>>/dev/null
     rc=$?
-    if [ $rc -ne $EXIT_SUCCESS ]; then
+    if [ $rc -ne $EXIT_SUCCESS ]; then        
         error "$KO svndump '$db' failed (rc=$rc)"
+        taskErr
         continue
     else
+        taskOk
         let iNbDbOk++
     fi
 done
@@ -87,15 +90,9 @@ if [ $bDoCompressAll -eq 1 ]; then
     rm -rf "$dir"
 fi
 
-if [ $iNbDbOk -eq $iNbDbTotal ]; then
-    sLabel="[ok]"
-else
-    sLabel="[KO]"
-fi
-
-
-sReport="$sLabel[$iNbDbOk/$iNbDbTotal] repos saved "
-reportByMail "$sReport"
-
-# see to use rc=$? and then exit $rc
-exit $EXIT_SUCCESS
+### Reporting
+taskReportStatus
+sReport="$_taskReportLabel repos saved"
+logStop "$sReport"
+reportByMail "$sReport" "$ME"
+exit $_iNbTaskErr

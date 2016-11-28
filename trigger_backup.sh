@@ -17,31 +17,38 @@
 LIB_PATH=$(dirname $0)
 . $LIB_PATH/boot.sh
 
-# À configurer dans les fichiers de conf plutôt!
-DEBUG=0
-#DEBUG=1
-
-
-FALSE=0
-TRUE=1
+bFakeWget=${bFakeWget:-0}
 
 function trigger_action()
 {
     target="$1"
     sWgetMsg=""
-    wget $wget_quiet -t 3 --no-check-certificate --auth-no-challenge \
-         -U $HTTP_AGENT \
-         -P $BAK_DIR "${CMD_URL}?action=$target"  2>> $ERR_FILE
-    # -O -
-    rc=$?
-    if [ $rc -eq 0 ]; then
-        status="[ok]"        
+    if [ $DEBUG -eq 0 ]; then
+        sOutput="/dev/null"
     else
-        status="[KO]"
+        sOutput="-"
+    fi
+    if [ $bFakeWget -eq 0 ]; then
+        wget -t 1 $wget_quiet --no-check-certificate --auth-no-challenge \
+             -U $HTTP_AGENT \
+             -P $BAK_DIR "${CMD_URL}?action=$target" \
+             -O $sOutput \
+              --read-timeout=900 \
+             2>> $ERR_FILE
+
+        rc=$?
+    else        
+        rc=$EXIT_SUCCESS
+    fi
+    if [ $rc -eq $EXIT_SUCCESS ]; then
+        #status="[ok]"
+        x=$ok
+    else
+        status="[KO]" # A single error could set all in error
+        x=$KO
         sWgetMsg=":"$(wget_translate_error $rc )
     fi
-    fileLogger "$status wget ${CMD_URL}?action=$target (rc=${rc}${sWgetMsg})"
-    reportByMail "$status wget $target (rc=${rc}${sWgetMsg})"
+    fileLogger "$x wget ${LOG_URL}?action=$target (rc=${rc}${sWgetMsg})"
     return $rc
 }
 
@@ -51,10 +58,6 @@ function trigger_action()
 #
 # ###########################################################################
 #set -x
-DATE=$(date +"%Y%m%d-%H%M%S")
-GENERAL_SUCCESS=$EXIT_SUCCESS
-fileLogger  "$ok $ME starting  >>>>>"
-echo "$DATE start" >> $ERR_FILE
 
 # Normalement le client n'est pas obligé d'avoir la même arborescence que le
 # serveur. Si c'est le cas, son répertoire BAK_DIR est BAK_DIR_CLI
@@ -62,43 +65,28 @@ echo "$DATE start" >> $ERR_FILE
 LTS_PATTERN=${LTS_PATTERN:-"4-Thu"}
 TASK_NAME=${TASK_NAME:-"OutThere"}
 
-if [ ! -d $BAK_DIR ]; then
-    fileLogger  "$KO BAK_DIR ('$BAK_DIR') is missing"
-    exit 1
-fi
-if [ ! -w $BAK_DIR ]; then
-    fileLogger  "$KO BAK_DIR ('$BAK_DIR') is not writable"
-    exit 1
-fi
-if [ ! -d $LTS_DIR ]; then
-    fileLogger  "$KO LTS_DIR ('$LTS_DIR') is missing"
-    exit 1
-fi
-if [ ! -w $LTS_DIR ]; then
-    fileLogger  "$KO LTS_DIR ('$LTS_DIR') is not writable"
-    exit 1
-fi
-if [ "x$BAK_URL" = "x" ]; then
-    fileLogger  "\$BAK_URL is not set"
-    exit 1
-fi
-LOG_URL="$(echo "$BAK_URL"|cut -d'@' -f2-)"
+LOG_URL="$(echo "$CMD_URL"|cut -d'@' -f2-)"
 
-
-rc_global=0
 for arg in $@
 do
+    taskCount
+    debug "$ME : arg=$arg"
     case $arg in
-        'mysql'|'web'|'wiki'|'sql'|'check')
+        'mysql'|'web'|'wiki'|'sql'|'check'|'safe')
             trigger_action $arg
             rc=$?
-            let rc_global+=$rc
-        ;;
+            ;;
         *)
-            error "unknown commmand"
-        ;;
+            error "unknown commmand arg='$arg'"
+            rc=$EXIT_FAILURE
+            ;;        
     esac
+    taskStatus $rc
 done
 
-logStop
-exit $rc_global
+### Reporting
+taskReportStatus
+sReport="$_taskReportLabel trigger $@"
+logStop "$sReport"
+reportByMail "$sReport" "$ME"
+exit $_iNbTaskErr

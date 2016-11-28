@@ -14,7 +14,8 @@
 
 ME=$0
 #  (À INCLURE) Chemin fichiers inclus, auto-ajustement
-DIR=$(dirname $0) #Resolving path
+ #Resolving path
+\cd $(dirname $0); DIR=$PWD; \cd - >/dev/null;
 cd $DIR 2>/dev/null; export LIB_PATH=$PWD; cd - >/dev/null
 . $LIB_PATH/boot.sh
 
@@ -68,8 +69,8 @@ Self=$(basename $ME)
 U=$(whoami)
 H=$(hostname -s)
 dumpfile=$H.crontab.$U.dump
+taskCount
 
-fileLogger "$Self : starting"
 
 cd $BAK_DIR
 crontab -l > $dumpfile 2>>$ERR_FILE
@@ -78,11 +79,19 @@ if [ $rc -eq $EXIT_SUCCESS ]; then
     fileLogger "$ok $L_DUMP $dumpfile (rc:$rc)"
     do_moveXferZone "$dumpfile"
     rc=$?
+    if [ $rc -eq $EXIT_SUCCESS ]; then
+        taskOk
+    else
+        taskErr
+    fi
 else
+    taskErr
     fileLogger "$KO $L_DUMP $dumpfile (rc:$rc)"
 fi
 
-logStop
-# see to use rc=$? and then exit $rc
-exit $rc
-
+### Reporting
+taskReportStatus
+sReport="$_taskReportLabel crontab"
+logStop "$sReport"
+reportByMail "$sReport" "$ME"
+exit $_iNbTaskErr

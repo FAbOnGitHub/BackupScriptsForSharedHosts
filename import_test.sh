@@ -10,7 +10,8 @@
 
 #set -x
 #  (À INCLURE) Chemin fichiers inclus, auto-ajustement
-LIB_PATH=$(dirname $0)
+\cd $(dirname $0); DIR=$LIB_PATH; \cd - >/dev/null;
+
 . $LIB_PATH/boot.sh
 
 FALSE=0
@@ -37,16 +38,17 @@ LOG_URL="$(echo "$BAK_URL"|cut -d'@' -f2-)"
 update_distant_list
 #exit $?
 
+BAK_FILES=${BAK_FILES:-'Docs.tar.gpg'}
+
 # Main loop ###################################################################
 declare -a aTmp=( ${BAK_FILES[*]} )
-#let iNbTargetTotal=${#BAK_FILES[*]}  #bug
 let iNbTargetTotal=${#aTmp[*]}
 let iNbTargetOk=0
 
 ### Make our own test in relation with import_test.sh
-### 
+###  Docs.tgz.gpg ?
 for raw_file in ${BAK_FILES[*]}; do
-
+    taskCount
     #   echo "file=$file"
     # WTF ???
     file="$raw_file"
@@ -62,23 +64,35 @@ for raw_file in ${BAK_FILES[*]}; do
     if [ $rc -ne $EXIT_SUCCESS ]; then
         fileLogger  "$KO wget file='$file' failed ($rc). Skip checks"
         hasFailed
+        taskErr
         continue
     fi
     let iNbTargetOk++
 
     case $file in
-        *.txt) bSkipCS=1 ;;
-        *) bSkipCS=0           
-           check_downloaded_file "$file"
-           rc=$?
-           SUCCESS=$rc
-           ;;
-    esac    
+        *.txt)
+            bSkipCS=1
+            SUCCESS=$EXIT_SUCCESS
+            ;;
+        *)
+            bSkipCS=0
+            check_downloaded_file "$file"
+            rc=$?
+            SUCCESS=$rc
+            ;;
+    esac
 
     if [ $SUCCESS -eq $EXIT_SUCCESS ]; then
         archive_downloaded_file "$file"
+        rc=$?
+        if [ $rc -eq $EXIT_SUCCESS ]; then
+            taskOk
+        else
+            taskErr
+        fi
     else
         fileLogger "$WARN no global success for file '$file', so no rename '$day-'"
+        taskErr
     fi
 
 done
@@ -86,14 +100,9 @@ done
 # Conclusion ##################################################################
 #   Now distant log files must be passed in BAK_FILES
 
-#
-if [ $iNbTargetOk -eq $iNbTargetTotal ]; then
-    sLabel="[ok]"
-else
-    sLabel="[KO]"
-fi
-
-logStop
-reportByMail "$sLabel[$iNbTargetOk/$iNbTargetTotal] DL files"
-
-exit $GENERAL_SUCCESS
+### Reporting
+taskReportStatus
+sReport="$_taskReportLabel DL files"
+logStop "$sReport"
+reportByMail "$sReport" "$ME"
+exit $_iNbTaskErr
