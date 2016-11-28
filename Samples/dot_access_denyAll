@@ -1,0 +1,8 @@
+ <ifModule mod_authz_core.c>
+     # Apache 2.4
+     Require all denied
+</ifModule>
+<ifModule !mod_authz_core.c>
+    Deny from all
+</ifModule>
+

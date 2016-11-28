@@ -190,7 +190,7 @@ function logStop()
 {
     sMsg=">>>>>>> $ME stopping : $@"
     fileLogger "$sMsg"
-    echo "$sMsg" >> $ERR_FILE 
+    echo "$sMsg" >> $ERR_FILE
 }
 
 ##
@@ -695,6 +695,44 @@ function readMetaData()
     return $EXIT_SUCCESS
 }
 
+##
+## Arg... with bash-3.2.25 mapfile is not available
+function readMetaDataOldWay()
+{
+    metafile="$1"
+    csumFile=
+    sizeFile=
+    epochFile=
+
+    if [ ! -f "$metafile" ]; then
+        error "readMetaData() file '$metafile' not found"
+        return $EXIT_FAILURE
+    fi
+
+    OLDIFS="$IFS"
+    IFS=$'\n'
+    META=( $(cat $metafile) ) # array
+    IFS=$OLDIFS
+
+    csumFile=${META[0]}
+    sizeFile=${META[1]}
+    epochFile=${META[2]}
+    unset META[0]; unset META[1]; unset META[2]
+    dateFile="${META[*]}"
+
+    if [ $DEBUG -eq 1 ]; then
+        echo "Metal = " ${META[*]}
+        echo "csum: " $csumFile
+        echo "size: " $sizeFile
+        echo "date: " $epochFile
+        unset META[0]; unset META[1]; unset META[2]
+        echo "DATE: " $dateFile
+    fi
+    return $EXIT_SUCCESS
+}
+
+
+
 ####
 #### Fonctions de vérifications du système de fichier
 ####
@@ -1086,4 +1124,3 @@ function wget_translate_error()
         echo ${aErrors[$1]}
     fi
 }
-
