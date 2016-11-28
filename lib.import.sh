@@ -177,14 +177,29 @@ function update_distant_list()
 function archive_downloaded_file()
 {
     file="$1"
+    flts="$(date +"%Y%m%d-%H%M%S")-$file"
     day="$(LANG=C date +"%u-%a")"
-    mv $BAK_DIR_CLI/$file $BAK_DIR_CLI/$day-$file 2>> $ERR_FILE
+    new="$day-$file"
+    mv "$BAK_DIR_CLI/$file" "$BAK_DIR_CLI/$new" 2>> $ERR_FILE
     rc=$?
-    debug "mv($rc)  $BAK_DIR_CLI/$file $BAK_DIR_CLI/$day-$file"
+    if [ $rc -eq $EXIT_SUCCESS ]; then
+        status=$ok
+    else
+        status=$KO
+    fi
+    fileLogger "$status $L_ARCH $new" 
+    debug "mv($rc)  $BAK_DIR_CLI/$file $BAK_DIR_CLI/$new"
     if [ "$day" = "$LTS_PATTERN" ]; then
-        cp $BAK_DIR_CLI/$day-$file $LTS_DIR/$ff 2>> $ERR_FILE
+        cp "$BAK_DIR_CLI/$new" "$LTS_DIR/$flts" 2>> $ERR_FILE
         rc=$?
-        debug "cp($rc) $BAK_DIR_CLI/$day-$file $LTS_DIR/$ff"
+        if [ $rc -eq $EXIT_SUCCESS ]; then
+            status=$ok
+        else
+            status=$KO
+        fi
+        fileLogger "$status $L_LTS $LTS_DIR/$flts" 
+
+        debug "cp($rc) $BAK_DIR_CLI/$new $LTS_DIR/$flts"
     fi
 
 }

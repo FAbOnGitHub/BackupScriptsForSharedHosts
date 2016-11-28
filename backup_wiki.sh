@@ -8,18 +8,18 @@
 #
 # Licence : GPL v3
 
-
 #  (À INCLURE) Chemin fichiers inclus, auto-ajustement
-DIR=$(dirname $0) #Resolving path
+\cd $(dirname $0); DIR=$PWD; \cd - >/dev/null;
+ #Resolving path
 cd $DIR 2>/dev/null; export LIB_PATH=$PWD; cd - >/dev/null
 . $LIB_PATH/boot.sh
 
 
-ZIP_FILE=$BAK_DIR/wiki.zip    # Archive zipée
+ARCHIVE_FILE=$BAK_DIR/wiki.tgz
 
 if [ ! -f $BAK_DIR/.htaccess ]; then
     fileLogger "$KO ERR fichier .htaccess inaccessible"
-    rm -f $ZIP_FILE
+    rm -f $ARCHIVE_FILE
     exit 1
 fi
 if [ -f $LOCK_FILE ]; then
@@ -32,19 +32,37 @@ if [ "x$ZIP_PASSWD" = "x" ]; then
     exit 1
 fi
 
-rm -f $ZIP_FILE
-zip -qr9 -P $ZIP_PASSWD $ZIP_FILE $WIKI_DIR \
-    2>>$ERR_FILE
-rc=$?
+rm -f $ARCHIVE_FILE
+# zip -qr9 -P $ZIP_PASSWD $ARCHIVE_FILE $WIKI_DIR \
+#     2>>$ERR_FILE
+# rc=$?
 
+taskCount
+
+cd $WWW_DIR
+tar zcf $ARCHIVE_FILE $WIKI_DIR
 if [ $rc -eq 0 ]; then
-    fileLogger "$ok $L_DUMP $ZIP_FILE"
-    bCompress=0
-    do_moveXferZone $ZIP_FILE
+    szArch="$(du --si -s $ARCHIVE_FILE | awk '{print $1}')"
+    szDir="$(du --si -s $WIKI_DIR | awk '{print $1}')"
+    fileLogger "$ok $L_DUMP $ARCHIVE_FILE ($szDir->$szArch)"
+    bDoCompress=0
+    do_moveXferZone $ARCHIVE_FILE
     rc=$?
+    if [ $rc -eq $EXIT_SUCCESS ]; then
+        taskOk
+    else
+        taskErr
+    fi
 else
-    fileLogger "$KO $L_DUMP $ZIP_FILE"
+    taskErr
+    rm -rf $ARCHIVE_FILE
+    fileLogger "$KO $L_DUMP $ARCHIVE_FILE (rc=$rc)"
 fi
 
-logStop
-exit $rc
+
+### Reporting
+taskReportStatus
+sReport="$_taskReportLabel wiki"
+logStop "$sReport"
+reportByMail "$sReport" "$ME"
+exit $_iNbTaskErr

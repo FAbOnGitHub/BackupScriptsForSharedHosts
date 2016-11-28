@@ -14,7 +14,12 @@
 * BackupScriptsForSharedHosts : ROAD MAP 
 
 ** TODO 
-   - Enhance security and security configuration control
-   - Enhance feeback after a =backup_import2.sh= operation towards the source server
-   - Do something better with log files.
+   - Enhance feeback  after a  =backup_import2.sh= operation towards  the source
+     server (clue found)
+   - Do something even better with log files.
    - Add an option to permit the check-certificat with is bypassed...
+
+** DONE
+   - [X] Enhance security and security configuration control
+   - [X] Do something better with log files.
+
