@@ -8,9 +8,11 @@
 #
 # Licence : GPL v3
 
-
+ME=$0
 #  (À INCLURE) Chemin fichiers inclus, auto-ajustement
-DIR=$(dirname $0) #Resolving path
+#DIR=$(dirname $(readlink -f $ME) ) #Resolving path
+\cd $(dirname $0); DIR=$PWD; \cd - >/dev/null;
+
 cd $DIR 2>/dev/null; export LIB_PATH=$PWD; cd - >/dev/null
 . $LIB_PATH/boot.sh
 

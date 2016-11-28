@@ -10,7 +10,8 @@
 
 #set -x
 #  (À INCLURE) Chemin fichiers inclus, auto-ajustement
-LIB_PATH=$(dirname $0)
+\cd $(dirname $0); LIB_PATH=$PWD; \cd - >/dev/null;
+
 . $LIB_PATH/boot.sh
 
 FALSE=0
