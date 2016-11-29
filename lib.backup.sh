@@ -634,7 +634,7 @@ function do_moveXferZone()
     fi
 #    checkSumFile "$BAK_DIR_PUB/$F"
     writeMetaData "$BAK_DIR_PUB/$F"
-    readMetaData "$BAK_DIR_PUB/$F".meta
+    readMetaDataOldWay "$BAK_DIR_PUB/$F".meta
     fileLogger "$ok $L_OFFER $buffer csum:$csumFile at $dateFile"
     return $EXIT_SUCCESS
 }
@@ -689,7 +689,6 @@ function readMetaData()
         echo "csum: " $csumFile
         echo "size: " $sizeFile
         echo "date: " $epochFile
-        unset META[0]; unset META[1]; unset META[2]
         echo "DATE: " $dateFile
     fi
     return $EXIT_SUCCESS
@@ -725,7 +724,6 @@ function readMetaDataOldWay()
         echo "csum: " $csumFile
         echo "size: " $sizeFile
         echo "date: " $epochFile
-        unset META[0]; unset META[1]; unset META[2]
         echo "DATE: " $dateFile
     fi
     return $EXIT_SUCCESS
