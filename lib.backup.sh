@@ -148,12 +148,16 @@ function __fm_trace()
         { i++}
         END{ printf("%d\n", log(i) / log(10) +1)}' "${BASH_SOURCE[0]}")
     [ "x$1" = "x" ] && iSkip=0 || iSkip=$1
-    error "Call stack:"
+    #error "Call stack:"
     for((i=$iSkip; i<${#BASH_LINENO[*]}; i++))
     do
         printf "%s: line %0"$iNbLines"d: call %s\n" "${BASH_SOURCE[$i]}" \
-            "${BASH_LINENO[$i]}"  ${FUNCNAME[$i]} 1>&2
-
+               "${BASH_LINENO[$i]}"  ${FUNCNAME[$i]} 2>&1
+        
+        if [ $i -gt 42 ]; then
+            echo "__fm_trace(): suicide"
+            exit 123
+        fi
     done
     return 0
 }
