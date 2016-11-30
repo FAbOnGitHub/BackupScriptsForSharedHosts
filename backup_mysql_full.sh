@@ -124,12 +124,13 @@ if [ $bDoCompressAll -eq 1 ]; then
 
 # 6 Move to xfer zone (option)
     do_moveXferZone "$f_current"
+    rc=$?
     rm -rf "$dir"
 fi
 
 ### Reporting
 taskReportStatus
-sReport="$_taskReportLabel DB saved (by $ME)"
+sReport="$_taskReportLabel DB saved "
 logStop "$sReport"
 reportByMail "$sReport" "$ME"
 exit $_iNbTaskErr
