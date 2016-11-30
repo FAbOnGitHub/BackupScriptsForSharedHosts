@@ -184,13 +184,14 @@ function logStart()
     sMsg="<<<<<<< $ME starting"
     fileLogger "$sMsg"
     DATE=$(date +"%Y%m%d-%H%M%S")
-    echo "$sMsg" >> $ERR_FILE
+    echo "$sMsg $DATE" >> $ERR_FILE
 }
 function logStop()
 {
     sMsg=">>>>>>> $ME stopping : $@"
     fileLogger "$sMsg"
-    echo "$sMsg" >> $ERR_FILE
+    DATE=$(date +"%Y%m%d-%H%M%S")
+    echo "$sMsg $DATE" >> $ERR_FILE
 }
 
 ##
