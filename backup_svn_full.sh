@@ -87,7 +87,9 @@ if [ $bDoCompressAll -eq 1 ]; then
     # $f_current est à jour
 
     do_moveXferZone "$f_current"
-    rm -rf "$dir"
+    rc=$?
+    taskAddAndStatus $rc
+    #rm -rf "$dir"
 fi
 
 ### Reporting
