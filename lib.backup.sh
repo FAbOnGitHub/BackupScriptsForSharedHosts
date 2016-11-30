@@ -228,7 +228,7 @@ function taskStatus()
 # Permits to do taskStatus withour declaring taskCount
 function taskAddAndStatus()
 {
-    taskCount()
+    taskCount
     taskStatus "$1"
 }
 
