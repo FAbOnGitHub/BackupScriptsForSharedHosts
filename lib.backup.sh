@@ -571,7 +571,8 @@ function do_cypher_gpg_a()
 {
     echo "$ME: WARNING ! No tested!"
     f="$1"
-    $sCypherProg  $sCypherArgs  $GPG_KEYFILE --yes  "$f" 2>&1 | tee -a $ERR_FILE
+    #$sCypherProg $sCypherArgs $GPG_KEYFILE --yes "$f" 2>&1 | tee -a $ERR_FILE
+    $sCypherProg $sCypherArgs $GPG_KEYFILE --yes "$f" 2> >(tee -a $ERR_FILE >&2)
     rc=$?
     [ $rc -eq 0 ] && echo "$f".gpg || echo ""
     return $rc
@@ -582,8 +583,10 @@ function do_cypher_gpg_s()
 {
     f="$1"
 
+#    $sCypherProg $sCypherArgs -q -c --passphrase "$GPG_PASSWD" \
+#                 --yes "$f"  2>&1 | tee -a $ERR_FILE
     $sCypherProg $sCypherArgs -q -c --passphrase "$GPG_PASSWD" \
-                 --yes "$f"  2>&1 | tee -a $ERR_FILE
+                 --yes "$f"  2> >(tee -a $ERR_FILE >&2)
     rc=$?
     [ $rc -eq 0 ] && echo "$f".gpg || echo ""
 
