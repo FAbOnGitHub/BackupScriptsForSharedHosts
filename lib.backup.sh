@@ -225,6 +225,12 @@ function taskStatus()
         taskErr
     fi
 }
+# Permits to do taskStatus withour declaring taskCount
+function taskAddAndStatus()
+{
+    taskCount()
+    taskStatus "$1"
+}
 
 function taskWarn()
 {

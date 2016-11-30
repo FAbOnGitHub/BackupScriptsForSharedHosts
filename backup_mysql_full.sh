@@ -125,7 +125,8 @@ if [ $bDoCompressAll -eq 1 ]; then
 # 6 Move to xfer zone (option)
     do_moveXferZone "$f_current"
     rc=$?
-    rm -rf "$dir"
+    taskAddAndStatus $rc
+    # rm -rf "$dir" # done by do_moveXferZone
 fi
 
 ### Reporting
