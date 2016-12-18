@@ -177,7 +177,7 @@ function update_distant_list()
 function archive_downloaded_file()
 {
     file="$1"
-    flts="$(date +"%Y%m%d-%H%M%S")-$file"
+    flts="$(LANG=C date +"%Y%m%d-%H%M%S")-$file"
     day="$(LANG=C date +"%u-%a")"
     new="$day-$file"
     mv "$BAK_DIR_CLI/$file" "$BAK_DIR_CLI/$new" 2>> $ERR_FILE
