@@ -180,6 +180,9 @@ function archive_downloaded_file()
     flts="$(LANG=C date +"%Y%m%d-%H%M%S")-$file"
     day="$(LANG=C date +"%u-%a")"
     new="$day-$file"
+
+    filelogger " bug-hunter : [day=$day][LANG=$LANG][LC_ALL=$LC_ALL][LC_TIME=$LC_TIME]"
+    
     mv "$BAK_DIR_CLI/$file" "$BAK_DIR_CLI/$new" 2>> $ERR_FILE
     rc=$?
     if [ $rc -eq $EXIT_SUCCESS ]; then
