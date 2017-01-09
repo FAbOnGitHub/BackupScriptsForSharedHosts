@@ -17,7 +17,11 @@ ME=$0
 
 
 #  (À INCLURE) Chemin fichiers inclus, auto-ajustement
+<<<<<<< HEAD
 LIB_PATH=$(dirname $0)
+=======
+LIB_PATH=$(dirname $(readlink -f $ME) )
+>>>>>>> ea55511b64ff2d7a19b1933d5e6e224d80e66a77
 export LIB_PATH
 . $LIB_PATH/boot.sh
 

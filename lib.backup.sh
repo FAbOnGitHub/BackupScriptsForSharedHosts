@@ -190,7 +190,11 @@ function logStop()
 {
     sMsg=">>>>>>> $ME stopping : $@"
     fileLogger "$sMsg"
+<<<<<<< HEAD
     echo "$sMsg" >> $ERR_FILE 
+=======
+    echo "$sMsg" >> $ERR_FILE
+>>>>>>> ea55511b64ff2d7a19b1933d5e6e224d80e66a77
 }
 
 ##
@@ -440,13 +444,21 @@ function do_compress()
         f_current="$src"
         return 0
     fi
+<<<<<<< HEAD
     rm -f "$arch"
+=======
+    rm -rf "$arch"
+>>>>>>> ea55511b64ff2d7a19b1933d5e6e224d80e66a77
     zip -qr9 -P $ZIP_PASSWD "$arch" "$src"  2>&1 | tee -a $ERR_FILE
     rc=$?
     if [ $rc -ne 0 ]; then
         fileLogger "$KO cmd zip failed rc=$rc"
     fi
+<<<<<<< HEAD
     rm -f "$src"
+=======
+    rm -rf "$src"
+>>>>>>> ea55511b64ff2d7a19b1933d5e6e224d80e66a77
 
     f_current="$arch"
     return $rc
@@ -634,7 +646,11 @@ function do_moveXferZone()
     fi
 #    checkSumFile "$BAK_DIR_PUB/$F"
     writeMetaData "$BAK_DIR_PUB/$F"
+<<<<<<< HEAD
     readMetaData "$BAK_DIR_PUB/$F".meta
+=======
+    readMetaDataOldWay "$BAK_DIR_PUB/$F".meta
+>>>>>>> ea55511b64ff2d7a19b1933d5e6e224d80e66a77
     fileLogger "$ok $L_OFFER $buffer csum:$csumFile at $dateFile"
     return $EXIT_SUCCESS
 }
@@ -689,12 +705,55 @@ function readMetaData()
         echo "csum: " $csumFile
         echo "size: " $sizeFile
         echo "date: " $epochFile
+<<<<<<< HEAD
         unset META[0]; unset META[1]; unset META[2]
+=======
+>>>>>>> ea55511b64ff2d7a19b1933d5e6e224d80e66a77
         echo "DATE: " $dateFile
     fi
     return $EXIT_SUCCESS
 }
 
+<<<<<<< HEAD
+=======
+##
+## Arg... with bash-3.2.25 mapfile is not available
+function readMetaDataOldWay()
+{
+    metafile="$1"
+    csumFile=
+    sizeFile=
+    epochFile=
+
+    if [ ! -f "$metafile" ]; then
+        error "readMetaData() file '$metafile' not found"
+        return $EXIT_FAILURE
+    fi
+
+    OLDIFS="$IFS"
+    IFS=$'\n'
+    META=( $(cat $metafile) ) # array
+    IFS=$OLDIFS
+
+    csumFile=${META[0]}
+    sizeFile=${META[1]}
+    epochFile=${META[2]}
+    unset META[0]; unset META[1]; unset META[2]
+    dateFile="${META[*]}"
+
+    if [ $DEBUG -eq 1 ]; then
+        echo "Metal = " ${META[*]}
+        echo "csum: " $csumFile
+        echo "size: " $sizeFile
+        echo "date: " $epochFile
+        echo "DATE: " $dateFile
+    fi
+    return $EXIT_SUCCESS
+}
+
+
+
+>>>>>>> ea55511b64ff2d7a19b1933d5e6e224d80e66a77
 ####
 #### Fonctions de vérifications du système de fichier
 ####
@@ -1086,4 +1145,7 @@ function wget_translate_error()
         echo ${aErrors[$1]}
     fi
 }
+<<<<<<< HEAD
 
+=======
+>>>>>>> ea55511b64ff2d7a19b1933d5e6e224d80e66a77
