@@ -10,12 +10,7 @@
 
 #set -x
 #  (À INCLURE) Chemin fichiers inclus, auto-ajustement
-<<<<<<< HEAD
-LIB_PATH=$(dirname $0)
-=======
-\cd $(dirname $0); LIB_PATH=$PWD; \cd - >/dev/null;
-
->>>>>>> ea55511b64ff2d7a19b1933d5e6e224d80e66a77
+\cd "$(dirname $0)"; LIB_PATH="$PWD"; \cd - >/dev/null;
 . $LIB_PATH/boot.sh
 
 FALSE=0
