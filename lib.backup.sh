@@ -451,30 +451,14 @@ function do_compress()
         f_current="$src"
         return 0
     fi
-<<<<<<< HEAD
     rm -rf "$arch"
-=======
-<<<<<<< HEAD
-    rm -f "$arch"
-=======
-    rm -rf "$arch"
->>>>>>> ea55511b64ff2d7a19b1933d5e6e224d80e66a77
->>>>>>> master
     zip -qr9 -P $ZIP_PASSWD "$arch" "$src"  2>&1 | tee -a $ERR_FILE
     rc=$?
     if [ $rc -ne 0 ]; then
         fileLogger "$KO cmd zip failed rc=$rc"
     fi
-<<<<<<< HEAD
-    rm -rf "$src"
-=======
-<<<<<<< HEAD
-    rm -f "$src"
-=======
-    rm -rf "$src"
->>>>>>> ea55511b64ff2d7a19b1933d5e6e224d80e66a77
->>>>>>> master
 
+    rm -rf "$src"
     f_current="$arch"
     return $rc
 }
@@ -664,15 +648,7 @@ function do_moveXferZone()
     fi
 #    checkSumFile "$BAK_DIR_PUB/$F"
     writeMetaData "$BAK_DIR_PUB/$F"
-<<<<<<< HEAD
     readMetaDataOldWay "$BAK_DIR_PUB/$F".meta
-=======
-<<<<<<< HEAD
-    readMetaData "$BAK_DIR_PUB/$F".meta
-=======
-    readMetaDataOldWay "$BAK_DIR_PUB/$F".meta
->>>>>>> ea55511b64ff2d7a19b1933d5e6e224d80e66a77
->>>>>>> master
     fileLogger "$ok $L_OFFER $buffer csum:$csumFile at $dateFile"
     return $EXIT_SUCCESS
 }
@@ -727,23 +703,12 @@ function readMetaData()
         echo "csum: " $csumFile
         echo "size: " $sizeFile
         echo "date: " $epochFile
-<<<<<<< HEAD
-=======
-<<<<<<< HEAD
         unset META[0]; unset META[1]; unset META[2]
-=======
->>>>>>> ea55511b64ff2d7a19b1933d5e6e224d80e66a77
->>>>>>> master
         echo "DATE: " $dateFile
     fi
     return $EXIT_SUCCESS
 }
 
-<<<<<<< HEAD
-=======
-<<<<<<< HEAD
-=======
->>>>>>> master
 ##
 ## Arg... with bash-3.2.25 mapfile is not available
 function readMetaDataOldWay()
@@ -781,10 +746,6 @@ function readMetaDataOldWay()
 
 
 
-<<<<<<< HEAD
-=======
->>>>>>> ea55511b64ff2d7a19b1933d5e6e224d80e66a77
->>>>>>> master
 ####
 #### Fonctions de vérifications du système de fichier
 ####
@@ -1176,10 +1137,3 @@ function wget_translate_error()
         echo ${aErrors[$1]}
     fi
 }
-<<<<<<< HEAD
-=======
-<<<<<<< HEAD
-
-=======
->>>>>>> ea55511b64ff2d7a19b1933d5e6e224d80e66a77
->>>>>>> master
