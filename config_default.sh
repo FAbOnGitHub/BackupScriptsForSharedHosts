@@ -96,6 +96,11 @@ LOG_FILE=$BAK_DIR/log.txt       # Journal
 ERR_FILE=$BAK_DIR/err.txt       # Journal des erreurs système
 #FR: Les logs devraient être de la forme $BAK_DIR/$(hostname -s).log.txt
 
+# Better : 
+LOG_FILE=$BAK_DIR_PUB/log.txt       # Journal
+ERR_FILE=$BAK_DIR_PUB/err.txt       # Journal des erreurs système
+
+
 
 ###############################################
 ## Server option

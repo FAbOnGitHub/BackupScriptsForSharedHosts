@@ -15,15 +15,10 @@ ME=$0
 #DEBUG=1
 #echo "1 [DEBUG=$DEBUG]"
 
-
 #  (À INCLURE) Chemin fichiers inclus, auto-ajustement
-<<<<<<< HEAD
-LIB_PATH=$(dirname $0)
-=======
-LIB_PATH=$(dirname $(readlink -f $ME) )
->>>>>>> ea55511b64ff2d7a19b1933d5e6e224d80e66a77
-export LIB_PATH
+\cd "$(dirname $0)"; LIB_PATH="$PWD"; \cd - >/dev/null;
 . $LIB_PATH/boot.sh
+
 
 function help()
 {

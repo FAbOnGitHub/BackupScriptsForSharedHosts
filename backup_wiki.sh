@@ -8,7 +8,6 @@
 #
 # Licence : GPL v3
 
-
 #  (À INCLURE) Chemin fichiers inclus, auto-ajustement
 \cd "$(dirname $0)"; LIB_PATH="$PWD"; \cd - >/dev/null;
 . $LIB_PATH/boot.sh

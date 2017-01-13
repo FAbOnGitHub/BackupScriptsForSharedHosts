@@ -23,6 +23,8 @@ VERSION=0.0.1
 ######################################################(FAb)###################
 
 ME=$0
+
+
 #  (À INCLURE) Chemin fichiers inclus, auto-ajustement
 \cd "$(dirname $0)"; LIB_PATH="$PWD"; \cd - >/dev/null;
 . $LIB_PATH/boot.sh
@@ -87,7 +89,9 @@ if [ $bDoCompressAll -eq 1 ]; then
     # $f_current est à jour
 
     do_moveXferZone "$f_current"
-    rm -rf "$dir"
+    rc=$?
+    taskAddAndStatus $rc
+    #rm -rf "$dir"
 fi
 
 ### Reporting
