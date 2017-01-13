@@ -9,11 +9,8 @@
 # Licence : GPL v3
 
 #  (À INCLURE) Chemin fichiers inclus, auto-ajustement
-\cd $(dirname $0); DIR=$PWD; \cd - >/dev/null;
- #Resolving path
-cd $DIR 2>/dev/null; export LIB_PATH=$PWD; cd - >/dev/null
+\cd "$(dirname $0)"; LIB_PATH="$PWD"; \cd - >/dev/null;
 . $LIB_PATH/boot.sh
-
 
 ARCHIVE_FILE=$BAK_DIR/wiki.tgz
 
