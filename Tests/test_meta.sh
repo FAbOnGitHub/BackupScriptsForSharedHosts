@@ -18,7 +18,6 @@ ME=$0
 #  (À INCLURE) Chemin fichiers inclus, auto-ajustement
 #Resolving path but in this script is in 'Tests'
 \cd $(dirname $0)/..; DIR=$PWD; \cd - >/dev/null;
-
 cd $DIR 2>/dev/null; export LIB_PATH=$PWD; cd - >/dev/null
 . $LIB_PATH/boot.sh
 
