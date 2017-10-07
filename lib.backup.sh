@@ -30,6 +30,7 @@ sCypherArgs=
 bUseMailWarning=1
 bMailCommandAvaible=1
 NOTIFY_SUBJECT="Errors occured, please inspect log='%LOG_FILE'"
+MAIL_FROM=
 ## Attention %LOG_FILE = template
 
 # $LOG_FILE n'est pas encore définie
@@ -306,9 +307,17 @@ function _notify_email()
         SUBJECT="[$PRJ]$1 (by $ME)"
     fi
 
+    if [ "x$MAIL_FROM" = "x" ]; then
+	mail_from_arg="-F $MAIL_FROM"
+    elif [ "x$NOTIFY_FROM" = "x" ]; then
+	mail_from_arg="-F $NOTIFY_FROM"
+    else
+	mail_from_arg=""
+    fi
 
+    
     if [ $bMailCommandAvaible -eq 1 ]; then
-        mail -s "$SUBJECT" $NOTIFY_TO
+        mail -s "$SUBJECT" $mail_from_arg $NOTIFY_TO
         rc=$?
     else
         echo "$KO *** mail not found : $NOTIFY_TO" >> $LOG_FILE
