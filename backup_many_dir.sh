@@ -55,7 +55,7 @@ do
 
     \cd "$basenane_d"
     rm -f "$ARCHIVE_FILE"  
-    tar zcf "$ARCHIVE_FILE" "$d"
+    tar zcf "$ARCHIVE_FILE" "$d" |grep -ve "^tar: Removing leading `/' from member names"
     rc=$?
     if [ $rc -eq 0 ]; then
         szArch="$(du --si -s $ARCHIVE_FILE | awk '{print $1}')"
