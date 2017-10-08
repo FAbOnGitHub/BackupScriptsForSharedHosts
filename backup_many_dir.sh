@@ -28,6 +28,9 @@ if [ "x$1" = "x-t" ]; then
     fileLogger "$ok test mode ${DIR_TO_BACKUP[*]}"
 fi
 
+ME=$(basename $0)
+me_log=$(mktemp /tmp/$ME_XXXXX)
+
 for d in ${DIR_TO_BACKUP[*]}
 do
     taskCount
@@ -55,7 +58,7 @@ do
 
     \cd "$basenane_d"
     rm -f "$ARCHIVE_FILE"  
-    tar zcf "$ARCHIVE_FILE" "$d" 2>&1 |grep -ve "^tar: Removing leading"
+    tar zcf "$ARCHIVE_FILE" "$d" 2>$me_log
     rc=$?
     if [ $rc -eq 0 ]; then
         szArch="$(du --si -s $ARCHIVE_FILE | awk '{print $1}')"
@@ -78,6 +81,7 @@ do
 done
 
 ### Reporting
+cat $me_log >>$LOG_FILE
 taskReportStatus
 sReport="$_taskReportLabel backup_many_dir"
 logStop "$sReport"
