@@ -24,6 +24,7 @@ fi
 bTestOnly=0
 if [ "x$1" = "x-t" ]; then
     bTestOnly=1
+    fileLogger "$ok test mode"
 fi
 
 for d in ${DIR_TO_BACKUP[*]}
