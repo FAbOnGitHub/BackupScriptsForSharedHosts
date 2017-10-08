@@ -47,7 +47,7 @@ do
     ARCHIVE_FILE="$BAK_DIR/${file_d}.tgz"
 
     if [ $bTestOnly -eq 1 ]; then
-        echo "$d -> $ARCHIVE_FILE in $BAK_DIR"
+        echo "$d -> $ARCHIVE_FILE"
         taskOk
         continue
     fi
