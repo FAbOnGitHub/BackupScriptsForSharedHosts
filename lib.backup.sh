@@ -457,8 +457,8 @@ function do_compress()
     if [ $rc -ne 0 ]; then
         fileLogger "$KO cmd zip failed rc=$rc"
     fi
-    rm -rf "$src"
 
+    rm -rf "$src"
     f_current="$arch"
     return $rc
 }
@@ -703,6 +703,7 @@ function readMetaData()
         echo "csum: " $csumFile
         echo "size: " $sizeFile
         echo "date: " $epochFile
+        unset META[0]; unset META[1]; unset META[2]
         echo "DATE: " $dateFile
     fi
     return $EXIT_SUCCESS

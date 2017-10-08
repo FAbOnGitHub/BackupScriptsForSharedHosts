@@ -24,12 +24,13 @@
 # Licence : GPL v3
 #
 ######################################################(FAb)###################
-ME=$0
-#  (À INCLURE) Chemin fichiers inclus, auto-ajustement
-\cd $(dirname $0); DIR=$PWD; \cd - >/dev/null;
-cd $DIR 2>/dev/null; export LIB_PATH=$PWD; cd - >/dev/null
 
+ME=$0
+
+#  (À INCLURE) Chemin fichiers inclus, auto-ajustement
+\cd "$(dirname $0)"; LIB_PATH="$PWD"; \cd - >/dev/null;
 . $LIB_PATH/boot.sh
+
 
 [ "x$MYSQL_USER" = "x" ] && die "$KO \$MYSQL_USER is empty"
 [ "x$MYSQL_PASS" = "x" ] && die "$KO \$MYSQL_PASS is empty"

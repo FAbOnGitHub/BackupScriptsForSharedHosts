@@ -64,15 +64,13 @@ msg=$msg"\nloading $LIB_PATH/config_default.sh"
 #  hostname varie... Donc je fixe un nom à config_priv comme
 #  privée
 export D_ETC="$(echo $LIB_PATH | sed -e "s@\/cgi-bin\$@\/cgi-etc@" )"
-
+if [ ! -d "$D_ETC" ]; then
+    die "boot.sh : cannot find D_ETC=\$D_ETC from \$LIB_PATH=$LIB_PATH"
+fi
 if [ "$D_ETC" = "$LIB_PATH" ]; then
     echo "boot.sh :  D_ETC=\$D_ETC and \$LIB_PATH are the same : '$D_ETC'"
     echo "boot.sh :  D_ETC must end with 'cgi-bin'. Fatal error."
     exit 666
-fi
-
-if [ ! -d "$D_ETC" ]; then
-    die "boot.sh : cannot find D_ETC=\$D_ETC from \$LIB_PATH=$LIB_PATH"
 fi
 
 #  Mais pour les machines des copains on peut encore redéfinir
