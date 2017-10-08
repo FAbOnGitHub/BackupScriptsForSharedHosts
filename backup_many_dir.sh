@@ -29,7 +29,7 @@ if [ "x$1" = "x-t" ]; then
 fi
 
 ME=$(basename $0)
-me_log=$(mktemp /tmp/$ME_XXXXX)
+me_log=$(mktemp /tmp/${ME}_XXXXXX)
 
 for d in ${DIR_TO_BACKUP[*]}
 do
