@@ -15,18 +15,6 @@ cd $DIR 2>/dev/null; export LIB_PATH=$PWD; cd - >/dev/null
 . $LIB_PATH/boot.sh
 
 
-
-
-if [ ! -f $BAK_DIR/.htaccess ]; then
-    fileLogger "$KO ERR: cannot find .htaccess in $BAK_DIR"
-    exit 1
-fi
-if [ -f $LOCK_FILE ]; then
-    fileLogger "$KO ERR missing lock file '$LOCK_FILE'... abort"
-    exit 1
-fi
-
-
 if [ ${#DIR_TO_BACKUP[*]} -lt 1 ]; then
     fileLogger "$KO empty DIR_TO_BACKUP ... abort"
     exit 1
