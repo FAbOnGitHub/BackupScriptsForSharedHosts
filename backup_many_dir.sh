@@ -15,8 +15,9 @@ cd $DIR 2>/dev/null; export LIB_PATH=$PWD; cd - >/dev/null
 . $LIB_PATH/boot.sh
 
 
-if [ ${#DIR_TO_BACKUP[*]} -lt 1 ]; then
-    fileLogger "$KO empty DIR_TO_BACKUP ... abort"
+let c=${#DIR_TO_BACKUP[*]}
+if [ $c -lt 1 ]; then
+    fileLogger "$KO empty DIR_TO_BACKUP (c=$c) ... abort"
     exit 1
     
 fi    
@@ -24,7 +25,7 @@ fi
 bTestOnly=0
 if [ "x$1" = "x-t" ]; then
     bTestOnly=1
-    fileLogger "$ok test mode"
+    fileLogger "$ok test mode ${DIR_TO_BACKUP[*]}"
 fi
 
 for d in ${DIR_TO_BACKUP[*]}
