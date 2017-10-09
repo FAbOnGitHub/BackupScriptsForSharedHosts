@@ -215,6 +215,14 @@ MYSQL_DB_EXCLUDE_PREFIX=	# reset
 
 
 
+#########################
+## backup_many_dir.sh
+#########################
+## Fill it with directory to backup
+# FR: sauvegarde totale des dossiers passés dans cette variable.
+#  (pas d'incrément)
+DIR_TO_BACKUP=""
+
 
 
 ###############################################
@@ -294,3 +302,5 @@ SQL_BASE2=base2		     	# Base SQL 2
 SQL_USER2=user2		     	# Login SQL 2
 SQL_PASSWD1=			# Mot de passe SQL 1
 SQL_PASSWD2=                  	# Mot de passe SQL 2
+
+
