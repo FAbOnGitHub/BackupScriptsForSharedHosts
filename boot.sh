@@ -93,7 +93,7 @@ else
     if [ ! -f "$f_host" ]; then
         echo "boot.sh : cannot find $f_priv (nor $f_host)" 2>&1
         # So no log files available
-        exit 666
+        exit 254 #666
     fi
 fi
 
