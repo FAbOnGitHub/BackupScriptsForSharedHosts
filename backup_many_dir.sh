@@ -14,6 +14,7 @@
 cd $DIR 2>/dev/null; export LIB_PATH=$PWD; cd - >/dev/null
 . $LIB_PATH/boot.sh
 
+JOB="Directory"
 
 let c=${#DIR_TO_BACKUP[*]}
 if [ $c -lt 1 ]; then
@@ -47,7 +48,7 @@ do
     hash_d=$(echo "$dirname_d"|sha1sum|cut -c-16)
     file_d="${hash_d}_${basename_d}"
     
-    ARCHIVE_FILE="$BAK_DIR/${hostname}.bnf.${file_d}.tgz"
+    ARCHIVE_FILE="$BAK_DIR/${hostname}.${JOB}.${file_d}.tgz"
 
     if [ $bTestOnly -eq 1 ]; then
         echo "$d -> $ARCHIVE_FILE"
