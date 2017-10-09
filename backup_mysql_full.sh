@@ -24,12 +24,13 @@
 # Licence : GPL v3
 #
 ######################################################(FAb)###################
-ME=$0
-#  (À INCLURE) Chemin fichiers inclus, auto-ajustement
-\cd $(dirname $0); DIR=$PWD; \cd - >/dev/null;
-cd $DIR 2>/dev/null; export LIB_PATH=$PWD; cd - >/dev/null
 
+ME=$0
+
+#  (À INCLURE) Chemin fichiers inclus, auto-ajustement
+\cd "$(dirname $0)"; LIB_PATH="$PWD"; \cd - >/dev/null;
 . $LIB_PATH/boot.sh
+
 
 [ "x$MYSQL_USER" = "x" ] && die "$KO \$MYSQL_USER is empty"
 [ "x$MYSQL_PASS" = "x" ] && die "$KO \$MYSQL_PASS is empty"
@@ -124,12 +125,14 @@ if [ $bDoCompressAll -eq 1 ]; then
 
 # 6 Move to xfer zone (option)
     do_moveXferZone "$f_current"
-    rm -rf "$dir"
+    rc=$?
+    taskAddAndStatus $rc
+    # rm -rf "$dir" # done by do_moveXferZone
 fi
 
 ### Reporting
 taskReportStatus
-sReport="$_taskReportLabel DB saved (by $ME)"
+sReport="$_taskReportLabel DB saved "
 logStop "$sReport"
 reportByMail "$sReport" "$ME"
 exit $_iNbTaskErr

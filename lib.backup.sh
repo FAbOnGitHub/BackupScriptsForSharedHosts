@@ -30,6 +30,7 @@ sCypherArgs=
 bUseMailWarning=1
 bMailCommandAvaible=1
 NOTIFY_SUBJECT="Errors occured, please inspect log='%LOG_FILE'"
+MAIL_FROM=
 ## Attention %LOG_FILE = template
 
 # $LOG_FILE n'est pas encore définie
@@ -148,12 +149,16 @@ function __fm_trace()
         { i++}
         END{ printf("%d\n", log(i) / log(10) +1)}' "${BASH_SOURCE[0]}")
     [ "x$1" = "x" ] && iSkip=0 || iSkip=$1
-    error "Call stack:"
+    #error "Call stack:"
     for((i=$iSkip; i<${#BASH_LINENO[*]}; i++))
     do
         printf "%s: line %0"$iNbLines"d: call %s\n" "${BASH_SOURCE[$i]}" \
-            "${BASH_LINENO[$i]}"  ${FUNCNAME[$i]} 1>&2
-
+               "${BASH_LINENO[$i]}"  ${FUNCNAME[$i]} 2>&1
+        
+        if [ $i -gt 42 ]; then
+            echo "__fm_trace(): suicide"
+            exit 123
+        fi
     done
     return 0
 }
@@ -184,13 +189,14 @@ function logStart()
     sMsg="<<<<<<< $ME starting"
     fileLogger "$sMsg"
     DATE=$(date +"%Y%m%d-%H%M%S")
-    echo "$sMsg" >> $ERR_FILE
+    echo "$sMsg $DATE" >> $ERR_FILE
 }
 function logStop()
 {
     sMsg=">>>>>>> $ME stopping : $@"
     fileLogger "$sMsg"
-    echo "$sMsg" >> $ERR_FILE
+    DATE=$(date +"%Y%m%d-%H%M%S")
+    echo "$sMsg $DATE" >> $ERR_FILE
 }
 
 ##
@@ -224,6 +230,12 @@ function taskStatus()
     else
         taskErr
     fi
+}
+# Permits to do taskStatus withour declaring taskCount
+function taskAddAndStatus()
+{
+    taskCount
+    taskStatus "$1"
 }
 
 function taskWarn()
@@ -295,9 +307,17 @@ function _notify_email()
         SUBJECT="[$PRJ]$1 (by $ME)"
     fi
 
+    if [ "x$MAIL_FROM" = "x" ]; then
+	mail_from_arg="-F $MAIL_FROM"
+    elif [ "x$NOTIFY_FROM" = "x" ]; then
+	mail_from_arg="-F $NOTIFY_FROM"
+    else
+	mail_from_arg=""
+    fi
 
+    
     if [ $bMailCommandAvaible -eq 1 ]; then
-        mail -s "$SUBJECT" $NOTIFY_TO
+        mail -s "$SUBJECT" $mail_from_arg $NOTIFY_TO
         rc=$?
     else
         echo "$KO *** mail not found : $NOTIFY_TO" >> $LOG_FILE
@@ -446,8 +466,8 @@ function do_compress()
     if [ $rc -ne 0 ]; then
         fileLogger "$KO cmd zip failed rc=$rc"
     fi
-    rm -rf "$src"
 
+    rm -rf "$src"
     f_current="$arch"
     return $rc
 }
@@ -565,7 +585,8 @@ function do_cypher_gpg_a()
 {
     echo "$ME: WARNING ! No tested!"
     f="$1"
-    $sCypherProg  $sCypherArgs  $GPG_KEYFILE --yes  "$f" 2>&1 | tee -a $ERR_FILE
+    #$sCypherProg $sCypherArgs $GPG_KEYFILE --yes "$f" 2>&1 | tee -a $ERR_FILE
+    $sCypherProg $sCypherArgs $GPG_KEYFILE --yes "$f" 2> >(tee -a $ERR_FILE >&2)
     rc=$?
     [ $rc -eq 0 ] && echo "$f".gpg || echo ""
     return $rc
@@ -576,8 +597,10 @@ function do_cypher_gpg_s()
 {
     f="$1"
 
+#    $sCypherProg $sCypherArgs -q -c --passphrase "$GPG_PASSWD" \
+#                 --yes "$f"  2>&1 | tee -a $ERR_FILE
     $sCypherProg $sCypherArgs -q -c --passphrase "$GPG_PASSWD" \
-                 --yes "$f"  2>&1 | tee -a $ERR_FILE
+                 --yes "$f"  2> >(tee -a $ERR_FILE >&2)
     rc=$?
     [ $rc -eq 0 ] && echo "$f".gpg || echo ""
 
@@ -689,6 +712,7 @@ function readMetaData()
         echo "csum: " $csumFile
         echo "size: " $sizeFile
         echo "date: " $epochFile
+        unset META[0]; unset META[1]; unset META[2]
         echo "DATE: " $dateFile
     fi
     return $EXIT_SUCCESS

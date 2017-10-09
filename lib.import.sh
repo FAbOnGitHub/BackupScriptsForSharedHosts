@@ -22,7 +22,7 @@ function wgetFile()
         rc_default=$EXIT_SUCCESS
         status="[-fake-]"
     fi
-    
+
     debug "wgetFile(\$1=$1, \$2=$2)"
     target="$1"
     [ "x$target" = "x" ] && return $rc_error
@@ -58,7 +58,7 @@ function wgetFile()
             try=$FALSE
         elif [ $bRequired -eq 0 ]; then
             status="$WARN"
-            sWgetMsg=":"$(wget_translate_error $rc )                        
+            sWgetMsg=":"$(wget_translate_error $rc )
             sWgetMsg="$sWgetMsg:optional file missing"
 	    rc=$rc_default
 	else
@@ -88,7 +88,7 @@ function check_downloaded_file()
     #     hasFailed
     #     return $EXIT_FAILURE
     # fi
-    
+
     wgetFile "$file.meta" 0
     rc=$?
     if [ $rc -ne $EXIT_SUCCESS ]; then
@@ -115,7 +115,7 @@ function check_downloaded_file()
             fileLogger "$ok _age $file is not too old :  $distTS"
         fi
     fi
-    
+
 
 
     #servCsum=`head -n 1 $BAK_DIR_CLI/$file.csum 2>> $ERR_FILE`
@@ -134,7 +134,7 @@ function check_downloaded_file()
         hasFailed
         debug "cksum error ($file)"
         SUCCESS=$FALSE
-        
+
         return $EXIT_FAILURE
     fi
 
@@ -178,8 +178,9 @@ function archive_downloaded_file()
 {
     file="$1"
     flts="$(date +"%Y%m%d-%H%M%S")-$file"
-    day="$(LANG=C date +"%u-%a")"
+    day="$(LANG=C LC_TIME=C date +"%u-%a")"
     new="$day-$file"
+  
     mv "$BAK_DIR_CLI/$file" "$BAK_DIR_CLI/$new" 2>> $ERR_FILE
     rc=$?
     if [ $rc -eq $EXIT_SUCCESS ]; then
@@ -187,7 +188,8 @@ function archive_downloaded_file()
     else
         status=$KO
     fi
-    fileLogger "$status $L_ARCH $new" 
+    sizeDir="$(du --si -s $BAK_DIR_CLI)"
+    fileLogger "$status $L_ARCH $new ($sizeDir)"
     debug "mv($rc)  $BAK_DIR_CLI/$file $BAK_DIR_CLI/$new"
     if [ "$day" = "$LTS_PATTERN" ]; then
         cp "$BAK_DIR_CLI/$new" "$LTS_DIR/$flts" 2>> $ERR_FILE
@@ -197,10 +199,10 @@ function archive_downloaded_file()
         else
             status=$KO
         fi
-        fileLogger "$status $L_LTS $LTS_DIR/$flts" 
+        sizeLtsDir="$(du --si -s $LTS_DIR)"
+        fileLogger "$status $L_LTS $LTS_DIR/$flts ($sizeLtsDir)"
 
         debug "cp($rc) $BAK_DIR_CLI/$new $LTS_DIR/$flts"
     fi
 
 }
-

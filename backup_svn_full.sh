@@ -21,10 +21,12 @@ VERSION=0.0.1
 # - $Date: 2015-04-14 21:52:57 +0200 (Tue, 14 Apr 2015) $
 #
 ######################################################(FAb)###################
+
 ME=$0
+
+
 #  (À INCLURE) Chemin fichiers inclus, auto-ajustement
-\cd $(dirname $0); DIR=$PWD; \cd - >/dev/null;  #Resolving path
-cd $DIR 2>/dev/null; export LIB_PATH=$PWD; cd - >/dev/null
+\cd "$(dirname $0)"; LIB_PATH="$PWD"; \cd - >/dev/null;
 . $LIB_PATH/boot.sh
 
 bDoCompress=${bDoCompress:-1}
@@ -87,7 +89,9 @@ if [ $bDoCompressAll -eq 1 ]; then
     # $f_current est à jour
 
     do_moveXferZone "$f_current"
-    rm -rf "$dir"
+    rc=$?
+    taskAddAndStatus $rc
+    #rm -rf "$dir"
 fi
 
 ### Reporting
