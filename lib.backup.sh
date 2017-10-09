@@ -1122,7 +1122,12 @@ function viewConfig()
     check_file $LOG_FILE "LOG_FILE"
     check_file $ERR_FILE "ERR_FILE"
 #    echo "[=]"
+    echo 
     echo "[DEBUG=$DEBUG]"
+    echo "[NOTIFY_TO=$NOTIFY_TO]"
+    echo "[NOTIFY_FROM=$NOTIFY_FROM]"
+    echo "[MAIL_FROM=$MAIL_FROM]"
+
 
 }
 
