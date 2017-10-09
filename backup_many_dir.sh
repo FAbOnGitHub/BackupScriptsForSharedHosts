@@ -82,7 +82,7 @@ do
 done
 
 ### Reporting
-cat $me_log >>$LOG_FILE
+
 taskReportStatus
 sReport="$_taskReportLabel backup_many_dir"
 logStop "$sReport"
