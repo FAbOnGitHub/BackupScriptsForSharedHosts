@@ -29,7 +29,7 @@ if [ "x$1" = "x-t" ]; then
 fi
 
 ME=$(basename $0)
-me_log=$(mktemp /tmp/${ME}_XXXXXX)
+#me_log=$(mktemp /tmp/${ME}_XXXXXX) #$ERR_FILE
 
 for d in ${DIR_TO_BACKUP[*]}
 do
@@ -58,7 +58,7 @@ do
 
     \cd "$basenane_d"
     rm -f "$ARCHIVE_FILE"  
-    tar zcf "$ARCHIVE_FILE" "$d" 2>$me_log
+    tar zcf "$ARCHIVE_FILE" "$d" 2>>$ERR_FILE
     rc=$?
     if [ $rc -eq 0 ]; then
         szArch="$(du --si -s $ARCHIVE_FILE | awk '{print $1}')"
