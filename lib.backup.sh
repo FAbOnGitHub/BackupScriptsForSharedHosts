@@ -307,9 +307,9 @@ function _notify_email()
         SUBJECT="[$PRJ]$1 (by $ME)"
     fi
 
-    if [ "x$MAIL_FROM" = "x" ]; then
+    if [ "x$MAIL_FROM" != "x" ]; then
 	mail_from_arg="-F $MAIL_FROM"
-    elif [ "x$NOTIFY_FROM" = "x" ]; then
+    elif [ "x$NOTIFY_FROM" != "x" ]; then
 	mail_from_arg="-F $NOTIFY_FROM"
     else
 	mail_from_arg=""
