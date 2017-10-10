@@ -308,9 +308,9 @@ function _notify_email()
     fi
 
     if [ "x$MAIL_FROM" != "x" ]; then
-	mail_from_arg="-F $MAIL_FROM"
+	mail_from_arg="-r $MAIL_FROM"
     elif [ "x$NOTIFY_FROM" != "x" ]; then
-	mail_from_arg="-F $NOTIFY_FROM"
+	mail_from_arg="-r $NOTIFY_FROM"
     else
 	mail_from_arg=""
     fi

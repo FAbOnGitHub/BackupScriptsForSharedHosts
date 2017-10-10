@@ -56,6 +56,9 @@ do
     let iNbTargetOk++
 done
 
+fileLogger "[NOTIFY_TO=$NOTIFY_TO][NOTIFY_FROM=$NOTIFY_FROM][MAIL_FROM=$MAIL_FROM]"
+
+
 # Conclusion ##################################################################
 #   Now distant log files must be passed in BAK_FILES
 
