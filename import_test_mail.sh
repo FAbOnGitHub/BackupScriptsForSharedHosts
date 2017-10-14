@@ -24,13 +24,17 @@ TRUE=1
 #set -x
 DATE=$(date +"%Y%m%d-%H%M%S")
 GENERAL_SUCCESS=$EXIT_SUCCESS
-
 let maxTime=3600*28
 
 TASK_NAME=${TASK_NAME:-"OutThere"}
 
 ## URL à afficher dans log, sans le mot de passe
 LOG_URL="$(echo "$BAK_URL"|cut -d'@' -f2-)"
+
+message=""
+if [ $# -gt 0  ]; then
+    message="$@"
+fi
 
 # test
 update_distant_list
@@ -66,5 +70,5 @@ fileLogger "[NOTIFY_TO=$NOTIFY_TO][NOTIFY_FROM=$NOTIFY_FROM][MAIL_FROM=$MAIL_FRO
 taskReportStatus
 sReport="$_taskReportLabel test import"
 logStop "$sReport"
-reportByMail "$sReport" "$ME"
+reportByMail "$sReport $message" "$ME"
 exit $_iNbTaskErr
