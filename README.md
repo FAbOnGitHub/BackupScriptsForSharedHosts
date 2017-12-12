@@ -1,6 +1,6 @@
 
 
-# BackupScriptsForSharedHosts  # ;-\*- mode: org -\*-
+# BackupScriptsForSharedHosts  # ;-**- mode: org -**-
 
 *(French version below)*
 
@@ -18,15 +18,18 @@ contribute to it.
 
 On July, 2016 the project migrated to GitHub (losing subversion history).
 
+Christmas 2017, some plugin have been added in an annex project.
+
 
 ### General : how it works :
 
 When you need to  backup a server `HOST A` (where you're  not root), you can
-use the scripts which starts which  `backup_` via a crontab. Then they build
+use the scripts  which start which `backup_` via a  crontab. Then they build
 archives and put them in a pseudo public area.
 
 In a second time, another machine `HOST B` can connect to this pseudo public
-aera in HTTP(s) and retrieve those archives : see `import_backup2.sh` 
+aera in HTTP(s)  and retrieve those archives :  see `import_backup2.sh`. You
+can have a relative trustness in the local admin as the archives are cyphered
 
 ![img](Docs/b4sh_schema.png)
 
