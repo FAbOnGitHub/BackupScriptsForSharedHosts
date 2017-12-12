@@ -189,14 +189,14 @@ function report_disk_space()
     export $(dfc -H $PWD \
                  | awk '/^\// {printf( "disk=%s size=%s ppc=%s mp=%s\n", $1, $4, $5, $6) }')
 
-    msg=" avaible space on $disk is $size ($ppc)"
+    sMsg=" available space on $disk is $size ($ppc)"
     let iPPC=${ppc//%/}
     if [ $iPPC -ge $iMax ]; then
         taskWarn
-        fileLogger " limit $iMax reached : $smg"
+        fileLogger "$warn limit $iMax reached : $sMsg"
     else
         taskOk
-        fileLogger " $smg"
+        fileLogger "$ok $sMsg"
     fi
 }
 
