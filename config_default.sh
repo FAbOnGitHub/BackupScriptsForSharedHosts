@@ -101,6 +101,10 @@ LOG_FILE=$BAK_DIR_PUB/log.txt       # Journal
 ERR_FILE=$BAK_DIR_PUB/err.txt       # Journal des erreurs système
 
 
+# Warning if this limit is overhelm
+DISK_USAGE_WARNING=80
+#FR: limite à partir de laquelle un warning est émis sur l'espace disponible
+
 
 ###############################################
 ## Server option
