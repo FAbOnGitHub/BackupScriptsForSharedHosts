@@ -170,6 +170,37 @@ function __fm_error()
 
 
 
+function report_disk_space()
+{
+    dir="$1"
+    max="$2"
+    if [ "x$1" = "x" ]; then
+        dir="$PWD"
+    fi
+    if [ "x$max" != "x" ]; then
+        let iMax=${max//%/}  # Remove %
+    elif [ "x$DISK_USAGE_WARNING" != "x" ]; then
+        let iMax=$DISK_USAGE_WARNING
+    else
+        let iMax=80
+    fi
+
+    taskCount
+    export $(dfc -H $PWD \
+                 | awk '/^\// {printf( "disk=%s size=%s ppc=%s mp=%s\n", $1, $4, $5, $6) }')
+
+    sMsg=" available space on $disk is $size ($ppc)"
+    let iPPC=${ppc//%/}
+    if [ $iPPC -ge $iMax ]; then
+        taskWarn
+        fileLogger "$warn limit $iMax reached : $sMsg"
+    else
+        taskOk
+        fileLogger "$ok $sMsg"
+    fi
+}
+
+
 # Formate le message de debut et le pousse dans le fichier
 function fileLogger()
 {
@@ -245,6 +276,8 @@ function taskWarn()
 function taskReportStatus()
 {
     local status
+    report_disk_space
+    
     taskReportCounters
     let _iNbTaskTotal=$_iNbTaskOk+$_iNbTaskErr+$_iNbTaskWarn
     if [ $_iNbTaskTotal -ne $_iNbTaskCount ]; then
@@ -1070,6 +1103,7 @@ function check_local_server_variables()
     fi
 
 }
+
 
 function check_client_variables()
 {
