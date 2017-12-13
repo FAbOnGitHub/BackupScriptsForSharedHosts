@@ -186,7 +186,7 @@ function report_disk_space()
     fi
 
     taskCount
-    export $(dfc -H $PWD \
+    export $(dfc -H $dir \
                  | awk '/^\// {printf( "disk=%s size=%s ppc=%s mp=%s\n", $1, $4, $5, $6) }')
 
     sMsg=" available space on $disk is $size ($ppc)"
@@ -276,7 +276,14 @@ function taskWarn()
 function taskReportStatus()
 {
     local status
-    report_disk_space
+    
+    report_disk_space $BAK_DIR
+    if [ "x$BAK_DIR_CLI" != "x" ]; then
+        if [ "$BAK_DIR_CLI" != "$BAK_DIR" ]; then
+            report_disk_space $BAK_DIR_CLI
+        fi
+    fi
+
     
     taskReportCounters
     let _iNbTaskTotal=$_iNbTaskOk+$_iNbTaskErr+$_iNbTaskWarn
