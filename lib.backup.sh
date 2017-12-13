@@ -174,6 +174,7 @@ function report_disk_space()
 {
     dir="$1"
     max="$2"
+    comment="$3"
     if [ "x$1" = "x" ]; then
         dir="$PWD"
     fi
@@ -186,14 +187,14 @@ function report_disk_space()
     fi
 
     taskCount
-    export $(dfc -H $PWD \
+    export $(df -H $dir \
                  | awk '/^\// {printf( "disk=%s size=%s ppc=%s mp=%s\n", $1, $4, $5, $6) }')
 
-    sMsg=" available space on $disk is $size ($ppc)"
+    sMsg=" available space on $disk is $size ($ppc, limit is $iMax) $comment"
     let iPPC=${ppc//%/}
     if [ $iPPC -ge $iMax ]; then
         taskWarn
-        fileLogger "$warn limit $iMax reached : $sMsg"
+        fileLogger "$warn limit reached : $sMsg"
     else
         taskOk
         fileLogger "$ok $sMsg"
@@ -276,7 +277,12 @@ function taskWarn()
 function taskReportStatus()
 {
     local status
-    report_disk_space
+
+    if [ $sModeCV = "SRV" ]; then
+        report_disk_space $BAK_DIR $DISK_USAGE_WARNING "BAK_DIR=$BAK_DIR"
+    else
+        report_disk_space $BAK_DIR_CLI $DISK_USAGE_WARNING "BAK_DIR_CLI=$BAK_DIR_CLI"
+    fi
     
     taskReportCounters
     let _iNbTaskTotal=$_iNbTaskOk+$_iNbTaskErr+$_iNbTaskWarn
