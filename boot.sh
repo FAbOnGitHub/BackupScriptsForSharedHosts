@@ -139,6 +139,20 @@ case $ME in
         fi
         ;;
 esac
+
+if [ "x$1" = "x-f" ]; then
+    if [ "x$2" != "x" ]; then
+        if [ ! -f "$2" ]; then
+            error "Cannot find additionnal config file $2"
+        else
+            msg=$msg"\nloading config $2"
+            . "$2"
+        fi
+    else
+        error "Missing argument for config file"
+    fi
+fi
+
 debug "$msg"
 
  if  [ "$ME" != "fix_fs.sh" ]; then
