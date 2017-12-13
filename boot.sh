@@ -115,13 +115,15 @@ check_local_server_variables
 #  possibilité de configuration par le fichier ci-dessous.
 #  FAb: sur mon serveur les BD sont différents donc ces 2 sortent de scripts
 #  doivent pouvoir utiliser des jeux différents de données.
-#
+#  sMode = CLI (client)  ou SRV (server)
 ME=$(basename $0)
 case $ME in
     backup_*)
         msg=$msg"\nLocal script skip bonus"
+        sModeCV='SRV'
         ;;
     *)
+        sModeCV='CLI'
         msg=$msg"\nDist script... bonus !"
         cfg_dist="$D_ETC/config_${hostname}_dist.sh"
         #echo "cfg_dist=$cfg_dist"

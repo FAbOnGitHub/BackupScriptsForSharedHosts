@@ -277,14 +277,12 @@ function taskWarn()
 function taskReportStatus()
 {
     local status
-    
-    report_disk_space $BAK_DIR $DISK_USAGE_WARNING "BAK_DIR=$BAK_DIR"
-    if [ "x$BAK_DIR_CLI" != "x" ]; then
-        if [ "$BAK_DIR_CLI" != "$BAK_DIR" ]; then
-            report_disk_space $BAK_DIR_CLI $DISK_USAGE_WARNING "BAK_DIR_CLI=$BAK_DIR_CLI"
-        fi
-    fi
 
+    if [ $sModeCV = "SRV" ]; then
+        report_disk_space $BAK_DIR $DISK_USAGE_WARNING "BAK_DIR=$BAK_DIR"
+    else
+        report_disk_space $BAK_DIR_CLI $DISK_USAGE_WARNING "BAK_DIR_CLI=$BAK_DIR_CLI"
+    fi
     
     taskReportCounters
     let _iNbTaskTotal=$_iNbTaskOk+$_iNbTaskErr+$_iNbTaskWarn
