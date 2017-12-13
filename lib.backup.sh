@@ -186,7 +186,7 @@ function report_disk_space()
     fi
 
     taskCount
-    export $(dfc -H $dir \
+    export $(df -H $dir \
                  | awk '/^\// {printf( "disk=%s size=%s ppc=%s mp=%s\n", $1, $4, $5, $6) }')
 
     sMsg=" available space on $disk is $size ($ppc)"
