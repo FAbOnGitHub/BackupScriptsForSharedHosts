@@ -1,4 +1,4 @@
- lib.backup.sh
+# lib.backup.sh
 #   ex general.sh
 #  - initial author : meo
 #  - main dev : FAb
