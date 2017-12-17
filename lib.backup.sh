@@ -190,6 +190,14 @@ function report_disk_space()
     export $(df -H $dir \
                  | awk '/^\// {printf( "disk=%s size=%s ppc=%s mp=%s\n", $1, $4, $5, $6) }')
 
+    if [ "x$disk" = "" ]; then
+        # df: Warning: cannot read table of mounted file systems: No such file or directory
+        # Filesystem      Size  Used Avail Use% Mounted on
+        # -                18T  4,9T   13T  29% /home/user123
+        export $(df -H $dir \
+                     | awk '/^-/ {printf( "disk=%s size=%s ppc=%s mp=%s\n", $1, $4, $5, $6) }')
+    fi
+    
     sMsg=" available space on $disk is $size ($ppc, limit is $iMax) $comment"
     let iPPC=${ppc//%/}
     if [ $iPPC -ge $iMax ]; then
