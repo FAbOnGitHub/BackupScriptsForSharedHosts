@@ -202,7 +202,7 @@ function report_disk_space()
     if [ "x$disk" = "" ]; then
         taskErr
         fileLogger "$KO 'df' error -- $sMsg"
-
+        return $EXIT_FAILURE
     fi
     
     sMsg=" available space on $disk is $size ($ppc, limit is $iMax) $comment"
