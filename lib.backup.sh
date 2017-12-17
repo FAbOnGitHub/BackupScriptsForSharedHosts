@@ -187,24 +187,24 @@ function report_disk_space()
     fi
 
     taskCount
-    export $(df -PH $dir 2>/dev/null \
-                 | awk '/^\// {printf( "disk=%s size=%s ppc=%s mp=%s\n", $1, $4, $5, $6) }' \
-                 2>/dev/null)
-           
-    if [ "x$disk" = "" ]; then
+    buffer1="$(df -PH $dir 2>/dev/null |grep '^/')"
+    buffer2="$(df -PH $dir 2>/dev/null |grep '^-')"
+    if [ "x$buffer1" != "x" ]; then  
+        export $(df -PH $dir 2>/dev/null \
+                     | awk '/^\// {printf( "disk=%s size=%s ppc=%s mp=%s\n", $1, $4, $5, $6) }' \
+                           2>/dev/null)
+    elif [ "x$buffer2" != "x" ]; then
         # df: Warning: cannot read table of mounted file systems: No such file or directory
         # Filesystem      Size  Used Avail Use% Mounted on
         # -                18T  4,9T   13T  29% /home/user123
         export $(df -PH $dir 2>/dev/null \
                      | awk '/^-/ {printf( "disk=%s size=%s ppc=%s mp=%s\n", $1, $4, $5, $6) }' \
-                 2>/dev/null)
-    fi
-    if [ "x$disk" = "x" ]; then
+                           2>/dev/null)
+    else
         taskErr
         fileLogger "$KO 'df' error -- $sMsg"
         return $EXIT_FAILURE
     fi
-
     
     sMsg=" available space on $disk is $size ($ppc, limit is $iMax) $comment"
     let iPPC=${ppc//%/}
