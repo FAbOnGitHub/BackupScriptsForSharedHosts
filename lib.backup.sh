@@ -1,4 +1,4 @@
-# lib.backup.sh
+ lib.backup.sh
 #   ex general.sh
 #  - initial author : meo
 #  - main dev : FAb
@@ -194,7 +194,7 @@ function report_disk_space()
         # df: Warning: cannot read table of mounted file systems: No such file or directory
         # Filesystem      Size  Used Avail Use% Mounted on
         # -                18T  4,9T   13T  29% /home/user123
-        export $(df -H $dir \
+        export $(df -PH $dir \
                      | awk '/^-/ {printf( "disk=%s size=%s ppc=%s mp=%s\n", $1, $4, $5, $6) }')
     fi
     
