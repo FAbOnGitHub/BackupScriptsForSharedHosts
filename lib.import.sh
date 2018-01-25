@@ -229,7 +229,7 @@ function checkDistantLogs()
     grepDate="$2"
 
     taskCount
-    if [ -f "$file" ]; then
+    if [ ! -f "$file" ]; then
         taskErr        
         fileLogger "$KO checkDistantLogs no such file '$file'"
         return $EXIT_FAILURE
