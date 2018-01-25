@@ -229,10 +229,17 @@ function checkDistantLogs()
     grepDate="$2"
 
     taskCount
+    if [ -f "$file" ]; then
+        taskErr        
+        fileLogger "$KO checkDistantLogs no such file '$file'"
+        return $EXIT_FAILURE
+    fi
+
+    
     buffer="$(grep -e "grepDate" "$file" | grep -e "$KO" -e "$WARN" -e "$ERRO")"
     if [ "x$buffer" = "x" ]; then
         taskOk
-        fileLogger "$OK log analysis '$file': no error detected"
+        fileLogger "$ok log analysis '$file': no error detected"
     else
         taskErr
         if [ $bLogCheckUsesMail -eq 1 ]; then

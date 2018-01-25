@@ -98,8 +98,8 @@ for raw_file in ${BAK_FILES[*]}; do
 
     case $file in
         log.txt|err.txt)
-            d="$(date "+%Y-%m-%d")"
-            checkDistantLogs "$file" "$d"
+            dpattern="$(date "+%Y-%m-%d")"
+            checkDistantLogs "$BAK_DIR_CLI/$file" "$dpattern"
             bSkipCS=1
             SUCCESS=$EXIT_SUCCESS
             ;;
