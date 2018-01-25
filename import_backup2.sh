@@ -97,6 +97,12 @@ for raw_file in ${BAK_FILES[*]}; do
     let iNbTargetOk++
 
     case $file in
+        log.txt|err.txt)
+            d="$(date "+%Y-%m-%d")"
+            checkDistantLogs "$file" "$d"
+            bSkipCS=1
+            SUCCESS=$EXIT_SUCCESS
+            ;;
         *.txt)
             bSkipCS=1
             SUCCESS=$EXIT_SUCCESS
