@@ -40,6 +40,7 @@ L_OFFER="_OFFER____"
 L_MAIL="_MAIL_____"
 L_ARCH="_ARCH_____"
 L_LTS="_ARCH+LTS_"
+L_PARSELOG="_SCAN_LOG_"
 export L_DUMP L_COMPRESS L_CYPHER L_OFFER
 
 ### Variables:

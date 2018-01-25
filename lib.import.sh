@@ -225,8 +225,8 @@ function checkDistantLogs()
         return $EXIT_FAILURE
     fi
 
-    file="$1"
-    grepDate="$2"
+    local file="$1"
+    local grepDate="$2"
 
     taskCount
     if [ ! -f "$file" ]; then
@@ -239,7 +239,7 @@ function checkDistantLogs()
     buffer="$(grep -e "grepDate" "$file" | grep -e "$KO" -e "$WARN" -e "$ERRO")"
     if [ "x$buffer" = "x" ]; then
         taskOk
-        fileLogger "$ok log analysis '$file': no error detected"
+        fileLogger "$ok $L_PARSELOG log analysis '$file': no error detected"
     else
         taskErr
         if [ $bLogCheckUsesMail -eq 1 ]; then
