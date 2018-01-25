@@ -135,7 +135,6 @@ case $ME in
             check_client_variables
 
             . $LIB_PATH/lib.import.sh
-            
         else
             msg=$msg"\nno '$cfg_dist' found"
         fi

@@ -24,7 +24,8 @@ TRUE=1
 DATE=$(date +"%Y%m%d-%H%M%S")
 GENERAL_SUCCESS=$EXIT_SUCCESS
 
-let maxTime=3600*28
+# Délai de validité d'une archive téléchargée
+#let maxTime=3600*28
 
 
 # Normalement le client n'est pas obligé d'avoir la même arborescence que le

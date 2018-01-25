@@ -291,6 +291,11 @@ bUseDistantBakFile=1
 sDistantBakFilename="Please_backup.lst"
 #FR: Fichier contenant la liste des archives supplémentaires à récupérer
 
+# Max hours for validity
+iMaxHoursValidity=23
+#FR: Nombre d'heure maximales pour accepter une archive téléchagée
+
+
 #########################
 ## backup_sql.sh
 #########################

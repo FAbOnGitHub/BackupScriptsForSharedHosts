@@ -7,6 +7,9 @@
 # Licence  GPL v3
 
 
+# Délai de validité d'une archive téléchargée
+let maxTime=3600*$iMaxHoursValidity
+
 let rc_default=999
 let rc_error=666
 ###
@@ -108,7 +111,7 @@ function check_downloaded_file()
         dateDiff -s "@""$nowTS" "@""$epochFile"
         delta=$dateDelta
         if [ $delta -gt $maxTime ]; then
-            sMsg="$KO  $file too old (delta=$delta > max=$maxTime) $distTS"
+            sMsg="$KO  $file too old (delta=$delta > max=$maxTime (${iMaxHoursValidity}h)) $distTS"
             error $sMsg
             fileLogger $sMsg
         else

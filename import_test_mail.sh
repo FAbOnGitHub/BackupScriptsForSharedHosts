@@ -24,7 +24,7 @@ TRUE=1
 #set -x
 DATE=$(date +"%Y%m%d-%H%M%S")
 GENERAL_SUCCESS=$EXIT_SUCCESS
-let maxTime=3600*28
+#let maxTime=3600*28 # See lib.import.sh
 
 TASK_NAME=${TASK_NAME:-"OutThere"}
 
