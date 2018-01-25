@@ -295,6 +295,10 @@ sDistantBakFilename="Please_backup.lst"
 iMaxHoursValidity=23
 #FR: Nombre d'heure maximales pour accepter une archive téléchagée
 
+# Max hours for validity
+bLogCheckUsesMail=1
+#FR: Nombre d'heure maximales pour accepter une archive téléchagée
+
 
 #########################
 ## backup_sql.sh

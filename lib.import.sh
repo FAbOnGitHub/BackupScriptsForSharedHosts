@@ -183,7 +183,7 @@ function archive_downloaded_file()
     flts="$(date +"%Y%m%d-%H%M%S")-$file"
     day="$(LANG=C LC_TIME=C date +"%u-%a")"
     new="$day-$file"
-  
+
     mv "$BAK_DIR_CLI/$file" "$BAK_DIR_CLI/$new" 2>> $ERR_FILE
     rc=$?
     if [ $rc -eq $EXIT_SUCCESS ]; then
@@ -208,4 +208,38 @@ function archive_downloaded_file()
         debug "cp($rc) $BAK_DIR_CLI/$new $LTS_DIR/$flts"
     fi
 
+}
+
+###
+# checkDistantLogs : vérifier dans le fichier s'il y a des erreurs ou warnings
+# $1 : le fichier à contrôler
+# $2 : date de filtre grep
+function checkDistantLogs()
+{
+    if [ "x$1" = "x" ]; then
+        error "checkDistantLogs missing filename"
+        return $EXIT_FAILURE
+    fi
+    if [ "x$2" = "x" ]; then
+        error "checkDistantLogs missing date filter"
+        return $EXIT_FAILURE
+    fi
+
+    file="$1"
+    grepDate="$2"
+
+    taskCount
+    buffer="$(grep -e "grepDate" "$file" | grep -e "$KO" -e "$WARN" -e "$ERRO")"
+    if [ "x$buffer" = "x" ]; then
+        taskOk
+        fileLogger "$OK log analysis '$file': no error detected"
+    else
+        taskErr
+        if [ $bLogCheckUsesMail -eq 1 ]; then
+            grep "$grepDate" "$file" | notify_email_stdin "log form distant server"
+            fileLogger "$WARN log analysis '$file': something went wrong. Mail sent"
+        else
+            fileLogger "$WARN log analysis '$file': something went wrong. No mail"
+        fi
+    fi
 }
