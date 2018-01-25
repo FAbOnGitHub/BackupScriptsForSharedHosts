@@ -236,10 +236,10 @@ function checkDistantLogs()
     fi
 
     
-    buffer="$(grep -e "grepDate" "$file" | grep -F -e "$KO" -e "$WARN" -e "$ERRO")"
+    buffer="$(grep -e "$grepDate" "$file" | grep -F -e "$KO" -e "$WARN" -e "$ERRO")"
     if [ "x$buffer" = "x" ]; then
         taskOk
-        fileLogger "$ok $L_PARSELOG log analysis '$file': no error detected"
+        fileLogger "$ok $L_PARSELOG log analysis '$file': no error detected ($grepDate)"
     else
         taskErr
         nb="$(echo "$buffer"|wc -l)|awk '{print $1}'"
