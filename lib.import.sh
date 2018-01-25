@@ -236,17 +236,19 @@ function checkDistantLogs()
     fi
 
     
-    buffer="$(grep -e "grepDate" "$file" | grep -e "$KO" -e "$WARN" -e "$ERRO")"
+    buffer="$(grep -e "grepDate" "$file" | grep -F "$KO" -F "$WARN" -F "$ERRO")"
     if [ "x$buffer" = "x" ]; then
         taskOk
         fileLogger "$ok $L_PARSELOG log analysis '$file': no error detected"
     else
         taskErr
+        nb="$(echo "$buffer"|wc -l)|awk '{print $1}'"
+        sMsg="$WARN log analysis '$file': something went wrong ($nb lines)."
         if [ $bLogCheckUsesMail -eq 1 ]; then
             grep "$grepDate" "$file" | notify_email_stdin "log form distant server"
-            fileLogger "$WARN log analysis '$file': something went wrong. Mail sent"
+            fileLogger "${sMsg} Mail sent"
         else
-            fileLogger "$WARN log analysis '$file': something went wrong. No mail"
+            fileLogger "${sMsg}"
         fi
     fi
 }
