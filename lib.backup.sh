@@ -189,6 +189,7 @@ function report_disk_space()
     taskCount
     buffer1="$(df -PH $dir 2>/dev/null |grep '^/')"
     buffer2="$(df -PH $dir 2>/dev/null |grep '^-')"
+    buffer3="$(df -P $(stat -c '%m' $dir 2>/dev/null) )"
     if [ "x$buffer1" != "x" ]; then  
         export $(df -PH $dir 2>/dev/null \
                      | awk '/^\// {printf( "disk=%s size=%s ppc=%s mp=%s\n", $1, $4, $5, $6) }' \
@@ -200,15 +201,22 @@ function report_disk_space()
         export $(df -PH $dir 2>/dev/null \
                      | awk '/^-/ {printf( "disk=%s size=%s ppc=%s mp=%s\n", $1, $4, $5, $6) }' \
                            2>/dev/null)
+    elif [ "x$buffer3" != "x" ]; then
+        taskErr
+        fileLogger "$WARN 'df' error. Please consider usage of stat -c %m"
+        return $EXIT_FAILURE
     else
         taskErr
-        fileLogger "$KO 'df' error -- $sMsg"
+        fileLogger "$WARN 'df' error -- dir='$dir'"
         return $EXIT_FAILURE
     fi
     
     sMsg=" available space on $disk is $size ($ppc, limit is $iMax) $comment"
     let iPPC=${ppc//%/}
-    if [ $iPPC -ge $iMax ]; then
+    if [ $iPPC -eq 100 ]; then
+        taskErr
+        fileLogger "$KO Disk full!! : $sMsg"
+    elif [ $iPPC -ge $iMax ]; then
         taskWarn
         fileLogger "$warn limit reached : $sMsg"
     else
