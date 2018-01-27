@@ -47,6 +47,14 @@ sDistantBakFilename="Please_backup.lst"
 
 DEBUG=${DEBUG:-0}
 
+let _iNbTaskCount=0
+let _iNbTaskOk=0
+let _iNbTaskErr=0
+let _iNbTaskWarn=0
+export _iNbTaskCount _iNbTaskOk _iNbTaskErr _iNbTaskWarn
+
+
+
 ###
 # Functions
 
