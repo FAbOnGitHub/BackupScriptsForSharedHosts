@@ -32,7 +32,8 @@ VERBOSE=${VERBOSE:-0}
 export ok KO NTFOUND INFO WARN t2 t3 t4
 export DEBUG VERBOSE
 
-# Labels :
+# Labels for tasks :
+L_WGET="_WGET_____"
 L_DUMP="_DUMP_____"
 L_COMPRESS="_COMPRESS_"
 L_CYPHER="_CYPHER___"
@@ -41,7 +42,10 @@ L_MAIL="_MAIL_____"
 L_ARCH="_ARCH_____"
 L_LTS="_ARCH+LTS_"
 L_PARSELOG="_SCAN_LOG_"
-export L_DUMP L_COMPRESS L_CYPHER L_OFFER
+export L_WGET L_DUMP L_COMPRESS L_CYPHER L_OFFER L_MAIL L_ARCH L_LTS
+
+BUG_IGNORE=1
+BUG_REPORT=2
 
 ### Variables:
 # BAK_DIR     :	dossier où sont fabriquées les archives

@@ -101,10 +101,20 @@ LOG_FILE=$BAK_DIR_PUB/log.txt       # Journal
 ERR_FILE=$BAK_DIR_PUB/err.txt       # Journal des erreurs système
 
 
+# Report or not disk usage
+# 0|1
+REPORT_DISK_USAGE=1
+#FR: active le rapport sur l'espace disque
+
+
 # Warning if this limit is overhelm
 DISK_USAGE_WARNING=80
 #FR: limite à partir de laquelle un warning est émis sur l'espace disponible
 
+# On some host command 'df' fails... so we can just ignore it
+#  BUG_IGNORE|BUG_REPORT
+BUG_CMD_DF=BUG_REPORT
+#FR : chez certains hébergeurs la commande 'df' échoue. 
 
 ###############################################
 ## Server option

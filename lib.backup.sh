@@ -172,6 +172,10 @@ function __fm_error()
 
 function report_disk_space()
 {
+    if [ $REPORT_DISK_USAGE -ne 1 ]; then
+        return
+    fi
+    
     dir="$1"
     max="$2"
     comment="$3"
@@ -202,12 +206,17 @@ function report_disk_space()
                      | awk '/^-/ {printf( "disk=%s size=%s ppc=%s mp=%s\n", $1, $4, $5, $6) }' \
                            2>/dev/null)
     elif [ "x$buffer3" != "x" ]; then
-        taskErr
+        taskWarn
         fileLogger "$WARN 'df' error. Please consider usage of stat -c %m"
         return $EXIT_FAILURE
     else
-        taskErr
-        fileLogger "$WARN 'df' error -- dir='$dir'"
+        if [ $BUG_CMD_DF = $BUG_IGNORE]; then
+            taskWarn
+            fileLogger "$WARN 'df' error -- dir='$dir'"
+        else
+            taskErr
+            fileLogger "$KO 'df' error -- dir='$dir'"
+        fi
         return $EXIT_FAILURE
     fi
     
