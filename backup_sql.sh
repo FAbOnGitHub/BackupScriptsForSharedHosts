@@ -3,9 +3,9 @@
 # backup_sql.sh
 #  Initial author : Meo for RL
 #  Main dev : FAb
-# 
 #
-# Spécifique à l'association : 
+#
+# Spécifique à l'association :
 # Sauvegarde, compresse et crypte les 2 bases MySQL de RL.
 #
 # Program author :
@@ -71,7 +71,7 @@ function dumpBase()
         return 1
     fi
     export MYSQL_PWD="$pass"
-    
+
     if [ "x$5" != "x" ]; then
         shift; shift; shift; shift; #drop $1 $2 $3 $4 for $@
         for table in $@
