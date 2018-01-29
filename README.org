@@ -19,7 +19,7 @@
 
    Collection of tools to perform backups  (MySQL, SVN, FS) and exfiltrate them.
    This project has been initiated to backup the forum and the wiki of an hiking
-   association. Some  features has been  added to  make tools less  specific. In
+   association. Some  features have been added  to make tools less  specific. In
    fact,  now it's  more a  kind of  library useful  to write  tools than  tools
    themselves.
 
@@ -29,6 +29,14 @@
    On July, 2016 the project migrated to GitHub (losing subversion history).
    
    Christmas 2017, some plugin have been added in an annex project.
+
+*** News
+    - 2018-01 : bugfix with some error messages
+    - 2018-01 : (option) server B can parse logs from server A
+    - 2017-12 :  scripts tells  the available  space on HDD  and warning  when a
+      limit is reached.
+
+
 
 *** General : how it works :
 
@@ -148,7 +156,8 @@ $ git clone https://github.com/FAbOnGitHub/BackupScriptsForSharedHosts cgi-bin
 
     - All archives are cyphered but default : All dumps are written to a private
       directory. Then  there are compressed  with zip  and a password  (which is
-      weak) or if it's possible via gnupg (much stronger)
+      weak) or if it's  possible via gnupg (much stronger) with  a password or a
+      key. The key method has not been tested yet.
 
 
     Indeed, it comes with no guaranties :-)
@@ -179,13 +188,15 @@ $ git clone https://github.com/FAbOnGitHub/BackupScriptsForSharedHosts cgi-bin
 
      Please realize  that the  aim of  the project  is to  protect your  data by
      letting you  having a copy somewhere  else... It must just  work... but not
-     work efficiently. Some it saves data, no a optimized subset of data.
+     work efficiently. So it saves data, no a optimized subset of data.
 
 **** Client : disk space issue
 
      When the system functions great, it's quite easy to forget it!!!
      So be  careful with the  Long Term Support  directory which may  grow until
      fulling the hard drive disk.
+
+     (Full disk warning added)
 
 **** Server : timeout
 
@@ -196,6 +207,8 @@ $ git clone https://github.com/FAbOnGitHub/BackupScriptsForSharedHosts cgi-bin
      
      This case is not handled gracefully... A script, able to send mail, will be
      provide soon. You should watch the logs file.
+
+     As a workaround, server B can try to parse log from server A.
 
 ** French version : en Français
 
