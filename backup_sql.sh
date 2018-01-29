@@ -129,6 +129,7 @@ dumpBase $SQL_SERVER1 $SQL_BASE1 $SQL_USER1 $SQL_PASSWD1 $SQL_TABLES1
 taskReportStatus
 sReport="$_taskReportLabel DB saved (by $ME)"
 logStop "$sReport"
+# FIXME : there is a new way to do this. (added to force a git push)
 if [ $bUseMailWarning -eq 1 ]; then
     view_today_logs| notify_email_stdin "$sReport"
 fi
