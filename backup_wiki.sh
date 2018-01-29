@@ -36,8 +36,9 @@ rm -f $ARCHIVE_FILE
 
 taskCount
 
+WIKI_DIR="${WIKI_DIR/\//}" # Remove tar warning on leading '/'
 cd $WWW_DIR
-tar zcf $ARCHIVE_FILE $WIKI_DIR
+tar zcf $ARCHIVE_FILE $WIKI_DIR 2>>$ERR_FILE
 if [ $rc -eq 0 ]; then
     szArch="$(du --si -s $ARCHIVE_FILE | awk '{print $1}')"
     szDir="$(du --si -s $WIKI_DIR | awk '{print $1}')"

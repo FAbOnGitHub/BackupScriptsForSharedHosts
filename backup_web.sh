@@ -29,6 +29,7 @@ rm -f $ARCHIVE_FILE
 #     2>>$ERR_FILE
 # rc=$?
 
+WWW_DIR="${WWW_DIR/\//}"
 cd $WWW_DIR
 tar zcf $ARCHIVE_FILE \
     --exclude="$(basename $BAK_DIR)" \
@@ -36,7 +37,7 @@ tar zcf $ARCHIVE_FILE \
     --exclude="$(basename $WIKI_DIR)" \
     --exclude="$(basename $UPLOAD_DIR)" \
     --exclude="$(basename $WWW_DIR)/upload\*"  \
-    $WWW_DIR
+    $WWW_DIR  2>>$ERR_FILE
 rc=$?
 if [ $rc -eq 0 ]; then    
     bDoCompress=0
