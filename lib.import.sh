@@ -114,6 +114,7 @@ function check_downloaded_file()
             sMsg="$KO  $file too old (delta=$delta > max=$maxTime (${iMaxHoursValidity}h)) $distTS"
             error $sMsg
             fileLogger $sMsg
+            return $EXIT_FAILURE                        
         else
             fileLogger "$ok _age $file is not too old :  $distTS"
         fi
@@ -230,25 +231,52 @@ function checkDistantLogs()
 
     taskCount
     if [ ! -f "$file" ]; then
-        taskErr        
+        taskErr
         fileLogger "$KO checkDistantLogs no such file '$file'"
         return $EXIT_FAILURE
     fi
 
-    
-    buffer="$(grep -e "$grepDate" "$file" | grep -F -e "$KO" -e "$WARN" -e "$ERRO")"
-    if [ "x$buffer" = "x" ]; then
-        taskOk
-        fileLogger "$ok $L_PARSELOG log analysis '$file': no error detected ($grepDate)"
-    else
-        taskErr
-        nb="$(echo "$buffer"|wc -l)|awk '{print $1}'"
-        sMsg="$WARN log analysis '$file': something went wrong ($nb lines)."
-        if [ $bLogCheckUsesMail -eq 1 ]; then
-            grep "$grepDate" "$file" | notify_email_stdin "log form distant server"
-            fileLogger "${sMsg} Mail sent"
-        else
-            fileLogger "${sMsg}"
-        fi
-    fi
+
+    case "$file" in
+        *log.txt)
+            buffer="$(grep -e "$grepDate" "$file" | grep -F -e "$KO" -e "$WARN" -e "$ERRO")"
+            if [ "x$buffer" = "x" ]; then
+                taskOk
+                fileLogger "$ok $L_PARSELOG log analysis '$file': no error detected ($grepDate)"
+            else
+                taskWarn
+                nb="$(echo "$buffer"|wc -l)|awk '{print $1}'"
+                sMsg="$WARN log analysis '$file': something went wrong ($nb lines)."
+                if [ $bLogCheckUsesMail -eq 1 ]; then
+                    grep "$grepDate" "$file" | \
+                        notify_email_stdin "log form server '$file'"
+                    fileLogger "${sMsg} Mail sent"
+                else
+                    fileLogger "${sMsg}"
+                fi
+                return $EXIT_FAILURE
+            fi
+            ;;
+        *err.txt)
+            grepDate="$(date "+%Y%m%d")" #FIXME as option later
+            buffer="$(sed -ne "/>>>.* $grepDate/,$ p" "$file" )"
+            lines="$(echo "$buffer"|grep -F -e "$KO" -e "$WARN" -e "$ERRO")"
+            if [ "x$lines" = "x" ]; then
+                taskOk
+                fileLogger "$ok $L_PARSELOG $file"
+            else
+                taskWarn
+                nb="$(echo "$buffer"|wc -l)|awk '{print $1}'"
+                sMsg="$WARN log analysis '$file': something went wrong ($nb lines)."
+                if [ $bLogCheckUsesMail -eq 1 ]; then
+                    echo "$buffer" | notify_email_stdin "log form server '$file'"
+                    fileLogger "${sMsg} Mail sent"
+                else
+                    fileLogger "${sMsg}"
+                fi
+                return $EXIT_FAILURE
+            fi
+            ;;
+    esac
+    return $EXIT_SUCCESS
 }
