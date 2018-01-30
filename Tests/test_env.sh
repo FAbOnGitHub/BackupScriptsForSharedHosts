@@ -11,7 +11,7 @@
 # \cd - >/dev/null;
 #Resolving path
 cd ..
-lib="$(find $PWD -maxdepth 2 -name "lib.backup.sh" 2>/dev/null | head -1)"
+lib="$(find $PWD/ -maxdepth 2 -name "lib.backup.sh" 2>/dev/null | head -1)"
 if [ "x$lib" = "x" ]; then
     echo "Cannot find lib.backup.sh. Abort" 2>&1
     exit 1
