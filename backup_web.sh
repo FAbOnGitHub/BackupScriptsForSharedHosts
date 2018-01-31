@@ -29,8 +29,8 @@ rm -f $ARCHIVE_FILE
 #     2>>$ERR_FILE
 # rc=$?
 
-WWW_DIR="${WWW_DIR/\//}"
-cd $WWW_DIR
+#WWW_DIR="${WWW_DIR/\//}"
+cd $WWW_DIR/.. || die "Cannot 'cd' into $WWW_DIR/.."
 tar zcf $ARCHIVE_FILE \
     --exclude="$(basename $BAK_DIR)" \
     --exclude="$(basename $BAK_DIR_PUB)" \
