@@ -32,3 +32,4 @@ ME=$(basename $0)
 # Next we'll test echo in cron
 # Then, we'll access to env
 # And fs (df)
+mainExit $EXIT_SUCCESS

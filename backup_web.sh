@@ -22,7 +22,7 @@ ARCHIVE_FILE=$BAK_DIR/www.tgz
 rm -f $ARCHIVE_FILE
 # tar is more efficient and will be able to perfom incremental backups.
 # Zip is also done by do_moveXferZone (no more with bDoCompress=0)
-# 
+#
 # zip -qr9 -P $ZIP_PASSWD $ARCHIVE_FILE $WWW_DIR \
 #     -x $BAK_DIR/\* -x $WIKI_DIR/\* -x $WWW_DIR/backup_\* \
 #     -x $UPLOAD_DIR -x $WWW_DIR/upload\*
@@ -39,7 +39,7 @@ tar zcf $ARCHIVE_FILE \
     --exclude="$(basename $WWW_DIR)/upload\*"  \
     $WWW_DIR  2>>$ERR_FILE
 rc=$?
-if [ $rc -eq 0 ]; then    
+if [ $rc -eq 0 ]; then
     bDoCompress=0
     fileLogger "$ok $L_DUMP $ARCHIVE_FILE "
     do_moveXferZone "$ARCHIVE_FILE"
@@ -61,4 +61,6 @@ taskReportStatus
 sReport="$_taskReportLabel web"
 logStop "$sReport"
 reportByMail "$sReport" "$ME"
-exit $_iNbTaskErr
+
+#exit $_iNbTaskErr
+mainExit $_iNbTaskErr

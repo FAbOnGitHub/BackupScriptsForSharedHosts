@@ -133,4 +133,6 @@ logStop "$sReport"
 if [ $bUseMailWarning -eq 1 ]; then
     view_today_logs| notify_email_stdin "$sReport"
 fi
-exit $_iNbTaskErr
+
+#exit $_iNbTaskErr
+mainExit $_iNbTaskErr

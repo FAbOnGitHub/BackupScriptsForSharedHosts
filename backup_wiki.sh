@@ -63,4 +63,6 @@ taskReportStatus
 sReport="$_taskReportLabel wiki"
 logStop "$sReport"
 reportByMail "$sReport" "$ME"
-exit $_iNbTaskErr
+
+#exit $_iNbTaskErr
+mainExit $_iNbTaskErr

@@ -116,6 +116,13 @@ DISK_USAGE_WARNING=80
 BUG_CMD_DF=BUG_REPORT
 #FR : chez certains hébergeurs la commande 'df' échoue. 
 
+# On some servers a cronjob with fails with a non-zero exit code can be banned!
+# So here we can lie
+# $TRUE : return real exit code
+# $FALSE : always return 0
+BUG_HONOR_EXIT=$TRUE
+# Sur certains serveurs une tâche cron qui s'exite avec autre chose que 0 peut
+# se faire bannier et compromettre les sauvegardes suivantes.
 ###############################################
 ## Server option
 ###############################################

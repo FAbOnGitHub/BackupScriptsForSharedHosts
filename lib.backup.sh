@@ -353,6 +353,17 @@ function taskReportCounters()
     _taskReportCounters="(ok:${_iNbTaskOk}/w:${_iNbTaskWarn}/e:${_iNbTaskErr}/T:${_iNbTaskCount})"
 }
 
+# Can lie on exit status.
+# See variable BUG_HONOR_EXIT
+function mainExit()
+{
+    rc=$1
+    if [ $BUG_HONOR_EXIT -eq $TRUE ]; then
+        exit $rc
+    fi
+    exit $EXIT_SUCCESS
+}
+
 ###
 # Afficher les logs du jour, pour envoi par email par exemple.
 #

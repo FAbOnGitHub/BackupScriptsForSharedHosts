@@ -16,6 +16,8 @@
 
 export EXIT_SUCCESS=0
 export EXIT_FAILURE=1
+export TRUE=1
+export FALSE=0
 ok='[__ok__]'
 KO='[**KO**]'
 NOTFOUND='[NOTFND]'
