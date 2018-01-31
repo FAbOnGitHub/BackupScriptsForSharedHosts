@@ -218,7 +218,6 @@ function report_disk_space()
         fileLogger "$WARN 'df' error. Please consider usage of stat -c %m"
         return $EXIT_FAILURE
     else
-            fileLogger "[BUG_CMD_DF=$BUG_CMD_DF][BUG_IGNORE=$BUG_IGNORE]"        
         if [ $BUG_CMD_DF = $BUG_IGNORE ]; then
             taskWarn
             fileLogger "$WARN 'df' error -- dir='$dir'"
