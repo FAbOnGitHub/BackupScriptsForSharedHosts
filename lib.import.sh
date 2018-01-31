@@ -71,7 +71,7 @@ function wgetFile()
         let count++
     done
     #echo "sWgetMsg=$sWgetMsg"
-    fileLogger "$status wget $target (rc=${rc}${sWgetMsg}) (try: $count/3)"
+    fileLogger "$_L_WGET $status wget $target (rc=${rc}${sWgetMsg}) (try: $count/3)"
     debug " wgetFile(): fin wget($rc) $LOG_URL/$target"
     return $rc
 }
@@ -111,12 +111,12 @@ function check_downloaded_file()
         dateDiff -s "@""$nowTS" "@""$epochFile"
         delta=$dateDelta
         if [ $delta -gt $maxTime ]; then
-            sMsg="$KO  $file too old (delta=$delta > max=$maxTime (${iMaxHoursValidity}h)) $distTS"
+            sMsg="$KO $L_WGET $file too old (delta=$delta > max=$maxTime (${iMaxHoursValidity}h)) $distTS"
             error $sMsg
             fileLogger $sMsg
             return $EXIT_FAILURE                        
         else
-            fileLogger "$ok _age $file is not too old :  $distTS"
+            fileLogger "$ok $L_WGET _age $file is not too old :  $distTS"
         fi
     fi
 
@@ -129,12 +129,12 @@ function check_downloaded_file()
     if [ "$localCsum" = "$servCsum" ]
     then
         size="$(du --si -s  $BAK_DIR_CLI/$file| awk '{print $1}')"
-        fileLogger "$ok csum $file ($localCsum / $sizeFile bytes)"
+        fileLogger "$ok L_CHECKMETA csum $file ($localCsum / $sizeFile bytes)"
         SUCCESS=$TRUE
         debug "cksum valid ($file) $localCsum = $servCsum "
     else
         mv $BAK_DIR_CLI/$file $BAK_DIR_CLI/$ff.MAY_BE_CORRUPTED 2>> $ERR_FILE
-        fileLogger  "$KO $file: CRC ERR ('$localCsum' vs '$servCsum')"
+        fileLogger  "$KO L_CHECKMETA $file: CRC ERR ('$localCsum' vs '$servCsum')"
         hasFailed
         debug "cksum error ($file)"
         SUCCESS=$FALSE
@@ -167,7 +167,7 @@ function update_distant_list()
 	return $rc
     fi
     if [ ! -f $BAK_DIR_CLI/$sDistantBakFilename ]; then
-        fileLogger "$fn \$sDistantBakFilename(=$sDistantBakFilename) not found"
+        fileLogger "$WARN $L_WGET $fn \$sDistantBakFilename(=$sDistantBakFilename) not found"
 	return $FALSE
     fi
     aDistFiles=( $(sed -e "s@ @%20@g" -e "/^$/ d" $BAK_DIR_CLI/$sDistantBakFilename ) )
@@ -232,7 +232,7 @@ function checkDistantLogs()
     taskCount
     if [ ! -f "$file" ]; then
         taskErr
-        fileLogger "$KO checkDistantLogs no such file '$file'"
+        fileLogger "$KO $L_PARSELOG checkDistantLogs no such file '$file'"
         return $EXIT_FAILURE
     fi
 
@@ -246,7 +246,7 @@ function checkDistantLogs()
             else
                 taskWarn
                 nb="$(echo "$buffer"|wc -l)|awk '{print $1}'"
-                sMsg="$WARN log analysis '$file': something went wrong ($nb lines)."
+                sMsg="$WARN $L_PARSELOG log analysis '$file': something went wrong ($nb lines)."
                 if [ $bLogCheckUsesMail -eq 1 ]; then
                     grep "$grepDate" "$file" | \
                         notify_email_stdin "log form server '$file'"
@@ -267,7 +267,7 @@ function checkDistantLogs()
             else
                 taskWarn
                 nb="$(echo "$buffer"|wc -l)|awk '{print $1}'"
-                sMsg="$WARN log analysis '$file': something went wrong ($nb lines)."
+                sMsg="$WARN $L_PARSELOG log analysis '$file': something went wrong ($nb lines)."
                 if [ $bLogCheckUsesMail -eq 1 ]; then
                     echo "$buffer" | notify_email_stdin "log form server '$file'"
                     fileLogger "${sMsg} Mail sent"

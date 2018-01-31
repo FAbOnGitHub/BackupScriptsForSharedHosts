@@ -94,12 +94,14 @@ $ git clone https://github.com/FAbOnGitHub/BackupScriptsForSharedHosts cgi-bin
      
      and then put it on the host (via ssh, scp, ftp, any way you could use)
 
-*** Getting the last version : how to update
-    
-    Like «Get the  code», you can overwrite the code  directory (except for your
-    own scripts). 
-    Read  the  documentation  for  the  new variables  and/or  use  the  command
-    « =diff_config.sh= » 
+**** Tested
+
+     Those scripts have been tested or are still running on :
+     - Debian GNU/Linux 8.9 (jessie)
+     - Ubuntu from 13.10 to  17.10
+     - Fedora release 17 (Beefy Miracle)
+     - CentOS release 5.11 (Final)
+     - Scientific Linux release 6.9 (Carbon)
 
 *** Configuration
     
