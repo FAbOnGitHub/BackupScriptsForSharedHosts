@@ -201,7 +201,7 @@ function report_disk_space()
     taskRegister
     buffer1="$(df -PH $dir 2>/dev/null |grep '^/')"
     buffer2="$(df -PH $dir 2>/dev/null |grep '^-')"
-    buffer3="$(df -P $(stat -c '%m' $dir 2>/dev/null) )"
+    buffer3="$(df -P $(stat -c '%m' $dir 2>/dev/null) 2>/dev/null)"
     if [ "x$buffer1" != "x" ]; then  
         export $(df -PH $dir 2>/dev/null \
                      | awk '/^\// {printf( "disk=%s size=%s ppc=%s mp=%s\n", $1, $4, $5, $6) }' \
