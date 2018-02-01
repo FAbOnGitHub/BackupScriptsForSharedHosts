@@ -765,6 +765,10 @@ function do_moveXferZone()
     return $EXIT_SUCCESS
 }
 
+# Bug fix : use UTC date on both side
+# $ date -u "+%F-%T"; date  "+%F-%T"; 
+
+
 #
 # Write the metadata of a file.
 # Used by do_moveXferZone
