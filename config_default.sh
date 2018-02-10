@@ -186,12 +186,15 @@ bMailCommandAvaible=1
 NOTIFY_SUBJECT="Errors occured, please inspect log='%LOG_FILE'"
 #FR: le sujet des messages
 
-# Who will be notified by mail 
+# Who will be notified by mail, check the syntax on your host
 NOTIFY_TO="admin1@your_domain.tld admin2@your_domain.tld"
+NOTIFY_TO="admin1@your_domain.tld,admin2@your_domain.tld"
+NOTIFY_TO=
 #FR:  Destinataires des messages
 
 # From field
 NOTIFY_FROM='you@your_domain.tld'
+NOTIFY_FROM=
 #FR: expéditeur des messages
 
 
