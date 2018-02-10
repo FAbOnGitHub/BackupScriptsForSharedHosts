@@ -249,7 +249,7 @@ function checkDistantLogs()
                 sMsg="$WARN $L_PARSELOG log analysis '$file': something went wrong ($nb lines)."
                 if [ $bLogCheckUsesMail -eq 1 ]; then
                     grep "$grepDate" "$file" | \
-                        notify_email_stdin "log form server '$file'"
+                        notify_email_stdin "$WARN log form server '$file'"
                     fileLogger "${sMsg} Mail sent"
                 else
                     fileLogger "${sMsg}"
@@ -259,8 +259,8 @@ function checkDistantLogs()
             ;;
         *err.txt)
             grepDate="$(date "+%Y%m%d")" #FIXME as option later
-            buffer="$(sed -ne "/>>>.* $grepDate/,$ p" "$file" )"
-            lines="$(echo "$buffer"|grep -F -e "$KO" -e "$WARN" -e "$ERRO")"
+            buffer="$(sed -ne "/<<<.* $grepDate/,$ p" "$file" )"
+            lines="$(echo "$buffer"|grep -F -e "$KO" -e "$WARN" -e "$ERRO" -ie error)"
             if [ "x$lines" = "x" ]; then
                 taskOk
                 fileLogger "$ok $L_PARSELOG $file"
@@ -269,7 +269,7 @@ function checkDistantLogs()
                 nb="$(echo "$buffer"|wc -l)|awk '{print $1}'"
                 sMsg="$WARN $L_PARSELOG log analysis '$file': something went wrong ($nb lines)."
                 if [ $bLogCheckUsesMail -eq 1 ]; then
-                    echo "$buffer" | notify_email_stdin "log form server '$file'"
+                    echo "$buffer" | notify_email_stdin "$WARN log form server '$file'"
                     fileLogger "${sMsg} Mail sent"
                 else
                     fileLogger "${sMsg}"
