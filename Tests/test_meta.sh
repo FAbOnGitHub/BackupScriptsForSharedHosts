@@ -136,5 +136,6 @@ fi
 
 logStop
 # see to use rc=$? and then exit $rc
-exit $rc
 
+#exit $rc
+mainExit $rc

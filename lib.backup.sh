@@ -47,6 +47,14 @@ sDistantBakFilename="Please_backup.lst"
 
 DEBUG=${DEBUG:-0}
 
+let _iNbTaskCount=0
+let _iNbTaskOk=0
+let _iNbTaskErr=0
+let _iNbTaskWarn=0
+export _iNbTaskCount _iNbTaskOk _iNbTaskErr _iNbTaskWarn
+
+
+
 ###
 # Functions
 
@@ -172,6 +180,10 @@ function __fm_error()
 
 function report_disk_space()
 {
+    if [ $REPORT_DISK_USAGE -ne 1 ]; then
+        return
+    fi
+    
     dir="$1"
     max="$2"
     comment="$3"
@@ -186,9 +198,10 @@ function report_disk_space()
         let iMax=80
     fi
 
-    taskCount
+    taskRegister
     buffer1="$(df -PH $dir 2>/dev/null |grep '^/')"
     buffer2="$(df -PH $dir 2>/dev/null |grep '^-')"
+    buffer3="$(df -P $(stat -c '%m' $dir 2>/dev/null) 2>/dev/null)"
     if [ "x$buffer1" != "x" ]; then  
         export $(df -PH $dir 2>/dev/null \
                      | awk '/^\// {printf( "disk=%s size=%s ppc=%s mp=%s\n", $1, $4, $5, $6) }' \
@@ -200,20 +213,36 @@ function report_disk_space()
         export $(df -PH $dir 2>/dev/null \
                      | awk '/^-/ {printf( "disk=%s size=%s ppc=%s mp=%s\n", $1, $4, $5, $6) }' \
                            2>/dev/null)
+    elif [ "x$buffer3" != "x" ]; then
+        taskWarn
+        fileLogger "$WARN $L_CHECKDISK 'df' error. Please consider usage of stat -c %m"
+        return $EXIT_FAILURE
     else
-        taskErr
-        fileLogger "$KO 'df' error -- $sMsg"
+        if [ $BUG_CMD_DF = $BUG_IGNORE ]; then
+            taskCancelled
+            fileLogger "$INFO $L_CHECKDISK 'df' bug accepted"
+            return $EXIT_SUCCESS
+        elif [ $BUG_CMD_DF = $BUG_WARN ]; then
+            taskWarn
+            fileLogger "$WARN $L_CHECKDISK 'df' error -- dir='$dir'"
+        else
+            taskErr
+            fileLogger "$KO $L_CHECKDISK 'df' error -- dir='$dir'"
+        fi
         return $EXIT_FAILURE
     fi
     
     sMsg=" available space on $disk is $size ($ppc, limit is $iMax) $comment"
     let iPPC=${ppc//%/}
-    if [ $iPPC -ge $iMax ]; then
+    if [ $iPPC -eq 100 ]; then
+        taskErr
+        fileLogger "$KO $L_CHECKDISK Disk full!! : $sMsg"
+    elif [ $iPPC -ge $iMax ]; then
         taskWarn
-        fileLogger "$warn limit reached : $sMsg"
+        fileLogger "$warn $L_CHECKDISK= limit reached : $sMsg"
     else
         taskOk
-        fileLogger "$ok $sMsg"
+        fileLogger "$ok $L_CHECKDISK $sMsg"
     fi
 }
 
@@ -261,6 +290,14 @@ function taskReportInit()
 function taskCount()
 {
     let _iNbTaskCount++
+}
+function taskRegister()
+{
+    let _iNbTaskCount++
+}
+function taskCancelled()
+{
+    let _iNbTaskCount--
 }
 function taskOk()
 {
@@ -314,6 +351,17 @@ function taskReportStatus()
 function taskReportCounters()
 {
     _taskReportCounters="(ok:${_iNbTaskOk}/w:${_iNbTaskWarn}/e:${_iNbTaskErr}/T:${_iNbTaskCount})"
+}
+
+# Can lie on exit status.
+# See variable BUG_HONOR_EXIT
+function mainExit()
+{
+    rc=$1
+    if [ $BUG_HONOR_EXIT -eq $TRUE ]; then
+        exit $rc
+    fi
+    exit $EXIT_SUCCESS
 }
 
 ###
@@ -716,6 +764,10 @@ function do_moveXferZone()
     fileLogger "$ok $L_OFFER $buffer csum:$csumFile at $dateFile"
     return $EXIT_SUCCESS
 }
+
+# Bug fix : use UTC date on both side
+# $ date -u "+%F-%T"; date  "+%F-%T"; 
+
 
 #
 # Write the metadata of a file.

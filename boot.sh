@@ -16,6 +16,8 @@
 
 export EXIT_SUCCESS=0
 export EXIT_FAILURE=1
+export TRUE=1
+export FALSE=0
 ok='[__ok__]'
 KO='[**KO**]'
 NOTFOUND='[NOTFND]'
@@ -32,7 +34,8 @@ VERBOSE=${VERBOSE:-0}
 export ok KO NTFOUND INFO WARN t2 t3 t4
 export DEBUG VERBOSE
 
-# Labels :
+# Labels for tasks :
+L_WGET="_WGET_____"
 L_DUMP="_DUMP_____"
 L_COMPRESS="_COMPRESS_"
 L_CYPHER="_CYPHER___"
@@ -40,7 +43,16 @@ L_OFFER="_OFFER____"
 L_MAIL="_MAIL_____"
 L_ARCH="_ARCH_____"
 L_LTS="_ARCH+LTS_"
-export L_DUMP L_COMPRESS L_CYPHER L_OFFER
+L_PARSELOG="_SCAN_LOG_"
+L_CHECKMETA="_CHK_META_"
+L_CHECKDISK="_CHK_DISK_"
+export L_WGET L_DUMP L_COMPRESS L_CYPHER L_OFFER L_MAIL L_ARCH L_LTS
+export L_CHECKMETA
+
+# bugs ignorable
+BUG_IGNORE=1
+BUG_REPORT=2
+BUG_WARN=4
 
 ### Variables:
 # BAK_DIR     :	dossier où sont fabriquées les archives
@@ -135,7 +147,6 @@ case $ME in
             check_client_variables
 
             . $LIB_PATH/lib.import.sh
-            
         else
             msg=$msg"\nno '$cfg_dist' found"
         fi

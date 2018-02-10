@@ -93,4 +93,6 @@ taskReportStatus
 sReport="$_taskReportLabel crontab"
 logStop "$sReport"
 reportByMail "$sReport" "$ME"
-exit $_iNbTaskErr
+
+#exit $_iNbTaskErr
+mainExit $_iNbTaskErr

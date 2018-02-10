@@ -3,9 +3,9 @@
 # backup_sql.sh
 #  Initial author : Meo for RL
 #  Main dev : FAb
-# 
 #
-# Spécifique à l'association : 
+#
+# Spécifique à l'association :
 # Sauvegarde, compresse et crypte les 2 bases MySQL de RL.
 #
 # Program author :
@@ -71,7 +71,7 @@ function dumpBase()
         return 1
     fi
     export MYSQL_PWD="$pass"
-    
+
     if [ "x$5" != "x" ]; then
         shift; shift; shift; shift; #drop $1 $2 $3 $4 for $@
         for table in $@
@@ -129,7 +129,10 @@ dumpBase $SQL_SERVER1 $SQL_BASE1 $SQL_USER1 $SQL_PASSWD1 $SQL_TABLES1
 taskReportStatus
 sReport="$_taskReportLabel DB saved (by $ME)"
 logStop "$sReport"
+# FIXME : there is a new way to do this. (added to force a git push)
 if [ $bUseMailWarning -eq 1 ]; then
     view_today_logs| notify_email_stdin "$sReport"
 fi
-exit $_iNbTaskErr
+
+#exit $_iNbTaskErr
+mainExit $_iNbTaskErr

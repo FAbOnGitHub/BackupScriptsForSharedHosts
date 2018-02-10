@@ -37,11 +37,11 @@ function  parse_args() {
 	  ;;
 	  --version) echo $VERSION; exit $EXIT_SUCCESS;
 	  ;;
-	 *) #break 
+	 *) #break
 	    #shift
 	  ;;
 	 esac
-	done 
+	done
 }
 
 ### Main
@@ -61,4 +61,3 @@ fi
 
 
 exit $EXIT_SUCCESS
-

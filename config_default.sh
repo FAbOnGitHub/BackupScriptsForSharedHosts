@@ -101,11 +101,28 @@ LOG_FILE=$BAK_DIR_PUB/log.txt       # Journal
 ERR_FILE=$BAK_DIR_PUB/err.txt       # Journal des erreurs système
 
 
+# Report or not disk usage
+# 0|1
+REPORT_DISK_USAGE=1
+#FR: active le rapport sur l'espace disque
+
+
 # Warning if this limit is overhelm
 DISK_USAGE_WARNING=80
 #FR: limite à partir de laquelle un warning est émis sur l'espace disponible
 
+# On some host command 'df' fails... so we can just ignore it
+#  BUG_IGNORE|BUG_REPORT
+BUG_CMD_DF=BUG_REPORT
+#FR : chez certains hébergeurs la commande 'df' échoue. 
 
+# On some servers a cronjob with fails with a non-zero exit code can be banned!
+# So here we can lie
+# $TRUE : return real exit code
+# $FALSE : always return 0
+BUG_HONOR_EXIT=$TRUE
+# Sur certains serveurs une tâche cron qui s'exite avec autre chose que 0 peut
+# se faire bannier et compromettre les sauvegardes suivantes.
 ###############################################
 ## Server option
 ###############################################
@@ -293,6 +310,15 @@ bUseDistantBakFile=1
 # Which is the file which contains the list of the archives to retrieve ?
 sDistantBakFilename="Please_backup.lst"
 #FR: Fichier contenant la liste des archives supplémentaires à récupérer
+
+# Max hours for validity
+iMaxHoursValidity=23
+#FR: Nombre d'heure maximales pour accepter une archive téléchagée
+
+# Max hours for validity
+bLogCheckUsesMail=1
+#FR: Nombre d'heure maximales pour accepter une archive téléchagée
+
 
 #########################
 ## backup_sql.sh

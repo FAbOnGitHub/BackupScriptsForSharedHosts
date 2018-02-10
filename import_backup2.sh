@@ -24,7 +24,8 @@ TRUE=1
 DATE=$(date +"%Y%m%d-%H%M%S")
 GENERAL_SUCCESS=$EXIT_SUCCESS
 
-let maxTime=3600*28
+# Délai de validité d'une archive téléchargée
+#let maxTime=3600*28
 
 
 # Normalement le client n'est pas obligé d'avoir la même arborescence que le
@@ -96,6 +97,12 @@ for raw_file in ${BAK_FILES[*]}; do
     let iNbTargetOk++
 
     case $file in
+        *log.txt|*err.txt)
+            dpattern="$(date "+%Y-%m-%d")"
+            checkDistantLogs "$BAK_DIR_CLI/$file" "$dpattern"
+            bSkipCS=1
+            SUCCESS=$rc
+            ;;
         *.txt)
             bSkipCS=1
             SUCCESS=$EXIT_SUCCESS
@@ -133,4 +140,6 @@ taskReportStatus
 sReport="$_taskReportLabel DL files"
 logStop "$sReport"
 reportByMail "$sReport" "$ME"
-exit $_iNbTaskErr
+
+#exit $_iNbTaskErr
+mainExit $_iNbTaskErr
