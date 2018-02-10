@@ -16,6 +16,8 @@
 
 export EXIT_SUCCESS=0
 export EXIT_FAILURE=1
+export TRUE=1
+export FALSE=0
 ok='[__ok__]'
 KO='[**KO**]'
 NOTFOUND='[NOTFND]'
@@ -43,12 +45,14 @@ L_ARCH="_ARCH_____"
 L_LTS="_ARCH+LTS_"
 L_PARSELOG="_SCAN_LOG_"
 L_CHECKMETA="_CHK_META_"
+L_CHECKDISK="_CHK_DISK_"
 export L_WGET L_DUMP L_COMPRESS L_CYPHER L_OFFER L_MAIL L_ARCH L_LTS
 export L_CHECKMETA
 
 # bugs ignorable
 BUG_IGNORE=1
 BUG_REPORT=2
+BUG_WARN=4
 
 ### Variables:
 # BAK_DIR     :	dossier où sont fabriquées les archives

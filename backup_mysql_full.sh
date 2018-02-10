@@ -93,9 +93,9 @@ do
             let iCountThisOne=1
             taskCount
             #sLock="-l";;
-            ;;        
+            ;;
     esac
-    
+
     dumpfile="${db}_${date}.sql"
 #    dumpfile="${db}.sql"
 
@@ -135,4 +135,6 @@ taskReportStatus
 sReport="$_taskReportLabel DB saved "
 logStop "$sReport"
 reportByMail "$sReport" "$ME"
-exit $_iNbTaskErr
+
+#exit $_iNbTaskErr
+mainExit $_iNbTaskErr

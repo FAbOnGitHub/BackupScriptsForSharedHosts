@@ -140,4 +140,6 @@ taskReportStatus
 sReport="$_taskReportLabel DL files"
 logStop "$sReport"
 reportByMail "$sReport" "$ME"
-exit $_iNbTaskErr
+
+#exit $_iNbTaskErr
+mainExit $_iNbTaskErr

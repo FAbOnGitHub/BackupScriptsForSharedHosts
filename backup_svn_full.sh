@@ -68,7 +68,7 @@ do
     dumpfile="$(basename ${db})"".svndump"
     /usr/bin/svnadmin dump "$db" >"$dumpfile" 2>>/dev/null
     rc=$?
-    if [ $rc -ne $EXIT_SUCCESS ]; then        
+    if [ $rc -ne $EXIT_SUCCESS ]; then
         error "$KO svndump '$db' failed (rc=$rc)"
         taskErr
         continue
@@ -99,4 +99,6 @@ taskReportStatus
 sReport="$_taskReportLabel repos saved"
 logStop "$sReport"
 reportByMail "$sReport" "$ME"
-exit $_iNbTaskErr
+
+#exit $_iNbTaskErr
+mainExit $_iNbTaskErr
