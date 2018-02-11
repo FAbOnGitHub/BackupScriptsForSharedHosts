@@ -245,7 +245,7 @@ function checkDistantLogs()
                 fileLogger "$ok $L_PARSELOG log analysis '$file': no error detected ($grepDate)"
             else
                 taskWarn
-                nb="$(echo "$buffer"|wc -l)|awk '{print $1}'"
+                nb="$(echo "$buffer"|wc -l|awk '{print $1}' )"
                 sMsg="$WARN $L_PARSELOG log analysis '$file': something went wrong ($nb lines)."
                 if [ $bLogCheckUsesMail -eq 1 ]; then
                     grep "$grepDate" "$file" | \
@@ -266,7 +266,7 @@ function checkDistantLogs()
                 fileLogger "$ok $L_PARSELOG $file"
             else
                 taskWarn
-                nb="$(echo "$buffer"|wc -l)|awk '{print $1}'"
+                nb="$(echo "$buffer"|wc -l |awk '{print $1}' )"
                 sMsg="$WARN $L_PARSELOG log analysis '$file': something went wrong ($nb lines)."
                 if [ $bLogCheckUsesMail -eq 1 ]; then
                     echo "$buffer" | notify_email_stdin "$WARN log form server '$file'"
