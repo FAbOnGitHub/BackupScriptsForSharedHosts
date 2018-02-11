@@ -71,7 +71,7 @@ function wgetFile()
         let count++
     done
     #echo "sWgetMsg=$sWgetMsg"
-    fileLogger "$_L_WGET $status wget $target (rc=${rc}${sWgetMsg}) (try: $count/3)"
+    fileLogger "$status $L_WGET $target (rc=${rc}${sWgetMsg}) (try: $count/3)"
     debug " wgetFile(): fin wget($rc) $LOG_URL/$target"
     return $rc
 }
@@ -129,12 +129,12 @@ function check_downloaded_file()
     if [ "$localCsum" = "$servCsum" ]
     then
         size="$(du --si -s  $BAK_DIR_CLI/$file| awk '{print $1}')"
-        fileLogger "$ok L_CHECKMETA csum $file ($localCsum / $sizeFile bytes)"
+        fileLogger "$ok $L_CHECKMETA csum $file ($localCsum / $sizeFile bytes)"
         SUCCESS=$TRUE
         debug "cksum valid ($file) $localCsum = $servCsum "
     else
         mv $BAK_DIR_CLI/$file $BAK_DIR_CLI/$ff.MAY_BE_CORRUPTED 2>> $ERR_FILE
-        fileLogger  "$KO L_CHECKMETA $file: CRC ERR ('$localCsum' vs '$servCsum')"
+        fileLogger  "$KO $L_CHECKMETA $file: CRC ERR ('$localCsum' vs '$servCsum')"
         hasFailed
         debug "cksum error ($file)"
         SUCCESS=$FALSE
