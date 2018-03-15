@@ -64,15 +64,17 @@ do
     taskCount
     date=$(date  +"%Y%m%d-%H%M%S")
     [ "$db" = "information_schema" ] && sLock="--skip-lock-tables" || sLock="-l"
-    fileLogger "$ok '$db' found @${date} "
     dumpfile="$(basename ${db})"".svndump"
     /usr/bin/svnadmin dump "$db" >"$dumpfile" 2>>/dev/null
     rc=$?
     if [ $rc -ne $EXIT_SUCCESS ]; then
+        fileLogger "$KO failure on '$db' found @${date} $size"
         error "$KO svndump '$db' failed (rc=$rc)"
         taskErr
         continue
     else
+        size="$(du --si -s "$dumpfile")"
+        fileLogger "$ok '$db' found @${date} $size"
         taskOk
         let iNbDbOk++
     fi
