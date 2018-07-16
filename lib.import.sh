@@ -71,7 +71,7 @@ function wgetFile()
         let count++
     done
     #echo "sWgetMsg=$sWgetMsg"
-    fileLogger "$_L_WGET $status wget $target (rc=${rc}${sWgetMsg}) (try: $count/3)"
+    fileLogger "$status $L_WGET $target (rc=${rc}${sWgetMsg}) (try: $count/3)"
     debug " wgetFile(): fin wget($rc) $LOG_URL/$target"
     return $rc
 }
