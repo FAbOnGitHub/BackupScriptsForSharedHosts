@@ -89,7 +89,7 @@ for raw_file in ${BAK_FILES[*]}; do
     wgetFile $file
     rc=$?
     if [ $rc -ne $EXIT_SUCCESS ]; then
-        fileLogger  "$KO wget file='$file' failed ($rc). Skip checks"
+        fileLogger "$KO wget file='$file' failed ($rc). Skip checks"
         hasFailed
         taskErr
         continue
