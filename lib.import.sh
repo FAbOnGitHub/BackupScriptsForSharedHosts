@@ -129,12 +129,12 @@ function check_downloaded_file()
     if [ "$localCsum" = "$servCsum" ]
     then
         size="$(du --si -s  $BAK_DIR_CLI/$file| awk '{print $1}')"
-        fileLogger "$ok L_CHECKMETA csum $file ($localCsum / $sizeFile bytes)"
+        fileLogger "$ok $L_CHECKMETA csum $file ($localCsum / $sizeFile bytes)"
         SUCCESS=$TRUE
         debug "cksum valid ($file) $localCsum = $servCsum "
     else
         mv $BAK_DIR_CLI/$file $BAK_DIR_CLI/$ff.MAY_BE_CORRUPTED 2>> $ERR_FILE
-        fileLogger  "$KO L_CHECKMETA $file: CRC ERR ('$localCsum' vs '$servCsum')"
+        fileLogger  "$KO $L_CHECKMETA $file: CRC ERR ('$localCsum' vs '$servCsum')"
         hasFailed
         debug "cksum error ($file)"
         SUCCESS=$FALSE
@@ -245,11 +245,11 @@ function checkDistantLogs()
                 fileLogger "$ok $L_PARSELOG log analysis '$file': no error detected ($grepDate)"
             else
                 taskWarn
-                nb="$(echo "$buffer"|wc -l)|awk '{print $1}'"
+                nb="$(echo "$buffer"|wc -l|awk '{print $1}' )"
                 sMsg="$WARN $L_PARSELOG log analysis '$file': something went wrong ($nb lines)."
                 if [ $bLogCheckUsesMail -eq 1 ]; then
                     grep "$grepDate" "$file" | \
-                        notify_email_stdin "log form server '$file'"
+                        notify_email_stdin "$WARN log form server '$file'"
                     fileLogger "${sMsg} Mail sent"
                 else
                     fileLogger "${sMsg}"
@@ -259,17 +259,17 @@ function checkDistantLogs()
             ;;
         *err.txt)
             grepDate="$(date "+%Y%m%d")" #FIXME as option later
-            buffer="$(sed -ne "/>>>.* $grepDate/,$ p" "$file" )"
-            lines="$(echo "$buffer"|grep -F -e "$KO" -e "$WARN" -e "$ERRO")"
+            buffer="$(sed -ne "/<<<.* $grepDate/,$ p" "$file" )"
+            lines="$(echo "$buffer"|grep -F -e "$KO" -e "$WARN" -e "$ERRO" -ie error)"
             if [ "x$lines" = "x" ]; then
                 taskOk
                 fileLogger "$ok $L_PARSELOG $file"
             else
                 taskWarn
-                nb="$(echo "$buffer"|wc -l)|awk '{print $1}'"
+                nb="$(echo "$buffer"|wc -l |awk '{print $1}' )"
                 sMsg="$WARN $L_PARSELOG log analysis '$file': something went wrong ($nb lines)."
                 if [ $bLogCheckUsesMail -eq 1 ]; then
-                    echo "$buffer" | notify_email_stdin "log form server '$file'"
+                    echo "$buffer" | notify_email_stdin "$WARN log form server '$file'"
                     fileLogger "${sMsg} Mail sent"
                 else
                     fileLogger "${sMsg}"

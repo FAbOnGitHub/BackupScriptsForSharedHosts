@@ -3,7 +3,7 @@
 # $Id: backup_svn_full.sh 140 2015-04-14 19:52:57Z fab $
 # do_full_backup crée avec cs par fab le '2012-03-17 20:01:02'
 VERSION=0.0.1
-# Objectif : faire un backup de tous les dépôts SVN de la machine
+# Objectif : faire un backup de tous les dépôts GIT de la machine
 #  dans un fichier pour chacune. Ce script est intégré à l'ensemble
 #  utilisé pour le projet de RL où le but est de permettre la
 #  sauvegarde partielle d'une machine mutualisée.
@@ -36,15 +36,15 @@ bDoXfer=${bDoXfer:-0}
 
 date=$(date  +"%Y%m%d")
 h=$(hostname -s)
-DIR="$h.SVN_complete"
+DIR="$h.GIT_complete"
 dir="$DIR.$date"
 
-[ "x$SVN_DIR" = "x" ] && die " $KO \$SVN_DIR not configured"
+[ "x$GIT_DIR" = "x" ] && die " $KO \$GIT_DIR not configured"
 
-# 2 Get name of databases
-declare  -a aDB=( $(find "$SVN_DIR" -maxdepth 1 -mindepth 1 -type d ) )
+# 2 Get name of git repos (aka databases)
+declare  -a aDB=( $(find "$GIT_DIR" -maxdepth 1 -mindepth 1 -type d ) )
 rc=$?
-[ $rc -ne $EXIT_SUCCESS ] && die "$KO cannot retrieve SVN"
+[ $rc -ne $EXIT_SUCCESS ] && die "$KO cannot retrieve GIT"
 
 if [ ${#aDB[*]} -eq 0 ]; then
     die " $KO no databases found."
@@ -63,13 +63,14 @@ do
     # 3 Save each DB
     taskCount
     date=$(date  +"%Y%m%d-%H%M%S")
-    [ "$db" = "information_schema" ] && sLock="--skip-lock-tables" || sLock="-l"
     dumpfile="$(basename ${db})"".svndump"
-    /usr/bin/svnadmin dump "$db" >"$dumpfile" 2>>/dev/null
-    rc=$?
+    cd "$db"
+    git bundle create "../$dumpfile" --all >/dev/null 2>>$ERR_FILE
+    rc=$?    
+    cd - >/dev/null
     if [ $rc -ne $EXIT_SUCCESS ]; then
         fileLogger "$KO failure on '$db' found @${date} $size"
-        error "$KO svndump '$db' failed (rc=$rc)"
+        error "$KO git bundle create '$db' failed (rc=$rc)"
         taskErr
         continue
     else
