@@ -66,6 +66,24 @@ function sizeOf()
     wc -c $1 | awk '{print $1}'
 }
 
+#
+# size_to_human
+#  If numfmt is awailable do :
+#    4296 -> 4.2KiB in $human_size
+#  else return 4296.
+# Warning always use bytes is a good idea
+bNumFmt=${bNumFmt:-0}
+function size_to_human()
+{
+    sz=$1
+    if [ $bNumFmt -eq 1 ]; then        
+        human_size="$(numfmt --to=iec-i --suffix=B --format="%f" $sz)"
+    else
+        human_size="$sz"
+    fi
+}
+
+
 # lineOf $file
 #
 # Nombre de ligne d'un fichier
@@ -1109,6 +1127,14 @@ function check_local_server_variables()
             fileLogger "sorry, can't use logger"
             bUseLogger=0
         fi
+    fi
+
+    # Can we use numfmt ?
+    bNumFmt=0
+    which numfmt >/dev/null 2>&1
+    rc=$?
+    if [ $rc -eq 0 ]; then
+        bNumFmt=1
     fi
 
     if [ "x$BAK_DIR" = "x" ]; then
