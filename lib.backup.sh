@@ -556,6 +556,11 @@ dateDiff ()
     return 0
 }
 
+# Common function to avoid the bug of %w instead of %u
+function dayOfWeek()
+{
+    LC_ALL=C date +"%u-%a"
+}
 
 
 
