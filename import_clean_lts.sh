@@ -74,7 +74,8 @@ if [ $rc -ne 0 ]; then
     taskErr
 fi
 
-archives="$(\ find . -maxdepth 1 -type f -atime +iAge \
+cd $LTS_DIR
+archives="$(find . -maxdepth 1 -type f -atime +iAge \
                 \( -name "*.gpg" -o -name "*.zip" -o -name "*.rar" \
                     -o -name "*.tgz" -o -name "*.tar"  \) \
                     )"
@@ -95,7 +96,7 @@ do
         continue
     fi
 
-    oldest="$(\ find . -maxdepth 1 -type f -atime +iAge \
+    oldest="$(find . -maxdepth 1 -type f -atime +iAge \
                 \( -name "*.gpg" -o -name "*.zip" -o -name "*.rar" \
                     -o -name "*.tgz" -o -name "*.tar"  \) \
                     ) | sort -n | head -1"
