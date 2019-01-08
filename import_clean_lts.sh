@@ -106,7 +106,8 @@ do
         fi
 
         taskCount
-        echo "rm $oldest"
+        #echo "rm $oldest"
+        rm "$oldest"
         rc=$?
         if [ $rc -eq 0 ]; then
             taskOk
