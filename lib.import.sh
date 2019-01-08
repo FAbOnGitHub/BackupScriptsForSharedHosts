@@ -286,5 +286,6 @@ function checkDistantLogs()
 # 
 function dir_clean_lts()
 {
-    
+    # next : move main loop from import_clean_lts.sh here
+    todo_soon=
 }
