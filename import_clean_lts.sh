@@ -64,8 +64,8 @@ fi
 bLoop=1
 
 # Checks
-cd $LTS_DIR
-buffer="$(df -PH $LTS_DIR)"
+cd $LTS_DIR || exit  $EXIT_FAILURE
+buffer="$(df -PH $LTS_DIR | grep '^/')"
 rc=$?
 if [ $rc -ne 0 ]; then
     taskCount
@@ -89,7 +89,7 @@ do
     simple_disk_space $PWD
     # Now $size $ppc and $iPPC are ready
 
-    if [ $iPPC -le $iMax ]; then
+    if [ $iPPC -gt $iMax ]; then
         bLoop=0
         fileLogger "$OK $L_CLEAN LTS under limit $iPPC <= ${iMax}% (${size})"
         # continue # Doubt=>else
