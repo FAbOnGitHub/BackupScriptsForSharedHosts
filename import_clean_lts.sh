@@ -84,7 +84,7 @@ let iNbLoop=0
 
 # Main loop ###################################################################
 cd $LTS_DIR
-while [ $bLoop ] 
+while [ $bLoop -eq 1 ] 
 do
     # if limit reached...
     simple_disk_space
@@ -92,29 +92,30 @@ do
 
     if [ $iPPC -le $iMax ]; then
         bLoop=0
-        fileLogger "$OK $L_CLEAN LTS under limit ${iMax}% (${size})"
-        continue
-    fi
-
-    oldest="$(find . -maxdepth 1 -type f -atime +$iAge \
+        fileLogger "$OK $L_CLEAN LTS under limit $iPPC <= ${iMax}% (${size})"
+        # continue # Doubt=>else
+    else
+        oldest="$(find . -maxdepth 1 -type f -atime +$iAge \
                 \( -name "*.gpg" -o -name "*.zip" -o -name "*.rar" \
                     -o -name "*.tgz" -o -name "*.tar"  \) \
                     ) | sort -n | head -1"
-    if [ "x$oldest" = "x" ]; then
-        fileLogger "$WARN $L_CLEAN no file left"
-        bLoop=0
-        continue
-    fi
+        if [ "x$oldest" = "x" ]; then
+            fileLogger "$WARN $L_CLEAN no file left"
+            bLoop=0
+            continue
+        fi
 
-    taskCount
-    echo "rm $oldest"
-    rc=$?
-    if [ $rc -eq 0 ]; then
-        taskOk
-        fileLogger "$ok $L_CLEAN removing $oldest"
-    else
-        taskErr
-        fileLogger "$KO $L_CLEAN removing $oldest failed"
+        taskCount
+        echo "rm $oldest"
+        rc=$?
+        if [ $rc -eq 0 ]; then
+            taskOk
+            fileLogger "$ok $L_CLEAN removing $oldest"
+        else
+            taskErr
+            fileLogger "$KO $L_CLEAN removing $oldest failed"
+        fi
+
     fi
 
     # For dummy test, prevent infinite loop
