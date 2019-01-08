@@ -77,7 +77,7 @@ fi
 
 # Main loop ###################################################################
 cd $LTS_DIR
-while $bLoop
+while [ $bLoop ] 
 do
     # if limit reached...
     simple_disk_space
@@ -117,7 +117,7 @@ done
 
 ### Reporting
 taskReportStatus
-sReport="$_taskReportLabel DL files"
+sReport="$_taskReportLabel clean LTS DIR"
 logStop "$sReport"
 reportByMail "$sReport" "$ME"
 
