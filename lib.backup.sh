@@ -194,7 +194,22 @@ function __fm_error()
     return 1
 }
 
-
+# Use a simpel df to determine available space
+# Output :
+#  $disk : device
+#  $size : size used in human readable
+#  $ppc : percentage used
+#  $iPPC : ppc without '%'
+#  $mp : mount-point
+function simple_disk_space()
+{
+    dir="$1"
+    export $(df -PH $dir 2>/dev/null \
+                 | awk '/^\// {printf( "disk=%s size=%s ppc=%s mp=%s\n", $1, $4, $5, $6) }' \
+                       2>/dev/null)
+    let iPPC=${ppc//%/}
+    export iPPC
+}  
 
 function report_disk_space()
 {
