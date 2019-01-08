@@ -49,7 +49,7 @@ fi
 LOG_URL="$(echo "$BAK_URL"|cut -d'@' -f2-)"
 
 iAgeArg="$1"
-iAge=${iAgeArg:-180}
+iAge=${iAgeArg:-"180"}
 
 max="$2"
 if [ "x$max" != "x" ]; then
@@ -75,7 +75,7 @@ if [ $rc -ne 0 ]; then
 fi
 
 cd $LTS_DIR
-archives="$(find . -maxdepth 1 -type f -atime +iAge \
+archives="$(find . -maxdepth 1 -type f -atime +$iAge \
                 \( -name "*.gpg" -o -name "*.zip" -o -name "*.rar" \
                     -o -name "*.tgz" -o -name "*.tar"  \) \
                     )"
@@ -96,7 +96,7 @@ do
         continue
     fi
 
-    oldest="$(find . -maxdepth 1 -type f -atime +iAge \
+    oldest="$(find . -maxdepth 1 -type f -atime +$iAge \
                 \( -name "*.gpg" -o -name "*.zip" -o -name "*.rar" \
                     -o -name "*.tgz" -o -name "*.tar"  \) \
                     ) | sort -n | head -1"
