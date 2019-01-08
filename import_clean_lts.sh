@@ -98,7 +98,7 @@ do
         oldest="$(find . -maxdepth 1 -type f -atime +$iAge \
                 \( -name "*.gpg" -o -name "*.zip" -o -name "*.rar" \
                     -o -name "*.tgz" -o -name "*.tar"  \) \
-                    ) | sort -n | head -1"
+                    | sort -n | head -1  )"
         if [ "x$oldest" = "x" ]; then
             fileLogger "$WARN $L_CLEAN no file left"
             bLoop=0
