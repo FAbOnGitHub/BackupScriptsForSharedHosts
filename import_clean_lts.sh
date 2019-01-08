@@ -94,7 +94,7 @@ do
         fileLogger "$OK $L_CLEAN LTS under limit $iPPC <= ${iMax}% (${size})"
         # continue # Doubt=>else
     else
-        fileLogger "$INFO $L_CLEAN LTS above limit $iPPC > ${iMax}% (${size})"
+        #fileLogger "$INFO $L_CLEAN LTS above limit $iPPC > ${iMax}% (${size})"
         oldest="$(find . -maxdepth 1 -type f -atime +$iAge \
                 \( -name "*.gpg" -o -name "*.zip" -o -name "*.rar" \
                     -o -name "*.tgz" -o -name "*.tar"  \) \
