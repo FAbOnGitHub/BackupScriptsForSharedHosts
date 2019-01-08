@@ -74,6 +74,12 @@ if [ $rc -ne 0 ]; then
     taskErr
 fi
 
+archives="$(\ find . -maxdepth 1 -type f -atime +iAge \
+                \( -name "*.gpg" -o -name "*.zip" -o -name "*.rar" \
+                    -o -name "*.tgz" -o -name "*.tar"  \) \
+                    )"
+let max_loop=${#archives[*]}
+let iNbLoop=0
 
 # Main loop ###################################################################
 cd $LTS_DIR
@@ -110,6 +116,11 @@ do
         fileLogger "$KO $L_CLEAN removing $oldest failed"
     fi
 
+    # For dummy test, prevent infinite loop
+    let iNbLoop++
+    if [ $iNbLoop -le $max_loop ]; then
+        bLoop=0
+    fi
 done
 
 
