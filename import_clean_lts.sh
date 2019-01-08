@@ -86,7 +86,7 @@ cd $LTS_DIR
 while [ $bLoop -eq 1 ] 
 do
     # if limit reached...
-    simple_disk_space
+    simple_disk_space $PWD
     # Now $size $ppc and $iPPC are ready
 
     if [ $iPPC -le $iMax ]; then

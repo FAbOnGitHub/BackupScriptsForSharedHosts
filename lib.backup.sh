@@ -204,7 +204,11 @@ function __fm_error()
 function simple_disk_space()
 {
     dir="$1"
-    export $(df -PH $dir 2>/dev/null \
+    if [ "x$dir" = "x" ]; then
+        fileLogger "simple_disk_space() missing argument"
+        exit $EXIT_FAILURE
+    fi
+    export $(df -PH "$dir" 2>/dev/null \
                  | awk '/^\// {printf( "disk=%s size=%s ppc=%s mp=%s\n", $1, $4, $5, $6) }' \
                        2>/dev/null)
     let iPPC=${ppc//%/}
