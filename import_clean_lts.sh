@@ -121,7 +121,7 @@ do
 
     # For dummy test, prevent infinite loop
     let iNbLoop++
-    if [ $iNbLoop -le $max_loop ]; then
+    if [ $iNbLoop -gt $max_loop ]; then
         bLoop=0
     fi
 done
