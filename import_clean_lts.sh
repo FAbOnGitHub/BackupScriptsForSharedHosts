@@ -64,7 +64,8 @@ fi
 bLoop=1
 
 # Checks
-buffer="$(df -PH $dir)"
+cd $LTS_DIR
+buffer="$(df -PH $LTS_DIR)"
 rc=$?
 if [ $rc -ne 0 ]; then
     taskCount
@@ -73,8 +74,6 @@ if [ $rc -ne 0 ]; then
     fileLogger "$KO cannot use df to determine available space"
     taskErr
 fi
-
-cd $LTS_DIR
 archives="$(find . -maxdepth 1 -type f -atime +$iAge \
                 \( -name "*.gpg" -o -name "*.zip" -o -name "*.rar" \
                     -o -name "*.tgz" -o -name "*.tar"  \) \
