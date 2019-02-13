@@ -129,7 +129,8 @@ do
     sql_serverI=${!name}
 
     if [ "x$sql_serverI" = "x" ]; then
-        fileLogger "$INFO $L_DUMP no more dabase as $name. Stop"
+        # $ok vs $info: je préfère $ok c'est plus simple pour lire les mails
+        fileLogger "$ok $L_DUMP no more dabase as $name. Stop"
         break
     fi
     name="SQL_BASE$i"
