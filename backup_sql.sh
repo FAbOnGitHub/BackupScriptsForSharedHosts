@@ -73,10 +73,12 @@ function dumpBase()
     export MYSQL_PWD="$pass"
 
     if [ "x$5" != "x" ]; then
+        # Présence de table à exclure ou traiter séparément
         shift; shift; shift; shift; #drop $1 $2 $3 $4 for $@
         for table in $@
         do
             taskCount
+            # On cumule une liste d'exclusion, on essaie de dumper ces tables d'abord.
             exclude="$exclude --ignore-table=${base}.${table}"
             name=${base}.${table}
             ## Attention au -n pour pas créer de DB
@@ -85,17 +87,18 @@ function dumpBase()
             res=$?
             if [ $res -eq 0 ]; then
                 taskOk
-                fileLogger "$ok $L_DUMP $base $table"
+                fileLogger "$ok $L_DUMP special table=$table in $base"
                 do_moveXferZone "$BAK_DIR/${name}.sql"
             else
                 taskWarn
-                fileLogger "$WARN $L_DUMP $srv/$base/$table (rc=$res)"
+                fileLogger "$WARN $L_DUMP failed $srv/$base/$table (rc=$res)"
                 #hasFailed #No it's an option
             fi
         done
 
     fi
 
+    # Finalement on essaie de dumper tout le reste de le BDD 
     # bug ! Fallait pas le -B
     mysqldump -h $srv -u $user $exclude -l $base \
         1>$BAK_DIR/$base.sql 2>>$ERR_FILE
@@ -105,7 +108,7 @@ function dumpBase()
         fileLogger "$ok $L_DUMP $base $table"
         do_moveXferZone "$BAK_DIR/$base.sql"
     else
-        fileLogger "$KO $L_DUMP $srv/$base/$table (rc=$res)"
+        fileLogger "$KO $L_DUMP $srv/$base/$table (rc=$res) $exclude"
         taskErr
         hasFailed
     fi

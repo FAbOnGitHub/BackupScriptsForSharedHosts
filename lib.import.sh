@@ -280,3 +280,12 @@ function checkDistantLogs()
     esac
     return $EXIT_SUCCESS
 }
+
+
+# Fait le ménage dans le dossier lts avec les paramètres suivants :
+# 
+function dir_clean_lts()
+{
+    # next : move main loop from import_clean_lts.sh here
+    todo_soon=
+}
