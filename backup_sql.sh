@@ -119,15 +119,32 @@ function dumpBase()
 ########
 
 cd $BAK_DIR
-debug "dumpBase $SQL_SERVER1,$SQL_BASE1,$SQL_USER1,$SQL_PASSWD1"
-dumpBase $SQL_SERVER1 $SQL_BASE1 $SQL_USER1 $SQL_PASSWD1 $SQL_TABLES1
 
+#debug "dumpBase $SQL_SERVER1,$SQL_BASE1,$SQL_USER1,$SQL_PASSWD1"
+#dumpBase $SQL_SERVER1 $SQL_BASE1 $SQL_USER1 $SQL_PASSWD1 $SQL_TABLES1
 
+for i in $(seq 1 32);
+do
+    name="SQL_SERVER$i"
+    sql_serverI=${!name}
 
-# 2016-05-29 Sur la demande d'olivier
-#debug "dumpBase $SQL_SERVER2,$SQL_BASE2,$SQL_USER2,$SQL_PASSWD2"
-#dumpBase $SQL_SERVER2 $SQL_BASE2 $SQL_USER2 $SQL_PASSWD2
+    if [ "x$sql_serverI" = "x" ]; then
+        break
+    fi
+    name="SQL_BASE$i"
+    sql_baseI=${!name}
+    name="SQL_USER$i"
+    sql_userI=${!name}
+    name="SQL_PASSWD$i"
+    sql_passwdI=${!name}
+    name="SQL_STABLES$i"
+    sql_tablesI=${!name}   
+    debug "dumpBase $SQL_SERVER1,$SQL_BASE1,$SQL_USER1,$SQL_PASSWD1"
+    dumpBase $sql_serverI $sql_baseI $sql_userI $sql_passwdI $sql_tablesI
 
+done
+
+    
 
 taskReportStatus
 sReport="$_taskReportLabel DB saved (by $ME)"
