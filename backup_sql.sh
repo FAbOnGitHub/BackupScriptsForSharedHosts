@@ -105,10 +105,10 @@ function dumpBase()
     res=$?
     if [ $res -eq 0 ]; then
         taskOk
-        fileLogger "$ok $L_DUMP $base $table"
+        fileLogger "$ok $L_DUMP $base (other tables)"
         do_moveXferZone "$BAK_DIR/$base.sql"
     else
-        fileLogger "$KO $L_DUMP $srv/$base/$table (rc=$res) $exclude"
+        fileLogger "$KO $L_DUMP $srv all $base (rc=$res) $exclude"
         taskErr
         hasFailed
     fi
