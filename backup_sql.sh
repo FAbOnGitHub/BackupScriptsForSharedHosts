@@ -129,6 +129,7 @@ do
     sql_serverI=${!name}
 
     if [ "x$sql_serverI" = "x" ]; then
+        fileLogger "$INFO $L_DUMP no more dabase as $name. Stop"
         break
     fi
     name="SQL_BASE$i"
@@ -137,7 +138,7 @@ do
     sql_userI=${!name}
     name="SQL_PASSWD$i"
     sql_passwdI=${!name}
-    name="SQL_STABLES$i"
+    name="SQL_TABLES$i"
     sql_tablesI=${!name}   
     debug "dumpBase $SQL_SERVER1,$SQL_BASE1,$SQL_USER1,$SQL_PASSWD1"
     dumpBase $sql_serverI $sql_baseI $sql_userI $sql_passwdI $sql_tablesI
