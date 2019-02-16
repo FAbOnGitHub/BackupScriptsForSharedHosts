@@ -45,7 +45,7 @@ function dumpBase()
     pass=$4
     exclude=''
 
-    rm -f $BAK_DIR/$base.sql*
+    rm -f "$BAK_DIR/$base".sql*
     if [ "x$srv" = "x" ]; then
         fileLogger "$KO $0 : pas de serveur indiqué... abandon"
         taskErr
@@ -70,7 +70,12 @@ function dumpBase()
         taskErr
         return 1
     fi
-    export MYSQL_PWD="$pass"
+    #export MYSQL_PWD="$MYSQL_PASS"  #better than '-p$MYSQL_PASS' but not enough
+    MYSQL_SESAME=
+    mysql_prepare_connexion "$srv" "$user" "$pass"
+
+    
+    #export MYSQL_PWD="$pass"
 
     if [ "x$5" != "x" ]; then
         # Présence de table à exclure ou traiter séparément
@@ -82,12 +87,13 @@ function dumpBase()
             exclude="$exclude --ignore-table=${base}.${table}"
             name=${base}.${table}
             ## Attention au -n pour pas créer de DB
-            mysqldump -h $srv -u $user -l -n $base $table \
-                1>"$BAK_DIR/${name}.sql" 2>>$ERR_FILE
+            mysqldump --defaults-file="$MYSQL_SESAME" "$mysql_opt" -l -n "$base" "$table" \
+                1>"$BAK_DIR/${name}.sql" 2>>"$ERR_FILE"
             res=$?
             if [ $res -eq 0 ]; then
                 taskOk
-                fileLogger "$ok $L_DUMP special table=$table in $base"
+                sz="$(du -sh "$$BAK_DIR/${name}.sql")"
+                fileLogger "$ok $L_DUMP special table=$table in $base ($sz)"
                 do_moveXferZone "$BAK_DIR/${name}.sql"
             else
                 taskWarn
@@ -100,12 +106,13 @@ function dumpBase()
 
     # Finalement on essaie de dumper tout le reste de le BDD 
     # bug ! Fallait pas le -B
-    mysqldump -h $srv -u $user $exclude -l $base \
-        1>$BAK_DIR/$base.sql 2>>$ERR_FILE
+    mysqldump --defaults-file="$MYSQL_SESAME" "$mysql_opt" "$exclude" -l "$base" \
+        1>"$BAK_DIR/$base.sql" 2>>"$ERR_FILE"
     res=$?
     if [ $res -eq 0 ]; then
         taskOk
-        fileLogger "$ok $L_DUMP $base (other tables)"
+        sz="$(du -sh "$$BAK_DIR/${base}.sql")"
+        fileLogger "$ok $L_DUMP $base (other tables, $sz)"
         do_moveXferZone "$BAK_DIR/$base.sql"
     else
         fileLogger "$KO $L_DUMP $srv all $base (rc=$res) $exclude"
@@ -118,10 +125,13 @@ function dumpBase()
 # Main
 ########
 
-cd $BAK_DIR
+cd "$BAK_DIR"
 
 #debug "dumpBase $SQL_SERVER1,$SQL_BASE1,$SQL_USER1,$SQL_PASSWD1"
 #dumpBase $SQL_SERVER1 $SQL_BASE1 $SQL_USER1 $SQL_PASSWD1 $SQL_TABLES1
+
+mysql_opt="--routines --triggers --comments --dump-date --extended-insert "
+mysql_opt="$mysql_opt --quick -C --set-charset"
 
 for i in $(seq 1 32);
 do
@@ -142,12 +152,12 @@ do
     name="SQL_TABLES$i"
     sql_tablesI=${!name}   
     debug "dumpBase $SQL_SERVER1,$SQL_BASE1,$SQL_USER1,$SQL_PASSWD1"
-    dumpBase $sql_serverI $sql_baseI $sql_userI $sql_passwdI $sql_tablesI
+    dumpBase "$sql_serverI" "$sql_baseI" "$sql_userI" "$sql_passwdI" "$sql_tablesI"
 
 done
 
     
-
+mysql_clean_up
 taskReportStatus
 sReport="$_taskReportLabel DB saved (by $ME)"
 logStop "$sReport"

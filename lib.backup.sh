@@ -753,6 +753,32 @@ function do_cypher_gpg_s()
     #mv "$f".gpg "$f".X
 }
 
+MYSQL_SESAME=
+function mysql_prepare_connexion()
+{
+    [ "x$1" = "x" ] && die "$KO \$MYSQL_HOST is empty"
+    [ "x$2" = "x" ] && die "$KO \$MYSQL_USER is empty"
+    [ "x$3" = "x" ] && die "$KO \$MYSQL_PASS is empty"
+
+    f=$(mktemp $BAK_DIR/sesame.XXXXXXXX.cnf)
+    chmod 600 "$f"
+    echo "
+[client]
+host=$1
+user=$2
+password=$3
+" > $f    
+    export $(mysql --defaults-file="$f" --help|\
+                 awk '/^max-allowed-packet/ {print "max_allowed_packet=" $2} ')
+    echo "max_allowed_packet=$max_allowed_packet" >> "$f"
+    echo "net_buffer_length=max_allowed_packet" >> "$f"
+
+    MYSQL_SESAME="$f"
+}
+function mysql_clean_up()
+{
+    rm -f "$MYSQL_SESAME"
+}
 
 #
 #  do_moveXferZone: cette fonction prend un fichier et va le déposer dans
