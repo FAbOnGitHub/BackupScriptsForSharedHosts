@@ -87,7 +87,7 @@ function dumpBase()
             exclude="$exclude --ignore-table=${base}.${table}"
             name=${base}.${table}
             ## Attention au -n pour pas créer de DB
-            mysqldump --defaults-file="$MYSQL_SESAME" "$mysql_opt" -l -n "$base" "$table" \
+            mysqldump --defaults-file="$MYSQL_SESAME" $mysql_opt -l -n "$base" "$table" \
                 1>"$BAK_DIR/${name}.sql" 2>>"$ERR_FILE"
             res=$?
             if [ $res -eq 0 ]; then
@@ -106,7 +106,7 @@ function dumpBase()
 
     # Finalement on essaie de dumper tout le reste de le BDD 
     # bug ! Fallait pas le -B
-    mysqldump --defaults-file="$MYSQL_SESAME" "$mysql_opt" "$exclude" -l "$base" \
+    mysqldump --defaults-file="$MYSQL_SESAME" $mysql_opt "$exclude" -l "$base" \
         1>"$BAK_DIR/$base.sql" 2>>"$ERR_FILE"
     res=$?
     if [ $res -eq 0 ]; then
