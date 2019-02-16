@@ -771,7 +771,7 @@ password=$3
     export $(mysql --defaults-file="$f" --help|\
                  awk '/^max-allowed-packet/ {print "max_allowed_packet=" $2} ')
     echo "max_allowed_packet=$max_allowed_packet" >> "$f"
-    echo "net_buffer_length=max_allowed_packet" >> "$f"
+    echo "net_buffer_length=$max_allowed_packet" >> "$f"
 
     MYSQL_SESAME="$f"
 }
