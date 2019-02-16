@@ -115,7 +115,7 @@ do
         taskErr
         continue
     else
-        size="$(du -sh "$dumpfile")"
+        size="$(du -sh "$dumpfile" | awk '{print $1 " " $2}')"
         fileLogger "$ok '$db' dumped @${date}, $size"
         taskOk
         let iNbTargetOk+=$iCountThisOne
