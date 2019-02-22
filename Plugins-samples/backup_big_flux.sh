@@ -193,7 +193,7 @@ do
     echo "$borne_min < X < $borne_max (max_id=$max_id) $sWhere"
 
     dumpBase "$SQL_SERVER1" "$SQL_BASE1" "$SQL_USER1" "$SQL_PASSWD1" \
-             "$table" "$sWhere" "$borne_min"
+             "$TABLE" "$sWhere" "$borne_min"
 
     borne_min=$borne_max
 done
