@@ -136,6 +136,11 @@ function dumpBase()
     MYSQL_SESAME=
     mysql_prepare_connexion "$srv" "$user" "$pass"
 
+    if [ "$borne" != "0" ]; then
+        # --no-create-info, -t
+        mysql_opt="$mysql_opt -t"
+    fi
+    
     name=${base}.${table}
     ## Attention au -n pour pas créer de DB
     mysqldump --defaults-file="$MYSQL_SESAME" $mysql_opt -l -n "$base" "$table" \
@@ -201,7 +206,7 @@ do
 done
 
  cd $BAK_DIR
-ARCHIVE_FILE="$BAK_DIR/${hostname}.${SQL_BASE1}.multiparts.tgz"
+ARCHIVE_FILE="$BAK_DIR/${SQL_BASE1}.${TABLE}.multiparts.tgz"
 rm -f "$ARCHIVE_FILE"
 tar zcf "$ARCHIVE_FILE" "$D_DUMP_FLUX" 2>>$ERR_FILE
 rc=$?
@@ -226,8 +231,7 @@ fi
 
 # Cleaning
 rm -rf "$D_DUMP_FLUX"
-rm -rf "$MYSQL_SESAME"
-
+mysql_clean_up
 ### Reporting
 
 taskReportStatus
