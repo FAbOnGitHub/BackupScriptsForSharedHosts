@@ -184,8 +184,8 @@ borne_max=
 # WHERE id > $borne_min AND id <= $borne_max
 bLoop=1
 while [[ $bLoop -eq 1 ]];
-do
-    sWhere="WHERE id > $borne_min "
+do    
+    sWhere=" id > $borne_min "  # 'WHERE' is auto added
     let borne_max=$borne_min+$interval
     if [[ $borne_max -le $max_id ]]; then
         sWhere="$sWhere AND id <= $borne_max"
