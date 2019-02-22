@@ -40,7 +40,8 @@
 \cd $(dirname $0); DIR=$PWD;
 #Resolving path
 cd ..
-lib="$(find $PWD -maxdepth 2 -name "lib.backup.sh" 2>/dev/null | head -1)"
+# Gottferdom $PWD ne fonctionne pas chez OVH
+lib="$(find . -maxdepth 2 -name "lib.backup.sh" 2>/dev/null | head -1)"
 if [ "x$lib" = "x" ]; then
     echo "Cannot find lib.backup.sh. Abort" 2>&1
     exit 1
