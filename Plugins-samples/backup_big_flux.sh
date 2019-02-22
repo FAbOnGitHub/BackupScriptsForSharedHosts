@@ -87,7 +87,7 @@ function dumpBase()
     where="$6"
     borne="$7"
 
-    dumpfile="$D_DUMP_FLUX/${base}_${table}_${borne}.sql"
+    dumpfile="$D_DUMP_FLUX/${base}.${table}.${borne}.sql"
     rm -f "$dumpfile"
     if [ "x$srv" = "x" ]; then
         fileLogger "$KO $0 : pas de serveur indiqué... abandon"
@@ -141,7 +141,6 @@ function dumpBase()
         mysql_opt="$mysql_opt -t"
     fi
     
-    name=${base}.${table}
     ## Attention au -n pour pas créer de DB
     mysqldump --defaults-file="$MYSQL_SESAME" $mysql_opt -l -n "$base" "$table" \
               -w "$where" 1>"$dumpfile" 2>>"$ERR_FILE"
@@ -149,7 +148,7 @@ function dumpBase()
     if [ $res -eq 0 ]; then
         taskOk
         sz="$(du -sh "$dumpfile"  | awk '{print $1 " " $2}')"
-        fileLogger "$ok $L_DUMP special table=$table / $borne in $base ($sz)"
+        fileLogger "$ok $L_DUMP special table=$table, $borne/$max_id in $base ($sz)"
     else
         taskWarn
         fileLogger "$WARN $L_DUMP failed $srv/$base/$table/$borne (rc=$res)"
@@ -197,8 +196,8 @@ do
     else
         bLoop=0
     fi
-    echo "$borne_min < X < $borne_max (max_id=$max_id) $sWhere"
-
+    #echo "$borne_min < X < $borne_max (max_id=$max_id) $sWhere"
+    
     dumpBase "$SQL_SERVER1" "$SQL_BASE1" "$SQL_USER1" "$SQL_PASSWD1" \
              "$TABLE" "$sWhere" "$borne_min"
 
