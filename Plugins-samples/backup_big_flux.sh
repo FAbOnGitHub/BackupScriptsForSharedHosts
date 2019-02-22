@@ -56,7 +56,8 @@ if [ ! -f $LIB_PATH/boot.sh ]; then
         echo "Cannot find cgi-bin/boot.sh" 2>&1
         exit 1
     else
-        .  cgi-bin/boot.sh 
+        LIB_PATH='cgi-bin'
+        .  $LIB_PATH/boot.sh 
     fi
 fi
 . $LIB_PATH/boot.sh
