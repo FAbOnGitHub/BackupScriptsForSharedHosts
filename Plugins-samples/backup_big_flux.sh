@@ -171,10 +171,13 @@ TABLE=${TABLE:-'pun_posts'}
 
 mkdir "$D_DUMP_FLUX"
 
+MYSQL_SESAME=
+mysql_prepare_connexion "$SQL_SRV1" "$SQL_USER1" "$SQL_PASSWD1"
 req_max="SELECT MAX(id) FROM $TABLE"
-max_id=$(echo $req_max)
+max_id=$(echo $req_max| mysql --defaults-file="$MYSQL_SESAME")
 #max_id=514991
-
+echo "$max_id"
+exit 0
 borne_min=0
 interval=100000
 borne_max=
