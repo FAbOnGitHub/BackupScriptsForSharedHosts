@@ -57,7 +57,7 @@ if [ ! -f $LIB_PATH/boot.sh ]; then
         exit 1
     else
         LIB_PATH='cgi-bin'
-        .  $LIB_PATH/boot.sh 
+        .  $LIB_PATH/boot.sh
     fi
 fi
 . $LIB_PATH/boot.sh
@@ -176,8 +176,7 @@ mysql_prepare_connexion "$SQL_SERVER1" "$SQL_USER1" "$SQL_PASSWD1"
 req_max="SELECT MAX(id) FROM $TABLE"
 max_id=$(echo $req_max| mysql --defaults-file="$MYSQL_SESAME"|tail -1)
 #max_id=514991
-echo "$max_id"
-exit 0
+
 borne_min=0
 interval=100000
 borne_max=
@@ -225,8 +224,12 @@ else
 fi
 
 
+# Cleaning
+rm -rf "$D_DUMP_FLUX"
+rm -rf "$MYSQL_SESAME"
 
 ### Reporting
+
 taskReportStatus
 sReport="$_taskReportLabel backup_many_dir"
 logStop "$sReport"
