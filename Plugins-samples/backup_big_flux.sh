@@ -50,6 +50,10 @@ DIR="$(dirname $lib)"
 cd - >/dev/null
 ### Load library
 cd $DIR 2>/dev/null; export LIB_PATH=$PWD; cd - >/dev/null
+if [ ! -f $LIB_PATH/boot.sh ]; then
+    echo "Cannot find $LIB_PATH/boot.sh" 2>&1
+    exit 1
+fi
 . $LIB_PATH/boot.sh
 ### END OF AUTOLOAD
 ##############################################################################
@@ -154,7 +158,7 @@ ME=$(basename $0)
 ##
 trap at_exit EXIT
 
-radical=${$ME%.sh}
+radical=${ME%.sh}
 D=$(date +"%Y%m%d_%H%M%S")
 D_DUMP_FLUX="$BAK_DIR/${radical}_${D}"
 TABLE=${TABLE:-'pun_posts'}
