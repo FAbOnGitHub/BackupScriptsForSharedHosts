@@ -49,10 +49,15 @@ fi
 DIR="$(dirname $lib)"
 cd - >/dev/null
 ### Load library
-cd $DIR 2>/dev/null; export LIB_PATH=$PWD; cd - >/dev/null
+cd "$DIR" 2>/dev/null; export LIB_PATH="$PWD"; cd - >/dev/null
 if [ ! -f $LIB_PATH/boot.sh ]; then
     echo "Cannot find $LIB_PATH/boot.sh" 2>&1
-    exit 1
+    if [ ! -f cgi-bin/boot.sh ]; then
+        echo "Cannot find cgi-bin/boot.sh" 2>&1
+        exit 1
+    else
+        .  cgi-bin/boot.sh 
+    fi
 fi
 . $LIB_PATH/boot.sh
 ### END OF AUTOLOAD
