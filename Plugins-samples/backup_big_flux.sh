@@ -201,7 +201,7 @@ mysql_prepare_connexion "$SQL_SERVER1" "$SQL_USER1" "$SQL_PASSWD1"
 ###   Schema and routines
 ###
 taskCount
-schemafile="$D_DUMP_FLUX/${base}.schema.sql"
+schemafile="$D_DUMP_FLUX/${SQL_BASE1}.schema.sql"
 mysql_opt="$mysql_opt --quick -C --set-charset --comments --dump-date --extended-insert "
 
 mysql_opt_schema="$mysql_opt --routines --triggers"
@@ -232,8 +232,9 @@ declare -a allTables=( $(
                                                2>>"$ERR_FILE"
                        ) )
 
+debug "tables found = ${allTables[*]}"
 unset ${allTables[0]} # Remove colname
-debug "tables=${allTables[*]}"
+debug "tables filtered = ${allTables[*]}"
 for TABLE in ${allTables[*]}
 do
     req_max="SELECT MAX(id) FROM $TABLE"
