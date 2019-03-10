@@ -220,7 +220,7 @@ else
     #hasFailed #No it's an option
 fi
 
-
+DEBUG=1
 ##
 ##  Now looping on each table
 ##
