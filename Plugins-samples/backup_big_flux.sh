@@ -229,11 +229,10 @@ declare -a allTables=( $(
                            echo "$query" | mysql \
                                                --defaults-file="$MYSQL_SESAME" \
                                                "$base" \
+                                               sed -e "1 d" \
                                                2>>"$ERR_FILE"
                        ) )
 
-debug "tables found = ${allTables[*]}"
-unset ${allTables[0]} # Remove colname
 debug "tables filtered = ${allTables[*]}"
 echo "tables filtered = ${allTables[*]} MYSQL_SESAME=$MYSQL_SESAME"
 for TABLE in ${allTables[*]}
