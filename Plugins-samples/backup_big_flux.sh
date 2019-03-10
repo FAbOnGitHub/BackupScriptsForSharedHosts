@@ -150,11 +150,14 @@ function dumpBaseTable()
 
     if [ "$borne" != "0" ]; then
         # --no-create-info, -t
-        mysql_opt="$mysql_opt -t"
+        local_mysql_opt="$mysql_opt -t"
+    else
+        local_mysql_opt="$mysql_opt"
     fi
 
     ## Attention au -n pour pas créer de DB
-    mysqldump --defaults-file="$MYSQL_SESAME" $mysql_opt -l -n "$base" "$table" \
+    mysqldump --defaults-file="$MYSQL_SESAME" $local_mysql_opt -l -n \
+              "$base" "$table" \
               -w "$where" 1>"$dumpfile" 2>>"$ERR_FILE"
     res=$?
     if [ $res -eq 0 ]; then
