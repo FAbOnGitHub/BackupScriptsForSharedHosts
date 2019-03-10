@@ -783,6 +783,7 @@ password=$3
     echo "net_buffer_length=$max_allowed_packet" >> "$f"
 
     MYSQL_SESAME="$f"
+    debug "> MYSQL_SESAME=$f"
 }
 function mysql_clean_up()
 {
