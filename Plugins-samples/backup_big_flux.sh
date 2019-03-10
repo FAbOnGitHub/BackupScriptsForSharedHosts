@@ -254,7 +254,7 @@ do
         else
             bLoop=0
         fi
-        #echo "$borne_min < X < $borne_max (max_id=$max_id) $sWhere"
+        echo "$borne_min < X < $borne_max (max_id=$max_id) $sWhere"
 
         dumpBaseTable "$SQL_SERVER1" "$SQL_BASE1" "$SQL_USER1" "$SQL_PASSWD1" \
                       "$TABLE" "$sWhere" "$borne_min"
