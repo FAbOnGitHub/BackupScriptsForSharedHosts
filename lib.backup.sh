@@ -18,6 +18,9 @@ PRJ="RLBackup"
 # Variable pour les backups MySQL, les tables dont le nom commencent
 # par cette chaîne sont exclues de backup_mysql_full.sh
 MYSQL_DB_EXCLUDE_PREFIX=
+# Variable pour faire des dumps par lot de X lignes où X=SQL_DUMP_INTERVAL
+# 10000 est sûr mais peut-être customisé dans la conf
+SQL_DUMP_INTERVAL=100000
 
 ##
 # Compress et crypto variables

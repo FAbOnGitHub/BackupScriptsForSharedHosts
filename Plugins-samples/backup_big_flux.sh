@@ -98,7 +98,7 @@ function dumpBaseTable()
     where="$6"
     borne="$7"
 
-    dumpfile="$D_DUMP_FLUX/${base}.${table}.${borne}.sql"
+    dumpfile="$D_DUMP_FLUX/${base}.table.${table}.${borne}.sql"
     rm -f "$dumpfile"
     if [ "x$srv" = "x" ]; then
         fileLogger "$KO $0 : pas de serveur indiqué... abandon"
@@ -241,7 +241,7 @@ do
     #max_id=514991
 
     borne_min=0
-    interval=${INTERVAL:-100000}
+    interval=${SQL_DUMP_INTERVAL:-100000}
     borne_max=
 
     # WHERE id > $borne_min AND id <= $borne_max
@@ -270,9 +270,10 @@ done
 ####
 
 bMoveXferZoneAutoPurge=0 #debug
+bDoCompress=0  # On laisse faire tar
 
 cd "$BAK_DIR" || exit 2
-ARCHIVE_FILE="$BAK_DIR/fluxx.${SQL_BASE1}.multiparts.tgz"
+ARCHIVE_FILE="$BAK_DIR/flubb.${SQL_BASE1}.multiparts.tgz"
 rm -f "$ARCHIVE_FILE"
 tar zcf "$ARCHIVE_FILE" "$D_DUMP_FLUX" 2>>"$ERR_FILE"
 rc=$?
@@ -280,7 +281,6 @@ if [ $rc -eq 0 ]; then
     szArch="$(du --si -s "$ARCHIVE_FILE" | awk '{print $1}')"
     szDir="$(du --si -s "$d" | awk '{print $1}')"
     fileLogger "$ok $L_DUMP $ARCHIVE_FILE ($szDir->$szArch)"
-    bDoCompress=0
     do_moveXferZone "$ARCHIVE_FILE"
     rc=$?
     if [ $rc -eq $EXIT_SUCCESS ]; then
