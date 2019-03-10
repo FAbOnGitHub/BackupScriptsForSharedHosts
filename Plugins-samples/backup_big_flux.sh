@@ -148,15 +148,12 @@ function dumpBaseTable()
     # MYSQL_SESAME=
     # mysql_prepare_connexion "$srv" "$user" "$pass"
 
-    if [ "$borne" != "0" ]; then
-        # --no-create-info, -t
-        local_mysql_opt="$mysql_opt -t"
-    else
-        local_mysql_opt="$mysql_opt"
-    fi
+    # -n, --no-create-db       Suppress the CREATE DATABASE ...
+    # --no-create-info, -t     Don't write table creation info. 
+    mysql_opt_data="$mysql_opt -t -n -l"
 
     ## Attention au -n pour pas créer de DB
-    mysqldump --defaults-file="$MYSQL_SESAME" $local_mysql_opt -l -n \
+    mysqldump --defaults-file="$MYSQL_SESAME" $mysql_opt_data \
               "$base" "$table" \
               -w "$where" 1>"$dumpfile" 2>>"$ERR_FILE"
     res=$?
@@ -205,11 +202,12 @@ mysql_prepare_connexion "$SQL_SERVER1" "$SQL_USER1" "$SQL_PASSWD1"
 ###
 taskCount
 schemafile="$D_DUMP_FLUX/${base}.schema.sql"
-mysql_opt="--routines --triggers --comments --dump-date --extended-insert "
-mysql_opt="$mysql_opt --quick -C --set-charset"
+mysql_opt="$mysql_opt --quick -C --set-charset --comments --dump-date --extended-insert "
+
+mysql_opt_schema="$mysql_opt --routines --triggers"
 
 rm -rf "$schemafile"
-mysqldump --defaults-file="$MYSQL_SESAME" $mysql_opt -n --no-data "$base" \
+mysqldump --defaults-file="$MYSQL_SESAME" $mysql_opt_schema --no-data "$base" \
           1>"$schemafile" 2>>"$ERR_FILE"
 res=$?
 if [ $res -eq 0 ]; then
