@@ -41,7 +41,6 @@
 #  (À INCLURE) Chemin fichiers inclus, auto-ajustement
 cd "$(dirname "$0")" || exit 1
 DIR="$PWD";
-DIR_INI="$DIR"
 #Resolving path
 cd ..
 # Gottferdom $PWD ne fonctionne pas chez OVH
@@ -51,8 +50,7 @@ if [ "x$lib" = "x" ]; then
     exit 2
 fi
 DIR="$(dirname "$lib")"
-#cd - >/dev/null || exit 3
-cd "$DIR_INI"
+cd - >/dev/null || exit 3
 pwd
 ### Load library
 cd "$DIR" 2>/dev/null || exit 4;
