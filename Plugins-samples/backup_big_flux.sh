@@ -47,18 +47,18 @@ cd ..
 lib="$(find . -maxdepth 2 -name "lib.backup.sh" 2>/dev/null | head -1)"
 if [ "x$lib" = "x" ]; then
     echo "Cannot find lib.backup.sh. Abort" 2>&1
-    exit 1
+    exit 2
 fi
 DIR="$(dirname "$lib")"
-cd - >/dev/null || exit 2
+cd - >/dev/null || exit 3
 ### Load library
-cd "$DIR" 2>/dev/null || exit 2;
-export LIB_PATH="$PWD"; cd - >/dev/null || exit 2
+cd "$DIR" 2>/dev/null || exit 4;
+export LIB_PATH="$PWD"; cd - >/dev/null || exit 5
 if [ ! -f "$LIB_PATH/boot.sh" ]; then
     echo "Cannot find $LIB_PATH/boot.sh" 2>&1
     if [ ! -f cgi-bin/boot.sh ]; then
         echo "Cannot find cgi-bin/boot.sh" 2>&1
-        exit 1
+        exit 6
     else
         LIB_PATH='cgi-bin'
         .  "$LIB_PATH/boot.sh"
