@@ -235,6 +235,7 @@ declare -a allTables=( $(
                                                2>>"$ERR_FILE"
                        ) )
 
+unset ${allTables[0]} # Remove colname
 echo "tables=${allTables[*]}"
 for TABLE in ${allTables[*]}
 do
