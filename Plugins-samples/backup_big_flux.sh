@@ -50,12 +50,13 @@ if [ "x$lib" = "x" ]; then
     echo "Cannot find lib.backup.sh. Abort" 2>&1
     exit 2
 fi
-DIR="$(dirname "$lib")"
+DIR="$(dirname "$lib")"    # relative dir of lib.backup.sh
 cd - >/dev/null || exit 3  # go back in plugins dir
 pwd
 ### Load library
-cd "$DIR" 2>/dev/null || exit 4;
-export LIB_PATH="$PWD"; cd - >/dev/null || exit 5
+#cd "$DIR" 2>/dev/null || exit 4;
+export LIB_PATH="$PWD";
+#cd - >/dev/null || exit 5
 if [ ! -f "$LIB_PATH/boot.sh" ]; then
     echo "Cannot find $LIB_PATH/boot.sh" 2>&1
     if [ ! -f cgi-bin/boot.sh ]; then
@@ -67,6 +68,8 @@ if [ ! -f "$LIB_PATH/boot.sh" ]; then
     fi
 fi
 . "$LIB_PATH/boot.sh"
+cd "$DIR" 2>/dev/null || exit 4;
+
 ### END OF AUTOLOAD
 ##############################################################################
 
