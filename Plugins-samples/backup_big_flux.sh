@@ -42,7 +42,8 @@
 cd "$(dirname "$0")" || exit 1
 DIR="$PWD";
 #Resolving path
-cd ..
+cd ..  # one level up
+pwd
 # Gottferdom $PWD ne fonctionne pas chez OVH
 lib="$(find . -maxdepth 2 -name "lib.backup.sh" 2>/dev/null | head -1)"
 if [ "x$lib" = "x" ]; then
@@ -50,7 +51,7 @@ if [ "x$lib" = "x" ]; then
     exit 2
 fi
 DIR="$(dirname "$lib")"
-cd - >/dev/null || exit 3
+cd - >/dev/null || exit 3  # go back in plugins dir
 pwd
 ### Load library
 cd "$DIR" 2>/dev/null || exit 4;
