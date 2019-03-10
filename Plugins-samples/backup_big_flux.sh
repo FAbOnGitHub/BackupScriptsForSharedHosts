@@ -51,11 +51,12 @@ if [ "x$lib" = "x" ]; then
     exit 2
 fi
 LIB_DIR="$(dirname "$lib")"    # relative dir of lib.backup.sh
-cd - >/dev/null || exit 3  # go back in plugins dir
+#cd - >/dev/null || exit 3  # go back in plugins dir
 pwd
 ### Load library
 cd "$LIB_DIR" 2>/dev/null || exit 4;
 export LIB_PATH="$PWD";
+echo "fixing LIB_PATH to $LIB_PATH"
 cd - >/dev/null || exit 5 # Ini
 if [ ! -f "$LIB_PATH/boot.sh" ]; then
     echo "Cannot find $LIB_PATH/boot.sh" 2>&1
