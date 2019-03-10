@@ -40,7 +40,7 @@
 ###
 #  (À INCLURE) Chemin fichiers inclus, auto-ajustement
 cd "$(dirname "$0")" || exit 1
-DIR="$PWD";
+CUR_DIR="$PWD";
 #Resolving path
 cd ..  # one level up
 pwd
@@ -50,13 +50,13 @@ if [ "x$lib" = "x" ]; then
     echo "Cannot find lib.backup.sh. Abort" 2>&1
     exit 2
 fi
-DIR="$(dirname "$lib")"    # relative dir of lib.backup.sh
+LIB_DIR="$(dirname "$lib")"    # relative dir of lib.backup.sh
 cd - >/dev/null || exit 3  # go back in plugins dir
 pwd
 ### Load library
-#cd "$DIR" 2>/dev/null || exit 4;
+cd "$LIB_DIR" 2>/dev/null || exit 4;
 export LIB_PATH="$PWD";
-#cd - >/dev/null || exit 5
+cd - >/dev/null || exit 5 # Ini
 if [ ! -f "$LIB_PATH/boot.sh" ]; then
     echo "Cannot find $LIB_PATH/boot.sh" 2>&1
     if [ ! -f cgi-bin/boot.sh ]; then
@@ -68,7 +68,9 @@ if [ ! -f "$LIB_PATH/boot.sh" ]; then
     fi
 fi
 . "$LIB_PATH/boot.sh"
-cd "$DIR" 2>/dev/null || exit 4;
+#cd "$DIR" 2>/dev/null || exit 4;
+# where are we ?
+pwd
 
 ### END OF AUTOLOAD
 ##############################################################################
