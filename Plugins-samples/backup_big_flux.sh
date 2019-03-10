@@ -235,7 +235,7 @@ declare -a allTables=( $(
                                                2>>"$ERR_FILE"
                        ) )
 
-
+echo "tables=${allTables[*]}"
 for TABLE in ${allTables[*]}
 do
     borne_min=0
