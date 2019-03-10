@@ -229,7 +229,7 @@ declare -a allTables=( $(
                            echo "$query" | mysql \
                                                --defaults-file="$MYSQL_SESAME" \
                                                "$base" \
-                                               sed -e "1 d" \
+                                               | sed -e "1 d" \
                                                2>>"$ERR_FILE"
                        ) )
 
