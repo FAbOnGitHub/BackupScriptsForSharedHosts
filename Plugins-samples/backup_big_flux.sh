@@ -43,7 +43,7 @@ cd "$(dirname "$0")" || exit 1
 CUR_DIR="$PWD";
 #Resolving path
 cd ..  # one level up
-pwd
+#pwd
 # Gottferdom $PWD ne fonctionne pas chez OVH
 lib="$(find . -maxdepth 2 -name "lib.backup.sh" 2>/dev/null | head -1)"
 if [ "x$lib" = "x" ]; then
@@ -52,11 +52,11 @@ if [ "x$lib" = "x" ]; then
 fi
 LIB_DIR="$(dirname "$lib")"    # relative dir of lib.backup.sh
 #cd - >/dev/null || exit 3  # go back in plugins dir
-pwd
+#pwd
 ### Load library
 cd "$LIB_DIR" 2>/dev/null || exit 4;
 export LIB_PATH="$PWD";
-echo "fixing LIB_PATH to $LIB_PATH"
+#echo "fixing LIB_PATH to $LIB_PATH"
 cd - >/dev/null || exit 5 # Ini
 if [ ! -f "$LIB_PATH/boot.sh" ]; then
     echo "Cannot find $LIB_PATH/boot.sh" 2>&1
@@ -71,8 +71,7 @@ fi
 . "$LIB_PATH/boot.sh"
 #cd "$DIR" 2>/dev/null || exit 4;
 # where are we ?
-pwd
-exit
+
 ### END OF AUTOLOAD
 ##############################################################################
 
