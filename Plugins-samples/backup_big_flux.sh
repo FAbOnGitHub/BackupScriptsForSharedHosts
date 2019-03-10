@@ -196,9 +196,6 @@ SQL_BASE1="$SQL_FLUX_BASE1"
 # Prepare secure MySQL connexion
 MYSQL_SESAME=
 mysql_prepare_connexion "$SQL_SERVER1" "$SQL_USER1" "$SQL_PASSWD1"
-req_max="SELECT MAX(id) FROM $TABLE"
-max_id=$(echo $req_max| mysql --defaults-file="$MYSQL_SESAME"|tail -1)
-#max_id=514991
 
 ###
 ###   Schema and routines
@@ -239,6 +236,10 @@ unset ${allTables[0]} # Remove colname
 echo "tables=${allTables[*]}"
 for TABLE in ${allTables[*]}
 do
+    req_max="SELECT MAX(id) FROM $TABLE"
+    max_id=$(echo $req_max| mysql --defaults-file="$MYSQL_SESAME"|tail -1)
+    #max_id=514991
+
     borne_min=0
     interval=${INTERVAL:-100000}
     borne_max=
@@ -254,7 +255,7 @@ do
         else
             bLoop=0
         fi
-        echo "$borne_min < X < $borne_max (max_id=$max_id) $sWhere"
+        echo "$TABLE $borne_min < X < $borne_max (max_id=$max_id) $sWhere"
 
         dumpBaseTable "$SQL_SERVER1" "$SQL_BASE1" "$SQL_USER1" "$SQL_PASSWD1" \
                       "$TABLE" "$sWhere" "$borne_min"
