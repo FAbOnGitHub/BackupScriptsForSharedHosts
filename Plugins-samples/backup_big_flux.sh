@@ -143,10 +143,10 @@ function dumpBaseTable()
         return 1
     fi
 
-    #export MYSQL_PWD="$MYSQL_PASS"  #better than '-p$MYSQL_PASS' but not enough
-    # and a file is even better!
-    MYSQL_SESAME=
-    mysql_prepare_connexion "$srv" "$user" "$pass"
+    # #export MYSQL_PWD="$MYSQL_PASS"  #better than '-p$MYSQL_PASS' but not enough
+    # # and a file is even better!
+    # MYSQL_SESAME=
+    # mysql_prepare_connexion "$srv" "$user" "$pass"
 
     if [ "$borne" != "0" ]; then
         # --no-create-info, -t
@@ -224,7 +224,6 @@ fi
 ##  Now looping on each table
 ##
 query="SHOW TABLES;"
-
 declare -a allTables=( $(
                            echo "$query" | mysql \
                                                --defaults-file="$MYSQL_SESAME" \
@@ -233,7 +232,7 @@ declare -a allTables=( $(
                        ) )
 
 unset ${allTables[0]} # Remove colname
-echo "tables=${allTables[*]}"
+debug "tables=${allTables[*]}"
 for TABLE in ${allTables[*]}
 do
     req_max="SELECT MAX(id) FROM $TABLE"
@@ -255,7 +254,7 @@ do
         else
             bLoop=0
         fi
-        echo "$TABLE $borne_min < X < $borne_max (max_id=$max_id) $sWhere"
+        debug "$TABLE $borne_min < X < $borne_max (max_id=$max_id) $sWhere"
 
         dumpBaseTable "$SQL_SERVER1" "$SQL_BASE1" "$SQL_USER1" "$SQL_PASSWD1" \
                       "$TABLE" "$sWhere" "$borne_min"
@@ -268,6 +267,8 @@ done
 ####
 ####  Final step : packaging
 ####
+
+bMoveXferZoneAutoPurge=0 #debug
 
 cd "$BAK_DIR" || exit 2
 ARCHIVE_FILE="$BAK_DIR/fluxx.${SQL_BASE1}.multiparts.tgz"

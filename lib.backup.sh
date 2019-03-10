@@ -25,6 +25,12 @@ sCompressProg=/bin/gzip
 sCompressArgs='-9'
 sCypherProg=/usr/bin/gpg2
 sCypherArgs=
+
+##
+# moveXferZoneAutoPurge à 0permet de ne pas effacer les dumps non chiffrés
+#  *déconseillé* mais utile en débug
+bMoveXferZoneAutoPurge=1
+
 ##
 # Mail variables
 bUseMailWarning=1
@@ -817,7 +823,9 @@ function do_moveXferZone()
         rm -rf "$f"
         return $EXIT_FAILURE
     fi
-    rm -rf "$f"
+    if [ $bMoveXferZoneAutoPurge -ne 0 ]; then
+        rm -rf "$f"
+    fi
     F="$(basename "$X")"
     debug "[f=$f][X=$X][F=$F] $do_cypher_fct"
     debug "[BAK_DIR=$BAK_DIR][BAK_DIR_PUB=$BAK_DIR_PUB]"
