@@ -235,6 +235,7 @@ declare -a allTables=( $(
 debug "tables found = ${allTables[*]}"
 unset ${allTables[0]} # Remove colname
 debug "tables filtered = ${allTables[*]}"
+echo "tables filtered = ${allTables[*]}"
 for TABLE in ${allTables[*]}
 do
     req_max="SELECT MAX(id) FROM $TABLE"
