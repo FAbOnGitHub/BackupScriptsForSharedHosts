@@ -895,7 +895,7 @@ function readMetaData()
     dateFile="${META[*]}"
 
     if [ $DEBUG -eq 1 ]; then
-        echo "Metal = " ${META[*]}
+        echo "Meta: " ${META[*]}
         echo "csum: " $csumFile
         echo "size: " $sizeFile
         echo "date: " $epochFile

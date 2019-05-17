@@ -90,6 +90,7 @@ function dumpBase()
             mysqldump --defaults-file="$MYSQL_SESAME" $mysql_opt -l -n "$base" "$table" \
                 1>"$BAK_DIR/${name}.sql" 2>>"$ERR_FILE"
             res=$?
+            debug "mysqldump res=$res"
             if [ $res -eq 0 ]; then
                 taskOk
                 sz="$(du -sh "$BAK_DIR/${name}.sql"  | awk '{print $1 " " $2}')"
@@ -151,7 +152,7 @@ do
     sql_passwdI=${!name}
     name="SQL_TABLES$i"
     sql_tablesI=${!name}   
-    debug "dumpBase $SQL_SERVER1,$SQL_BASE1,$SQL_USER1,$SQL_PASSWD1"
+    debug "dumpBase $sql_serverI, $sql_baseI $sql_userI $sql_passwdI"
     dumpBase "$sql_serverI" "$sql_baseI" "$sql_userI" "$sql_passwdI" "$sql_tablesI"
 
 done
