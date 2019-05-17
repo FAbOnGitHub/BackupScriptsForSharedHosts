@@ -263,6 +263,11 @@ do
 
         borne_min=$borne_max
     done
+    ## Concat files into a single .sql
+    # "$D_DUMP_FLUX/${base}.table.${table}.${borne}.sql"
+    # cat $(ls -1 bornes|sort -n ) > table.sql
+    # rm bornes
+    
 done
              
 
