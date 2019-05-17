@@ -87,8 +87,9 @@ function dumpBase()
             exclude="$exclude --ignore-table=${base}.${table}"
             name=${base}.${table}
             ## Attention au -n pour pas créer de DB
-            mysqldump --defaults-file="$MYSQL_SESAME" $mysql_opt -l -n "$base" "$table" \
-                1>"$BAK_DIR/${name}.sql" 2>>"$ERR_FILE"
+            mysqldump --defaults-file="$MYSQL_SESAME" \
+                      $mysql_opt -l -n "$base" "$table" \
+                      1>"$BAK_DIR/${name}.sql" 2>>"$ERR_FILE"
             res=$?
             debug "mysqldump (excluded $table) res=$res"
             if [ $res -eq 0 ]; then
@@ -106,18 +107,20 @@ function dumpBase()
     fi
 
     # Finalement on essaie de dumper tout le reste de le BDD 
-    # bug ! Fallait pas le -B
-    mysqldump --defaults-file="$MYSQL_SESAME" $mysql_opt "$exclude" -l "$base" \
-        1>"$BAK_DIR/$base.sql" 2>>"$ERR_FILE"
+    # bug1 : Fallait pas le -B
+    # bug2 : il ne faut pas les quotes "$exclude"
+    mysqldump --defaults-file="$MYSQL_SESAME" \
+              $mysql_opt $exclude -l "$base" \
+              1>"$BAK_DIR/$base.sql" 2>>"$ERR_FILE"
     res=$?
-    debug "mysqldump (main) res=$res"
+    debug "mysqldump (main $base) res=$res"
     if [ $res -eq 0 ]; then
         taskOk
         sz="$(du -sh "$$BAK_DIR/${base}.sql" | awk '{print $1 " " $2}')"
         fileLogger "$ok $L_DUMP $base (other tables, $sz)"
         do_moveXferZone "$BAK_DIR/$base.sql"
     else
-        fileLogger "$KO $L_DUMP $srv all $base (rc=$res) $exclude"
+        fileLogger "$KO $L_DUMP $srv all $base (rc=$res) [exclusion:$exclude]"
         taskErr
         hasFailed
     fi
