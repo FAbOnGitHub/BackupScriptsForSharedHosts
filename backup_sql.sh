@@ -90,7 +90,7 @@ function dumpBase()
             mysqldump --defaults-file="$MYSQL_SESAME" $mysql_opt -l -n "$base" "$table" \
                 1>"$BAK_DIR/${name}.sql" 2>>"$ERR_FILE"
             res=$?
-            debug "mysqldump res=$res"
+            debug "mysqldump (excluded $table) res=$res"
             if [ $res -eq 0 ]; then
                 taskOk
                 sz="$(du -sh "$BAK_DIR/${name}.sql"  | awk '{print $1 " " $2}')"
@@ -110,6 +110,7 @@ function dumpBase()
     mysqldump --defaults-file="$MYSQL_SESAME" $mysql_opt "$exclude" -l "$base" \
         1>"$BAK_DIR/$base.sql" 2>>"$ERR_FILE"
     res=$?
+    debug "mysqldump (main) res=$res"
     if [ $res -eq 0 ]; then
         taskOk
         sz="$(du -sh "$$BAK_DIR/${base}.sql" | awk '{print $1 " " $2}')"
