@@ -816,12 +816,14 @@ function do_moveXferZone()
     sSize="$(du --si -s $f| awk '{print $1}' )"
     do_compress "$f"
     rc=$?
+    debug "do_compress rc=$rc"
     if [ $rc -eq $EXIT_SUCCESS ]; then
         f="$f_current"
     fi
 
     X="$(do_cypher "$f")"
     rc=$?
+    debug "do_cypher rc=$rc"
     if [ $rc -ne 0 ]; then
         error "ERROR cypher f='$f' (rc=$rc)"
         rm -rf "$f"
@@ -831,8 +833,8 @@ function do_moveXferZone()
         rm -rf "$f"
     fi
     F="$(basename "$X")"
-    debug "[f=$f][X=$X][F=$F] $do_cypher_fct"
-    debug "[BAK_DIR=$BAK_DIR][BAK_DIR_PUB=$BAK_DIR_PUB]"
+    debug " [f=$f][X=$X][F=$F] $do_cypher_fct"
+    debug " [BAK_DIR=$BAK_DIR][BAK_DIR_PUB=$BAK_DIR_PUB]"
 
     buffer=" $sSize->$(du --si -s "$X")"
     if [ "x$BAK_DIR" != "x$BAK_DIR_PUB" ]; then
