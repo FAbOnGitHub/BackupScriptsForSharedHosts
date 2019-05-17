@@ -87,6 +87,45 @@ function at_exit()
     exit $_iNbTaskErr
 }
 
+function old_main_loop()
+{
+for TABLE in ${allTables[*]}
+do
+    req_max="SELECT MAX(id) FROM $TABLE"
+    max_id=$(echo $req_max| mysql --defaults-file="$MYSQL_SESAME"|tail -1)
+    #max_id=514991
+
+    borne_min=0
+    interval=${SQL_DUMP_INTERVAL:-100000}
+    borne_max=
+
+    # WHERE id > $borne_min AND id <= $borne_max
+    bLoop=1
+    while [[ $bLoop -eq 1 ]];
+    do
+        sWhere=" id > $borne_min "  # 'WHERE' is auto added
+        let borne_max=$borne_min+$interval
+        if [[ $borne_max -le $max_id ]]; then
+            sWhere="$sWhere AND id <= $borne_max"
+        else
+            bLoop=0
+        fi
+        debug "$TABLE $borne_min < X < $borne_max (max_id=$max_id) $sWhere"
+
+        dumpBaseTable "$SQL_SERVER1" "$SQL_BASE1" "$SQL_USER1" "$SQL_PASSWD1" \
+                      "$TABLE" "$sWhere" "$borne_min"
+
+        borne_min=$borne_max
+    done
+    ## Concat files into a single .sql
+    # "$D_DUMP_FLUX/${base}.table.${table}.${borne}.sql"
+    # cat $(ls -1 bornes|sort -n ) > table.sql
+    # rm bornes
+
+done
+    
+}
+
 
 function dumpBaseTable()
 {
@@ -239,15 +278,26 @@ debug "tables filtered = ${allTables[*]}"
 echo "tables filtered = ${allTables[*]} MYSQL_SESAME=$MYSQL_SESAME"
 for TABLE in ${allTables[*]}
 do
+    #   req_max="SELECT count(*) FROM $TABLE"
     req_max="SELECT MAX(id) FROM $TABLE"
-    max_id=$(echo $req_max| mysql --defaults-file="$MYSQL_SESAME"|tail -1)
-    #max_id=514991
+    max_id=$(echo $req_max| mysql --defaults-file="$MYSQL_SESAME"|tail -1)  
+    
+#    case $TABLE in
+#        pun_config) key=conf_name ;;
+#        pun_forums_perm) key='group_id, forum_id' ;;
+#        pun_groups) key=g_id ;;
+#        pun_online) key=user_id ;;
+#        pun_topic_subscriptions) key='user_id, topic_id';;
+#        *) key='id';;
+#    esac
+        
 
     borne_min=0
     interval=${SQL_DUMP_INTERVAL:-100000}
     borne_max=
 
-    # WHERE id > $borne_min AND id <= $borne_max
+    # ORDER BY $key
+    # LIMIT $borne_min+1, $borne_max
     bLoop=1
     while [[ $bLoop -eq 1 ]];
     do

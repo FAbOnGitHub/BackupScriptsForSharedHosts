@@ -92,7 +92,7 @@ function dumpBase()
             res=$?
             if [ $res -eq 0 ]; then
                 taskOk
-                sz="$(du -sh "$$BAK_DIR/${name}.sql"  | awk '{print $1 " " $2}')"
+                sz="$(du -sh "$BAK_DIR/${name}.sql"  | awk '{print $1 " " $2}')"
                 fileLogger "$ok $L_DUMP special table=$table in $base ($sz)"
                 do_moveXferZone "$BAK_DIR/${name}.sql"
             else
