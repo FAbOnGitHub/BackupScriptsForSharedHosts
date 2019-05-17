@@ -33,6 +33,7 @@
 #  Project = FluxBB sauvegarde de grosses tables qui plantent chez OVH
 #    - On commence par sauvegarder le schéma et les procédures
 #    - Puis pour chacune des tables on essaie d'extraires les données par lots
+#      en fonction de l'id entre 2 bornes
 #
 ##############################################################################
 ###
@@ -149,7 +150,7 @@ function dumpBaseTable()
     # mysql_prepare_connexion "$srv" "$user" "$pass"
 
     # -n, --no-create-db       Suppress the CREATE DATABASE ...
-    # --no-create-info, -t     Don't write table creation info. 
+    # --no-create-info, -t     Don't write table creation info.
     mysql_opt_data="$mysql_opt -t -n -l"
 
     ## Attention au -n pour pas créer de DB
@@ -229,8 +230,9 @@ declare -a allTables=( $(
                            echo "$query" | mysql \
                                                --defaults-file="$MYSQL_SESAME" \
                                                "$base" \
-                                               | sed -e "1 d" \
-                                               2>>"$ERR_FILE"
+                               		       | sed -e "1 d" \
+		                               | grep -e '^pun_' \
+                                                      2>>"$ERR_FILE"
                        ) )
 
 debug "tables filtered = ${allTables[*]}"
@@ -267,9 +269,9 @@ do
     # "$D_DUMP_FLUX/${base}.table.${table}.${borne}.sql"
     # cat $(ls -1 bornes|sort -n ) > table.sql
     # rm bornes
-    
+
 done
-             
+
 
 ####
 ####  Final step : packaging
@@ -300,7 +302,7 @@ else
     fileLogger "$KO $L_DUMP $ARCHIVE_FILE (rc=$rc)"
 fi
 
-    
+
 
 
 # Cleaning
@@ -313,3 +315,31 @@ sReport="$_taskReportLabel backup_many_dir"
 logStop "$sReport"
 reportByMail "$sReport" "$ME"
 exit $_iNbTaskErr
+
+
+###
+# Discussions
+
+#  Attention ces tables n'ont pas de colonnes id :
+#  pun_config (conf_name)
+#  pun_forums_perm (group_id, forum_id)
+#  pun_groups (g_id)
+#  pun_online (None, user_id is unique)
+#  pun_topic_subscriptions (user_id, topic_id)
+
+#
+# On peut récupérer les colonnes auto-incréments avec
+# SELECT * FROM sys.`schema_auto_increment_columns` WHERE table_schema = 'test_randolegerforum'
+#
+# Mais certaines tables n'ont pas ça.
+#mysqldump: Couldn't execute 'SELECT /*!40001 SQL_NO_CACHE */ * FROM `poids_backup` WHERE  id > 0 ': Unknown column 'id' in 'where clause' (1054)
+#mysqldump: Couldn't execute 'SELECT /*!40001 SQL_NO_CACHE */ * FROM `poids_categories` WHERE  id > 0 ': Unknown column 'id' in 'where clause' (1054)
+#mysqldump: Couldn't execute 'SELECT /*!40001 SQL_NO_CACHE */ * FROM `poids_marques` WHERE  id > 0 ': Unknown column 'id' in 'where clause' (1054)
+#mysqldump: Couldn't execute 'SELECT /*!40001 SQL_NO_CACHE */ * FROM `poids_mat` WHERE  id > 0 ': Unknown column 'id' in 'where clause' (1054)
+#mysqldump: Couldn't execute 'SELECT /*!40001 SQL_NO_CACHE */ * FROM `pun_config` WHERE  id > 0 ': Unknown column 'id' in 'where clause' (1054)
+#mysqldump: Couldn't execute 'SELECT /*!40001 SQL_NO_CACHE */ * FROM `pun_forum_perms` WHERE  id > 0 ': Unknown column 'id' in 'where clause' (1054)
+#mysqldump: Couldn't execute 'SELECT /*!40001 SQL_NO_CACHE */ * FROM `pun_forum_subscriptions` WHERE  id > 0 ': Unknown column 'id' in 'where clause' (1054)
+#mysqldump: Couldn't execute 'SELECT /*!40001 SQL_NO_CACHE */ * FROM `pun_groups` WHERE  id > 0 ': Unknown column 'id' in 'where clause' (1054)
+#mysqldump: Couldn't execute 'SELECT /*!40001 SQL_NO_CACHE */ * FROM `pun_online` WHERE  id > 0 ': Unknown column 'id' in 'where clause' (1054)
+#mysqldump: Couldn't execute 'SELECT /*!40001 SQL_NO_CACHE */ * FROM `pun_search_matches` WHERE  id > 0 ': Unknown column 'id' in 'where clause' (1054)
+#mysqldump: Couldn't execute 'SELECT /*!40001 SQL_NO_CACHE */ * FROM `pun_topic_subscriptions` WHERE  id > 0 ': Unknown column 'id' in 'where clause' (1054)
