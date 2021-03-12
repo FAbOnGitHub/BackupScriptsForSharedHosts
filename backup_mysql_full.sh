@@ -39,9 +39,14 @@ ME=$0
 [ "x$MYSQL_USER" = "x" ] && die "$KO \$MYSQL_USER is empty"
 [ "x$MYSQL_PASS" = "x" ] && die "$KO \$MYSQL_PASS is empty"
 [ "x$MYSQL_HOST" = "x" ] && die "$KO \$MYSQL_HOST is empty"
+
+if [ "x$MYSQL_PORT" = "x" ]; then
+    MYSQL_PORT=3306
+fi
+
 #export MYSQL_PWD="$MYSQL_PASS"  #better than '-p$MYSQL_PASS' but not enough
 MYSQL_SESAME=
-mysql_prepare_connexion "$MYSQL_HOST" "$MYSQL_USER" "$MYSQL_PASS"
+mysql_prepare_connexion "$MYSQL_HOST" "$MYSQL_USER" "$MYSQL_PASS" "$MYSQL_PORT"
 
 bDoCompress=${bDoCompress:-1}
 bDoCompressAll=${bDoCompressAll:-1}

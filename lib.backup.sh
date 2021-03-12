@@ -768,6 +768,8 @@ function mysql_prepare_connexion()
     [ "x$1" = "x" ] && die "$KO \$MYSQL_HOST is empty"
     [ "x$2" = "x" ] && die "$KO \$MYSQL_USER is empty"
     [ "x$3" = "x" ] && die "$KO \$MYSQL_PASS is empty"
+    _port="$4"
+    [ "x$4" = "x" ] && _port=3306
 
     f=$(mktemp $BAK_DIR/sesame.XXXXXXXX.cnf)
     chmod 600 "$f"
@@ -776,6 +778,7 @@ function mysql_prepare_connexion()
 host=$1
 user=$2
 password=$3
+port=$_port
 " > $f    
     export $(mysql --defaults-file="$f" --help|\
                  awk '/^max-allowed-packet/ {print "max_allowed_packet=" $2} ')
