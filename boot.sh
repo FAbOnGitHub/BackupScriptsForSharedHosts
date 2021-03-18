@@ -61,6 +61,8 @@ BUG_WARN=4
 # BAK_DIR_PUB :	dossier où le serveur dépose les archives pour le client
 # BAK_DIR_CLI :	dossier où le client dépose les archives récupérées sur le serveur 
 # LTS_DIR     : dossier jamais effacé automatiquement
+export ARCHIVE_PREFIX=  
+export bFake=${bFake:-0}
 
 ME=$(basename $0)
 # Chargement des fonctions générales

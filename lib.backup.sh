@@ -600,6 +600,16 @@ function dayOfWeek()
 f_current=  # Nom du fichier manipulé. Permet de chaîner des foncions en y
             # plaçant la valeur du fichier produit
 
+function build_archive_prefix()
+{
+    h=$(hostname -s)
+    new="$h"
+    if [ "x$TASK_NAME" != "x" ]; then
+	new="${h}.${TASK_NAME}"
+    fi
+    ARCHIVE_PREFIX="$new"
+}
+
 
 # Compresse un fichier avec le paramètre kivabien
 function do_compress()
@@ -811,22 +821,11 @@ function do_moveXferZone()
         fileLogger "do_moveXferZone() : no argument"
         return $EXIT_FAILURE
     fi
-    if [ ! -f "$f" ]; then
-        fileLogger "do_moveXferZone() : missing file '$f'"
-        return $EXIT_FAILURE
-    fi
-
     if [ ! -f "$BAK_DIR_PUB/.htaccess" ]; then
         fileLogger "$KO $L_OFFER BAK_DIR_PUB <> .htaccess ! Abort."
         return $EXIT_FAILURE
     fi
-   
-    if [ "x$TASK_NAME" != "x" ]; then
-	new="${f}.${TASK_NAME}"
-	mv "$f" "$new"
-	f="$new"
-    fi
-    
+     
     sSize="$(du --si -s $f| awk '{print $1}' )"
     do_compress "$f"
     rc=$?

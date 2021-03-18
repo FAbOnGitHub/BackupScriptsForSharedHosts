@@ -54,8 +54,9 @@ bDoCypher=${bDoCypher:-0}
 bDoXfer=${bDoXfer:-0}
 
 date=$(date  +"%Y%m%d")
-h=$(hostname -s)
-DIR="$h.MySQL_complete"
+TASK_NAME=${TASK_NAME:-'mysql'}
+build_archive_prefix
+DIR="${ARCHIVE_PREFIX}.MySQL_complete"
 dir="$DIR.$date"
 
 MYSQL_DB_EXCLUDE_PREFIX=${MYSQL_DB_EXCLUDE_PREFIX:-""}
@@ -112,8 +113,13 @@ do
     dumpfile="${db}_${date}.sql"
 #    dumpfile="${db}.sql"
 
-    mysqldump --defaults-file="$MYSQL_SESAME" $MYSQL_OPT $sLock $mysql_opt ${db} >"$dumpfile" 2>>$ERR_FILE
-    rc=$?
+    if [ $bFake -eq 1 ]; then
+	echo "Ok fake $dumpfile $(date)" > "$dumpfile"
+	rc=0
+    else
+	mysqldump --defaults-file="$MYSQL_SESAME" $MYSQL_OPT $sLock $mysql_opt ${db} >"$dumpfile" 2>>$ERR_FILE
+	rc=$?
+    fi
     if [ $rc -ne $EXIT_SUCCESS ]; then
         fileLogger "$KO '$db' failed (rc=$rc)"
         let iNbTargetErr++
