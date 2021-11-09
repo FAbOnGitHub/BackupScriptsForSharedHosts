@@ -18,6 +18,9 @@ PRJ="RLBackup"
 # Variable pour les backups MySQL, les tables dont le nom commencent
 # par cette chaîne sont exclues de backup_mysql_full.sh
 MYSQL_DB_EXCLUDE_PREFIX=
+# Variable pour faire des dumps par lot de X lignes où X=SQL_DUMP_INTERVAL
+# 10000 est sûr mais peut-être customisé dans la conf
+SQL_DUMP_INTERVAL=100000
 
 ##
 # Compress et crypto variables
@@ -25,6 +28,12 @@ sCompressProg=/bin/gzip
 sCompressArgs='-9'
 sCypherProg=/usr/bin/gpg2
 sCypherArgs=
+
+##
+# moveXferZoneAutoPurge à 0permet de ne pas effacer les dumps non chiffrés
+#  *déconseillé* mais utile en débug
+bMoveXferZoneAutoPurge=1
+
 ##
 # Mail variables
 bUseMailWarning=1
@@ -591,6 +600,16 @@ function dayOfWeek()
 f_current=  # Nom du fichier manipulé. Permet de chaîner des foncions en y
             # plaçant la valeur du fichier produit
 
+function build_archive_prefix()
+{
+    h=$(hostname -s)
+    new="$h"
+    if [ "x$TASK_NAME" != "x" ]; then
+	new="${h}.${TASK_NAME}"
+    fi
+    ARCHIVE_PREFIX="$new"
+}
+
 
 # Compresse un fichier avec le paramètre kivabien
 function do_compress()
@@ -691,9 +710,9 @@ function init_cypher()
             sCypherArgs=
             return $EXIT_FAILURE
         fi
+	fileLogger "$WARN $sCypherProg not found ! using zip to cypher : WEAK !"
     fi
 
-    fileLogger "$WARN $sCypherProg not found ! using zip to cypher : WEAK !"
     bCypherInit=1
     return $EXIT_SUCCESS
 }
@@ -753,6 +772,36 @@ function do_cypher_gpg_s()
     #mv "$f".gpg "$f".X
 }
 
+MYSQL_SESAME=
+function mysql_prepare_connexion()
+{
+    [ "x$1" = "x" ] && die "$KO \$MYSQL_HOST is empty"
+    [ "x$2" = "x" ] && die "$KO \$MYSQL_USER is empty"
+    [ "x$3" = "x" ] && die "$KO \$MYSQL_PASS is empty"
+    _port="$4"
+    [ "x$4" = "x" ] && _port=3306
+
+    f=$(mktemp $BAK_DIR/sesame.XXXXXXXX.cnf)
+    chmod 600 "$f"
+    echo "
+[client]
+host=$1
+user=$2
+password=$3
+port=$_port
+" > $f    
+    export $(mysql --defaults-file="$f" --help|\
+                 awk '/^max-allowed-packet/ {print "max_allowed_packet=" $2} ')
+    echo "max_allowed_packet=$max_allowed_packet" >> "$f"
+    echo "net_buffer_length=$max_allowed_packet" >> "$f"
+
+    MYSQL_SESAME="$f"
+    debug "> MYSQL_SESAME=$f"
+}
+function mysql_clean_up()
+{
+    rm -f "$MYSQL_SESAME"
+}
 
 #
 #  do_moveXferZone: cette fonction prend un fichier et va le déposer dans
@@ -776,25 +825,29 @@ function do_moveXferZone()
         fileLogger "$KO $L_OFFER BAK_DIR_PUB <> .htaccess ! Abort."
         return $EXIT_FAILURE
     fi
-
+     
     sSize="$(du --si -s $f| awk '{print $1}' )"
     do_compress "$f"
     rc=$?
+    debug "do_compress rc=$rc"
     if [ $rc -eq $EXIT_SUCCESS ]; then
         f="$f_current"
     fi
 
     X="$(do_cypher "$f")"
     rc=$?
+    debug "do_cypher rc=$rc"
     if [ $rc -ne 0 ]; then
         error "ERROR cypher f='$f' (rc=$rc)"
         rm -rf "$f"
         return $EXIT_FAILURE
     fi
-    rm -rf "$f"
+    if [ $bMoveXferZoneAutoPurge -ne 0 ]; then
+        rm -rf "$f"
+    fi
     F="$(basename "$X")"
-    debug "[f=$f][X=$X][F=$F] $do_cypher_fct"
-    debug "[BAK_DIR=$BAK_DIR][BAK_DIR_PUB=$BAK_DIR_PUB]"
+    debug " [f=$f][X=$X][F=$F] $do_cypher_fct"
+    debug " [BAK_DIR=$BAK_DIR][BAK_DIR_PUB=$BAK_DIR_PUB]"
 
     buffer=" $sSize->$(du --si -s "$X")"
     if [ "x$BAK_DIR" != "x$BAK_DIR_PUB" ]; then
@@ -857,7 +910,7 @@ function readMetaData()
     dateFile="${META[*]}"
 
     if [ $DEBUG -eq 1 ]; then
-        echo "Metal = " ${META[*]}
+        echo "Meta: " ${META[*]}
         echo "csum: " $csumFile
         echo "size: " $sizeFile
         echo "date: " $epochFile

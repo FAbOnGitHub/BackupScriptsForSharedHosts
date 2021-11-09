@@ -22,7 +22,12 @@ TRUE=1
 # ###########################################################################
 #set -x
 DATE=$(date +"%Y%m%d-%H%M%S")
-GENERAL_SUCCESS=$EXIT_SUCCESS
+#GENERAL_SUCCESS=$EXIT_SUCCESS
+
+bLogsOnly=$FALSE
+if [ "x$1" = "--logs" ]; then
+    bLogsOnly=$TRUE
+fi
 
 # Délai de validité d'une archive téléchargée
 #let maxTime=3600*28
@@ -84,10 +89,20 @@ for raw_file in ${BAK_FILES[*]}; do
     SUCCESS=$TRUE
 
     ff=$DATE-$file
-    rm -f $BAK_DIR_CLI/$ff $BAK_DIR_CLI/$file.csum
+    rm -f "$BAK_DIR_CLI/$ff" "$BAK_DIR_CLI/$file.csum"
 
-    wgetFile $file
-    rc=$?
+    if [ $bLogsOnly = $TRUE ]; then
+        case $file in
+            *log.txt|*err.txt)
+                wgetFile "$file"
+                rc=$?   
+                ;;
+            *) I_just_want_logs="";;
+        esac
+    else
+        wgetFile "$file"
+        rc=$?   
+    fi
     if [ $rc -ne $EXIT_SUCCESS ]; then
         fileLogger "$KO wget file='$file' failed ($rc). Skip checks"
         hasFailed

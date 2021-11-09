@@ -90,12 +90,16 @@ if [ $bDoCompressAll -eq 1 ]; then
     do_compress_clean "$DIR".zip "$dir"
     rc_x=$?
     # $f_current est à jour
-
-    do_moveXferZone "$f_current"
-    rc=$?
-    taskAddAndStatus $rc
-    #rm -rf "$dir"
+    bundle="$f_current"
+else
+    bundle="$dir"
 fi
+
+do_moveXferZone "$bundle"
+rc=$?
+taskAddAndStatus $rc
+
+
 
 ### Reporting
 taskReportStatus

@@ -1,0 +1,68 @@
+* mysqldump
+
+** Troubles and considerations
+
+*** Security
+
+https://dev.mysql.com/doc/refman/5.7/en/password-security-user.html
+shell> mysql --defaults-file=/home/francis/mysql-opts
+--defaults-file=#
+
+
+*** Schema
+
+mysqldump does not dump the INFORMATION_SCHEMA, performance_schema, or sys
+schema by default. To dump any of these, name them explicitly on the command
+line. You can also name them with the --databases option. For
+INFORMATION_SCHEMA and performance_schema, also use the --skip-lock-tables
+option.  
+
+
+*** Error 2013 connection lost
+
+We have a lot of "error 2013 connection lost"
+
+**** Hint1 :
+
+ https://mnt-tech.fr/blog/trucs-et-astuces-mysql/
+ https://mnt-tech.fr/blog/do-it-quick-regler-lerreur-mysqldump-error-2013/
+ set global net_write_timeout = 28800;
+ set global net_read_timeout = 28800;
+  --> failed
+
+**** Hint2 :
+
+ https://dev.mysql.com/doc/refman/5.7/en/mysqldump.html#mysqldump-performance
+ To dump tables row by row, use the --quick (witch is the default)
+  -> --quick and --skip-quick both failed
+
+**** Hint3 : to explore
+
+ --max_allowed_packet: Maximum packet length to send to or receive from server
+ --net_buffer_length 	Buffer size for TCP/IP and socket communication
+ --log-error 	Append warnings and errors to named file
+ --force 	Continue even if an SQL error occurs during a table dump
+ --result-file 	Direct output to a given file
+ --where 	Dump only rows selected by given WHERE condition
+
+ -> failed max_allowed_packet=1024M; net_buffer_length=16777216;
+ -> failed set global net_read_timeout=3600; set global net_write_timeout=3600;
+ -> failed --force
+ -> failed --log-err  (like 2>& log.err)
+
+# max-allowed-packet                16777216
+# net-buffer-length                 1046528
+# max-allowed-packet                16777216
+# net-buffer-length                 1046528
+
+*** Template
+
+#+begin_src conf
+[client]
+host=
+user=
+password=
+database=_rl
+max_allowed_packet=1024M
+net_buffer_length=1024M
+#+end_src

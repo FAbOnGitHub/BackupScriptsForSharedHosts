@@ -25,6 +25,10 @@
 #
 ######################################################(FAb)###################
 
+## Considérations
+# Please have a lot at Docs/Difficulties/mysqldump*
+
+
 ME=$0
 
 #  (À INCLURE) Chemin fichiers inclus, auto-ajustement
@@ -35,29 +39,39 @@ ME=$0
 [ "x$MYSQL_USER" = "x" ] && die "$KO \$MYSQL_USER is empty"
 [ "x$MYSQL_PASS" = "x" ] && die "$KO \$MYSQL_PASS is empty"
 [ "x$MYSQL_HOST" = "x" ] && die "$KO \$MYSQL_HOST is empty"
-export MYSQL_PWD="$MYSQL_PASS"  #instead of '-p$MYSQL_PASS'
+
+if [ "x$MYSQL_PORT" = "x" ]; then
+    MYSQL_PORT=3306
+fi
+
+#export MYSQL_PWD="$MYSQL_PASS"  #better than '-p$MYSQL_PASS' but not enough
+MYSQL_SESAME=
+mysql_prepare_connexion "$MYSQL_HOST" "$MYSQL_USER" "$MYSQL_PASS" "$MYSQL_PORT"
+
 bDoCompress=${bDoCompress:-1}
 bDoCompressAll=${bDoCompressAll:-1}
 bDoCypher=${bDoCypher:-0}
 bDoXfer=${bDoXfer:-0}
 
 date=$(date  +"%Y%m%d")
-h=$(hostname -s)
-DIR="$h.MySQL_complete"
+TASK_NAME=${TASK_NAME:-'mysql'}
+build_archive_prefix
+DIR="${ARCHIVE_PREFIX}.MySQL_complete"
 dir="$DIR.$date"
 
 MYSQL_DB_EXCLUDE_PREFIX=${MYSQL_DB_EXCLUDE_PREFIX:-""}
 
 # Oups ! Désormais on sauvegarde tout, comme des pros !
-mysql_opt="--routines --triggers --comments --dump-date --extended-insert --set-charset"
+mysql_opt="--routines --triggers --comments --dump-date --extended-insert "
+mysql_opt="$mysql_opt --quick -C --set-charset"
 
 # 2 Get name of databases
 if [ "x$MYSQL_DB_EXCLUDE_PREFIX" = "x" ]; then
     declare -a aDB=( $(echo "SHOW DATABASES; " \
-        | mysql -u $MYSQL_USER -N ) )
+        | mysql --defaults-file="$MYSQL_SESAME" -N ) )
 else
     declare -a aDB=( $(echo "SHOW DATABASES; " \
-        | mysql -u $MYSQL_USER -N \
+        | mysql --defaults-file="$MYSQL_SESAME" -N \
         | grep -v -e "^$MYSQL_DB_EXCLUDE_PREFIX" ) )
 fi
 rc=$?
@@ -99,16 +113,21 @@ do
     dumpfile="${db}_${date}.sql"
 #    dumpfile="${db}.sql"
 
-    mysqldump -h $MYSQL_HOST -u $MYSQL_USER $MYSQL_OPT $sLock $mysql_opt ${db} >"$dumpfile" 2>>$ERR_FILE
-    rc=$?
+    if [ $bFake -eq 1 ]; then
+	echo "Ok fake $dumpfile $(date)" > "$dumpfile"
+	rc=0
+    else
+	mysqldump --defaults-file="$MYSQL_SESAME" $MYSQL_OPT $sLock $mysql_opt ${db} >"$dumpfile" 2>>$ERR_FILE
+	rc=$?
+    fi
     if [ $rc -ne $EXIT_SUCCESS ]; then
         fileLogger "$KO '$db' failed (rc=$rc)"
         let iNbTargetErr++
         taskErr
         continue
     else
-        size="$(du --si -s "$dumpfile")"
-        fileLogger "$ok '$db' dumped ${date} $size"
+        size="$(du -sh "$dumpfile" | awk '{print $1 " " $2}')"
+        fileLogger "$ok '$db' dumped @${date}, $size"
         taskOk
         let iNbTargetOk+=$iCountThisOne
     fi
@@ -123,14 +142,18 @@ if [ $bDoCompressAll -eq 1 ]; then
     do_compress_clean  "$DIR".zip "$dir"
     rc_x=$?
     # $f_current est à jour
-
-# 6 Move to xfer zone (option)
-    do_moveXferZone "$f_current"
-    rc=$?
-    taskAddAndStatus $rc
-    # rm -rf "$dir" # done by do_moveXferZone
+    bundle="$f_current"
+else
+    bundle="$dir"
 fi
 
+do_moveXferZone "$bundle"
+rc=$?
+taskAddAndStatus $rc
+# rm -rf "$dir" # done by do_moveXferZone
+
+
+mysql_clean_up
 ### Reporting
 taskReportStatus
 sReport="$_taskReportLabel DB saved "
