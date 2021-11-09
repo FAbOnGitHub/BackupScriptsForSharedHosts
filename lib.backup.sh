@@ -710,9 +710,9 @@ function init_cypher()
             sCypherArgs=
             return $EXIT_FAILURE
         fi
+	fileLogger "$WARN $sCypherProg not found ! using zip to cypher : WEAK !"
     fi
 
-    fileLogger "$WARN $sCypherProg not found ! using zip to cypher : WEAK !"
     bCypherInit=1
     return $EXIT_SUCCESS
 }
